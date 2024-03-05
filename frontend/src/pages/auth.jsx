@@ -1,13 +1,45 @@
-import {Button, Checkbox, Form, Input, Space, Typography} from 'antd';
-
-const onFinish = (values) => {
-    console.log('Success:', values);
-}
-const onFinishFailed = () => {
-    console.log('Authentication Failed!');
-}
+import {Button, Form, Input, notification, Space, Typography} from 'antd';
+import {useNavigate} from "react-router-dom";
 
 export default function Auth() {
+    const apiUrl = import.meta.env.VITE_API_URL;
+    const navigate = useNavigate();
+
+    const [api, contextHolder] = notification.useNotification();
+    const showAlert = (msg) => {
+        api.error({
+            message: msg,
+            placement: 'topRight'
+        })
+    }
+
+    const onFinish = (values) => {
+        let formData = new FormData();
+        formData.append('username', values.username);
+        formData.append('password', values.password);
+
+        fetch(apiUrl + '/auth/token', {
+            method: 'POST',
+            body: formData,
+        })
+            .then(response => {
+                if (!response.ok) throw new Error('Неверный логин или пароль');
+                response.json()
+                    .then(data => {
+                        localStorage.setItem('token', data.access_token);
+                        localStorage.setItem('refreshToken', data.refresh_token);
+                        window.location.reload()
+                    })
+            })
+            .catch((error) => {
+                showAlert(error.message)
+            });
+    };
+
+    const onFinishFailed = () => {
+        console.log('Authentication Failed!');
+    }
+
     const pageStyle = {
         justifyContent: "center",
         width: '100%',
@@ -16,6 +48,7 @@ export default function Auth() {
 
     return (
         <Space style={pageStyle} direction="vertical" align="center" size="small">
+            {contextHolder}
             <Typography.Title>LDAP Authentication</Typography.Title>
             <Form
                 name="auth"
@@ -39,7 +72,7 @@ export default function Auth() {
             >
                 <Form.Item
                     label="Логин"
-                    name="login"
+                    name="username"
                     rules={[
                         {
                             required: true,
@@ -63,13 +96,6 @@ export default function Auth() {
                     <Input.Password/>
                 </Form.Item>
 
-                <Form.Item
-                    name="remember"
-                    valuePropName="checked"
-                >
-                    <Checkbox>Запомнить меня</Checkbox>
-                </Form.Item>
-
                 <Form.Item>
                     <Button type="primary" htmlType="submit">
                         Войти
@@ -77,5 +103,6 @@ export default function Auth() {
                 </Form.Item>
             </Form>
         </Space>
+
     )
 }
