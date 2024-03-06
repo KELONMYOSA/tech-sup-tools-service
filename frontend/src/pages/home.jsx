@@ -1,7 +1,9 @@
-import {Layout, Typography} from "antd";
+import {Col, Layout, Row, Typography} from "antd";
 import {Content, Header} from "antd/es/layout/layout.js";
 import Navbar from "../components/navbar.jsx";
 import useWindowSize from "../utils/useWindowSize.js";
+import Search from "antd/es/input/Search.js";
+import {PhoneOutlined} from "@ant-design/icons";
 
 export default function Home(data) {
     const isMobile = useWindowSize().width < 600
@@ -14,11 +16,20 @@ export default function Home(data) {
                         <Typography.Title level={3}>Техническая поддержка</Typography.Title>
                     </div>
                 }
-
                 <Navbar userData={data.userData}/>
             </Header>
             <Content>
-                <p>Test</p>
+                <Row>
+                    <Col flex={1} style={{padding: 8}}>
+                        <Search size="large" addonBefore={<PhoneOutlined/>} placeholder="Номер телефона" enterButton />
+                    </Col>
+                    <Col flex={1} style={{padding: 8}}>
+
+                    </Col>
+                    <Col flex={1} style={{padding: 8}}>
+
+                    </Col>
+                </Row>
             </Content>
         </Layout>
     )
