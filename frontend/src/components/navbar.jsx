@@ -33,6 +33,111 @@ export default function Navbar(data) {
                         </a>
                     )
                 },
+                {
+                    label: (
+                        <a href='https://tools.comfortel.pro/wifi/authlog.php' target="_blank">
+                            Wi-Fi auth log
+                        </a>
+                    )
+                },
+                {
+                    label: (
+                        <a href='https://tools.comfortel.pro/as/aes/vlans2' target="_blank">
+                            Выгрузки услуг из биллинга по id-услуг или id-vlan
+                        </a>
+                    )
+                },
+                {
+                    label: (
+                        <a href='https://tools.comfortel.pro/ipmac2/' target="_blank">
+                            Поиск маков, история на портах
+                        </a>
+                    )
+                },
+                {
+                    label: (
+                        <a href='http://nfsen.comfortel.pro/' target="_blank">
+                            Web-ка для просмотра Netflow
+                        </a>
+                    )
+                },
+                {
+                    label: (
+                        <a href='http://antifraud.voip.comfortel.pro:8092/' target="_blank">
+                            Антифрод voip
+                        </a>
+                    )
+                },
+                {
+                    label: (
+                        <a href='http://lg.comfortel.pro/' target="_blank">
+                            Комфортеловский Looking Glass
+                        </a>
+                    )
+                },
+                {
+                    label: (
+                        <a href='https://calendar.google.com/calendar/u/0?cid=am5qdDNuYnBpcmN2cTdrZWhvNXZlNTluaXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ' target="_blank">
+                            Календарь - Плановые и Аварийные работы
+                        </a>
+                    )
+                },
+                {
+                    label: (
+                        <a href='https://docs.google.com/spreadsheets/d/1Ze9IVWfpOY9zoayJV4M5tghJtLgObXEGzB-ohcSTybc/edit#gid=441148252' target="_blank">
+                            График дежурств
+                        </a>
+                    )
+                },
+                {
+                    label: (
+                        <a href='https://docs.google.com/spreadsheets/d/1QEbpKjR5IVQpOQlXH-AtSXBLLXbXPtDLVNlgA0HiQ5w/edit?usp=sharing' target="_blank">
+                            Сводный документ по работам в техарбайтунге
+                        </a>
+                    )
+                },
+                {
+                    label: (
+                        <a href='https://nextcloud.comfortel.pro' target="_blank">
+                            Nextcloud
+                        </a>
+                    )
+                },
+                {
+                    label: (
+                        <a href='https://geo.roing.com/portal/home/webmap/viewer.html?webmap=b19ca4e386714f558f1a3eee2c0a6475' target="_blank">
+                            Карта
+                        </a>
+                    )
+                },
+                {
+                    label: (
+                        <a href='https://rosseti-lenenergo.ru/planned_work/' target="_blank">
+                            Работы ЛенЭнерго СБП
+                        </a>
+                    )
+                },
+                {
+                    label: (
+                        <a href='https://rossetimr.ru/client/disconnection/#tab-planovie-otkluchenia' target="_blank">
+                            Работы Россети МСК
+                        </a>
+                    )
+                },
+                {
+                    label: (
+                        <a href='https://zbxweb.comfortel.pro' target="_blank">
+                            Zabbix
+                        </a>
+                    )
+                },
+                {
+                    label: (
+                        <a href='https://wiki.comfortel.pro/' target="_blank">
+                            CMFT WIKI
+                        </a>
+                    )
+                },
             ]
         }
     ]
@@ -47,6 +152,7 @@ export default function Navbar(data) {
 
     return <Menu
         onClick={onClick}
+        selectable={false}
         mode="horizontal"
         style={{height: '100%', width: '100%', alignItems: 'center', justifyContent: 'end'}}
         items={items}
