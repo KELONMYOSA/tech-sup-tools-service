@@ -13,8 +13,10 @@ def get_service_by_id(service_id: int) -> tuple[bool, str] | tuple[bool, dict]:
     return True, srv.get_tech_info()
 
 
-def get_services_by_company_id(company_id: int) -> dict:
+def get_services_by_company_id(company_id: int) -> dict | None:
     company = CompanyModel().search_by_id(company_id)
+    if not company:
+        return None
     active = []
     disabled = []
     for service in company.services:
@@ -22,7 +24,7 @@ def get_services_by_company_id(company_id: int) -> dict:
         if srv.is_delete and srv.is_delete == "Y":
             continue
         if srv.status_id and srv.status_id in (727, 1454, 8316, 1228):
-            active.append(srv.get_tech_info())
+            active.append(srv.get_brief_info())
         else:
             disabled.append(srv.get_tech_info())
     return {"active": active, "disabled": disabled}

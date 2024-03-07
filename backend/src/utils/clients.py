@@ -16,3 +16,11 @@ def get_company_by_id(company_id: int) -> dict | None:
         return search.get_info()
     else:
         return None
+
+
+def get_contacts_by_company_id(company_id: int) -> list[dict] | None:
+    search = CompanyModel().search_by_id(company_id)
+    if search:
+        return search.get_contacts()
+    else:
+        return None

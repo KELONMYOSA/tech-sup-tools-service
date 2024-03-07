@@ -58,7 +58,6 @@ class ServiceModel(Service):
             "id": int(self.id),
             "typeId": int(self.id_type_service),
             "type": self.type_descr.name,
-            "statusId": self.status_id,
             "status": self.status_descr,
             "statusDate": self.changed_status_date.strftime("%Y-%m-%d")
             if self.changed_status_date
@@ -83,4 +82,18 @@ class ServiceModel(Service):
             "subnets": self.__get_subnets(),
             "interfaces": self.__get_interfaces(),
             "speed": self.speed,
+        }
+
+    def get_brief_info(self):
+        return {
+            "id": int(self.id),
+            "type": self.type_descr.name,
+            "status": self.status_descr,
+            "statusDate": self.changed_status_date.strftime("%Y-%m-%d")
+            if self.changed_status_date
+            else self.create_date.strftime("%Y-%m-%d"),
+            "isProvider": self.provider == "Y",
+            "description": self.description or None,
+            "supportDescription": self.support_desc or None,
+            "addresses": self.__get_addresses(),
         }
