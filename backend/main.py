@@ -1,8 +1,12 @@
+import warnings
+
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import exc as sa_exc
 
-from src.routers import auth
+from src.database.db import init_db
+from src.routers import auth, search
 
 app = FastAPI(
     title="Comfortel Technical Support API",
@@ -21,10 +25,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Database initialization
+init_db()
+
 # Include routers
 app.include_router(auth.router)
+app.include_router(search.router)
 
 if __name__ == "__main__":
     host = "0.0.0.0"
     port = 5000
-    uvicorn.run(app, host=host, port=port)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=sa_exc.SAWarning)
+        uvicorn.run(app, host=host, port=port)

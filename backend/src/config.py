@@ -12,5 +12,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     REFRESH_SECRET_KEY: str
 
+    ORACLE_DB_URL: str
+
 
 settings = Settings()
