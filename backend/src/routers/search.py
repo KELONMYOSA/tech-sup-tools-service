@@ -13,10 +13,10 @@ router = APIRouter(
 
 # Поиск клиента по номеру телефона
 @router.get("/client")
-async def client_by_phone(phone: str, _: User = Depends(get_current_user)):  # noqa: B008
-    result = get_client_by_phone(phone)
+async def client_by_phone(phone: str, max_results: int = 10, _: User = Depends(get_current_user)):  # noqa: B008
+    result = get_client_by_phone(phone, max_results)
     if not result:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Wrong input format")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Clients not found")
     return result
 
 

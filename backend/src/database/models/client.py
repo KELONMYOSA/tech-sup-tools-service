@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from src.database.db import oracle_db
 from src.database.models.aes import Client, ClientPhone, Company, CompanyContact
@@ -63,7 +63,8 @@ class CompanyContactModel(CompanyContact):
         with oracle_db() as db:
             self.db = db
 
-    def search_by_phonenum(self, phonenum):
+    def search_by_phonenum(self, phonenum, max_results=10):
+        position_expression = func.instr(ClientPhone.phone, phonenum)
         q_client_by_phone = (
             select(CompanyContact)
             .join(Client, CompanyContact.id_client == Client.id)
@@ -71,27 +72,19 @@ class CompanyContactModel(CompanyContact):
             .where(
                 Client.is_delete == "N",
                 ClientPhone.is_delete == "N",
-                ClientPhone.phone == phonenum,
+                ClientPhone.phone.like(f"%{phonenum}%"),
             )
-            .distinct()
+            .order_by(position_expression, ClientPhone.phone)
+            .limit(max_results)
         )
 
         return self.db.execute(q_client_by_phone)
 
 
 class ClientByPhoneSearchModel:
-    def __init__(self, phonenum):
-        digits_only = "".join([x for x in phonenum if x.isdigit()])
-
-        if len(digits_only) not in (7, 10, 11):
-            raise ValueError
-
-        if len(digits_only) == 7:  # noqa: PLR2004
-            self.phonenum = "812" + digits_only
-        elif len(digits_only) == 11 and digits_only[0] == "7":  # noqa: PLR2004
-            self.phonenum = digits_only[1:]
-        else:
-            self.phonenum = digits_only
+    def __init__(self, phonenum, max_results=10):
+        self.phonenum = "".join([x for x in phonenum if x.isdigit()])
+        self.max_results = max_results
 
     @staticmethod
     def _get_company_data(company):
@@ -101,10 +94,11 @@ class ClientByPhoneSearchModel:
         result_data = []
         # три места для поиска номера:
         # - телефоны контактов компании
-        contacts_by_phone = CompanyContactModel().search_by_phonenum(self.phonenum)
+        contacts_by_phone = CompanyContactModel().search_by_phonenum(self.phonenum, self.max_results)
+        company_ids = []
         for res in contacts_by_phone:
             contact = res[0]
-            if contact.company and int(contact.company.status_id) == 291:  # noqa: PLR2004
+            if contact.company and contact.company.status_id and int(contact.company.status_id) == 291:  # noqa: PLR2004
                 result_object = {
                     "company": self._get_company_data(contact.company),
                     "contact": {
@@ -115,10 +109,13 @@ class ClientByPhoneSearchModel:
                         ),
                         "title": contact.position or "",
                     },
-                    "source": "contacts",
+                    "phone": [phone.phone for phone in contact.client.phones if phone.phone.find(self.phonenum) != -1][  # noqa: RUF015
+                        0
+                    ],
                 }
-
-                result_data.append(result_object)
+                if contact.company.id not in company_ids:
+                    result_data.append(result_object)
+                    company_ids.append(contact.company.id)
 
         # - поле company.phone
         companies_by_phone = CompanyModel().search_by_phone(self.phonenum)
