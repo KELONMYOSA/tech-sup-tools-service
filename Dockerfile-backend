@@ -1,0 +1,33 @@
+FROM python:3.11-slim as builder
+
+WORKDIR /opt/oracle
+
+RUN apt-get update && apt-get install -y libaio1 wget unzip && apt-get install -y gcc\
+  && wget https://download.oracle.com/otn_software/linux/instantclient/2113000/instantclient-basiclite-linux.x64-21.13.0.0.0dbru.zip \
+  && unzip instantclient-basiclite-linux.x64-21.13.0.0.0dbru.zip \
+  && rm -f instantclient-basiclite-linux.x64-21.13.0.0.0dbru.zip \
+  && cd /opt/oracle/instantclient* \
+  && rm -f *jdbc* *occi* *mysql* *README *jar uidrvci genezi adrci \
+  && echo /opt/oracle/instantclient* > /etc/ld.so.conf.d/oracle-instantclient.conf \
+  && ldconfig
+
+FROM builder as builder_wheels
+
+RUN pip install poetry
+
+COPY backend/pyproject.toml backend/poetry.lock ./
+
+RUN poetry export -f requirements.txt --without=dev > requirements.txt \
+    && pip wheel --no-cache-dir --no-deps --wheel-dir /wheels -r requirements.txt
+
+FROM builder
+
+WORKDIR /app/backend
+
+COPY --from=builder_wheels /wheels /wheels
+RUN pip install --no-cache /wheels/*
+
+COPY backend /app/backend
+COPY .env /app/.env
+
+ENTRYPOINT ["python", "main.py"]

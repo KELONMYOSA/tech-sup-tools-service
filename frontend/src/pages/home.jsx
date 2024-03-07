@@ -10,7 +10,7 @@ export default function Home(data) {
     return (
         <Layout>
             <Header style={{display: 'flex', alignItems: 'center', padding: 0, backgroundColor: 'white'}}>
-                <img src='public/logo.png' height='70%' style={{marginLeft: 10}}/>
+                <img src='/logo.png' height='70%' style={{marginLeft: 10}}/>
                 {!isMobile &&
                     <div style={{display: 'flex', width: '100%', marginLeft: 20, paddingTop: 5}}>
                         <Typography.Title level={3}>Техническая поддержка</Typography.Title>

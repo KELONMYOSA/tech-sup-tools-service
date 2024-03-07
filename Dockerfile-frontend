@@ -1,0 +1,17 @@
+FROM node:alpine
+
+WORKDIR /app/frontend
+
+ENV PATH /app/frontend/node_modules/.bin:$PATH
+
+COPY ./frontend/package.json ./
+COPY ./frontend/package-lock.json ./
+
+RUN npm install --silent
+RUN npm install -g serve
+
+COPY ./frontend /app/frontend
+COPY .env /app/.env
+
+RUN npm run build
+CMD ["serve", "-s", "-l", "5001", "dist"]

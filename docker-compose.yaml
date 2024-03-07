@@ -1,0 +1,24 @@
+version: "3.9"
+
+services:
+  backend:
+    image: tech-sup-backend
+    container_name: tech-sup-backend
+    build:
+      context: .
+      dockerfile: Dockerfile-backend
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+
+  frontend:
+    image: tech-sup-frontend
+    container_name: tech-sup-frontend
+    build:
+      context: .
+      dockerfile: Dockerfile-frontend
+    ports:
+      - "5001:5001"
+    restart: unless-stopped
+    depends_on:
+      - backend
