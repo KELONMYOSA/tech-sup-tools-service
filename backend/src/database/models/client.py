@@ -6,9 +6,8 @@ from src.database.models.service import ServiceModel
 
 
 class CompanyModel(Company):
-    def __init__(self):
-        with oracle_db() as db:
-            self.db = db
+    def __init__(self, db):
+        self.db = db
 
     def search_by_phone(self, phonenum):
         q_company_by_phone = select(Company).where(
@@ -59,9 +58,8 @@ class CompanyModel(Company):
 
 
 class CompanyContactModel(CompanyContact):
-    def __init__(self):
-        with oracle_db() as db:
-            self.db = db
+    def __init__(self, db):
+        self.db = db
 
     def search_by_phonenum(self, phonenum, max_results=10):
         position_expression = func.instr(ClientPhone.phone, phonenum)
@@ -94,54 +92,57 @@ class ClientByPhoneSearchModel:
         result_data = []
         # три места для поиска номера:
         # - телефоны контактов компании
-        contacts_by_phone = CompanyContactModel().search_by_phonenum(self.phonenum, self.max_results)
-        company_ids = []
-        for res in contacts_by_phone:
-            contact = res[0]
-            if contact.company and contact.company.status_id and int(contact.company.status_id) == 291:  # noqa: PLR2004
-                result_object = {
-                    "company": self._get_company_data(contact.company),
-                    "contact": {
-                        "name": "{0}{1}{2}".format(  # noqa: UP030
-                            contact.client.lname + " " if contact.client.lname else "",
-                            contact.client.fname + " " if contact.client.fname else "",
-                            contact.client.mname if contact.client.mname else "",
-                        ),
-                        "title": contact.position or "",
-                    },
-                    "phone": [phone.phone for phone in contact.client.phones if phone.phone.find(self.phonenum) != -1][  # noqa: RUF015
-                        0
-                    ],
-                }
-                if contact.company.id not in company_ids:
-                    result_data.append(result_object)
-                    company_ids.append(contact.company.id)
+        with oracle_db() as db:
+            contacts_by_phone = CompanyContactModel(db).search_by_phonenum(self.phonenum, self.max_results)
+            company_ids = []
+            for res in contacts_by_phone:
+                contact = res[0]
+                if contact.company and contact.company.status_id and int(contact.company.status_id) == 291:  # noqa: PLR2004
+                    result_object = {
+                        "company": self._get_company_data(contact.company),
+                        "contact": {
+                            "name": "{0}{1}{2}".format(  # noqa: UP030
+                                contact.client.lname + " " if contact.client.lname else "",
+                                contact.client.fname + " " if contact.client.fname else "",
+                                contact.client.mname if contact.client.mname else "",
+                            ),
+                            "title": contact.position or "",
+                        },
+                        "phone": [phone.phone for phone in contact.client.phones if phone.phone.find(self.phonenum) != -1][  # noqa: RUF015
+                            0
+                        ],
+                    }
+                    if contact.company.id not in company_ids:
+                        result_data.append(result_object)
+                        company_ids.append(contact.company.id)
 
         # - поле company.phone
-        companies_by_phone = CompanyModel().search_by_phone(self.phonenum)
-        for res in companies_by_phone:
-            company = res[0]
-            result_data.append(
-                {
-                    "company": self._get_company_data(company),
-                    "source": "company.phone",
-                }
-            )
+        with oracle_db() as db:
+            companies_by_phone = CompanyModel(db).search_by_phone(self.phonenum)
+            for res in companies_by_phone:
+                company = res[0]
+                result_data.append(
+                    {
+                        "company": self._get_company_data(company),
+                        "source": "company.phone",
+                    }
+                )
 
         # - наши продаваемые номера?..
         service_id = ServiceModel.search_by_phonenum(self.phonenum)
         if service_id != -1:
-            service = ServiceModel().get_by_id(service_id)
+            with oracle_db() as db:
+                service = ServiceModel(db).get_by_id(service_id)
 
-            if service and service.company:
-                try:  # noqa: SIM105
-                    result_data.append(
-                        {
-                            "company": self._get_company_data(service.company),
-                            "source": f"service id {int(service.id)}",
-                        }
-                    )
-                except:  # noqa: E722
-                    pass
+                if service and service.company:
+                    try:  # noqa: SIM105
+                        result_data.append(
+                            {
+                                "company": self._get_company_data(service.company),
+                                "source": f"service id {int(service.id)}",
+                            }
+                        )
+                    except:  # noqa: E722
+                        pass
 
         return result_data

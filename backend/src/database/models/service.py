@@ -1,13 +1,12 @@
 import ipaddress
 
-from src.database.db import oracle_db
 from src.database.models.aes import Service
 
 
 class ServiceModel(Service):
-    def __init__(self):
-        with oracle_db() as db:
-            self.db = db
+    def __init__(self, db):
+        self.db = db
+
 
     def get_by_id(self, id):
         return self.db.query(ServiceModel).filter(ServiceModel.id == id).first()
