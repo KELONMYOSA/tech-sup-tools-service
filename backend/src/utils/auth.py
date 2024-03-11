@@ -41,7 +41,7 @@ def ldap_login(username: str, password: str) -> User | None:
         conn.unbind()
         return User(
             cn=attr["cn"][0] if "cn" in attr else None,
-            gecos=attr["gecos"] if "gecos" in attr else None,
+            gecos=attr.get("gecos"),
             mail=attr["mail"][0] if "mail" in attr else None,
             telephoneNumber=attr["telephoneNumber"][0] if "telephoneNumber" in attr else None,
             title=attr["title"][0] if "title" in attr else None,

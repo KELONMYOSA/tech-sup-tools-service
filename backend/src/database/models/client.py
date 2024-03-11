@@ -2,7 +2,6 @@ from sqlalchemy import func, select
 
 from src.database.db import oracle_db
 from src.database.models.aes import Client, ClientPhone, Company, CompanyContact
-from src.database.models.service import ServiceModel
 
 
 class CompanyModel(Company):
@@ -108,12 +107,12 @@ class ClientByPhoneSearchModel:
                             ),
                             "title": contact.position or "",
                         },
-                        "phone": [phone.phone for phone in contact.client.phones if phone.phone.find(self.phonenum) != -1][  # noqa: RUF015
-                            0
-                        ],
+                        "phone": [  # noqa: RUF015
+                            phone.phone for phone in contact.client.phones if phone.phone.find(self.phonenum) != -1
+                        ][0],
                     }
                     if contact.company.id not in company_ids:
                         result_data.append(result_object)
                         company_ids.append(contact.company.id)
 
-        return result_data[:self.max_results]
+        return result_data[: self.max_results]

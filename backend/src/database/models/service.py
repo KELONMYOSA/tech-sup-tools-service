@@ -7,7 +7,6 @@ class ServiceModel(Service):
     def __init__(self, db):
         self.db = db
 
-
     def get_by_id(self, id):
         return self.db.query(ServiceModel).filter(ServiceModel.id == id).first()
 
