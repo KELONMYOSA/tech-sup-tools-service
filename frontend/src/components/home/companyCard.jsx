@@ -25,7 +25,8 @@ export default function CompanyCard(data) {
                         items={[
                             {
                                 label: 'Телефон',
-                                children: contact.phones ? <ul style={{marginLeft: 10}}>{contact.phones.map(phone => (<li>{phone.ext ? `${phone.phone} (доб. ${phone.ext})` : phone.phone}</li>))}</ul> : "-",
+                                children: contact.phones ? <ul style={{marginLeft: 10}}>{contact.phones.map(phone => (
+                                    <li>{phone.ext ? `${phone.phone} (доб. ${phone.ext})` : phone.phone}</li>))}</ul> : "-",
                             },
                             {
                                 label: 'email',
@@ -130,5 +131,5 @@ export default function CompanyCard(data) {
             </Modal>
             <Collapse items={items} defaultActiveKey={['0']} style={{marginTop: 20}}/>
         </>
-)
+    )
 }

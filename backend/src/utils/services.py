@@ -10,8 +10,6 @@ def get_service_by_id(service_id: int) -> tuple[bool, str] | tuple[bool, dict]:
             return False, "NotFound!"
         if srv.fiz_id and int(srv.fiz_id) > 0:
             return False, "Forbidden!"
-        if srv.id_type_service and int(srv.id_type_service) not in (297, 303, 4179):
-            return False, "Wrong type"
         return True, srv.get_tech_info()
 
 

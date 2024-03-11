@@ -5,6 +5,7 @@ import useWindowSize from "../utils/useWindowSize.js";
 import SearchClientByPhoneNumber from "../components/home/phoneSearch.jsx";
 import {useState} from "react";
 import CompanyCard from "../components/home/companyCard.jsx";
+import ServiceCard from "../components/home/serviceCard.jsx";
 
 export default function Home(data) {
     const [companyIds, setCompanyIds] = useState([]);
@@ -24,7 +25,7 @@ export default function Home(data) {
             </Header>
             <Content>
                 <Row>
-                    <Col flex={1} style={{padding: 20}}>
+                    <Col flex='1 2' style={{padding: 20}}>
                         <SearchClientByPhoneNumber
                             updateCompanies={setCompanyIds}
                             updatePhone={setPhoneNumber}
@@ -32,11 +33,8 @@ export default function Home(data) {
                         />
                         <CompanyCard companyIds={companyIds} isMobile={isMobile}/>
                     </Col>
-                    <Col flex={1} style={{padding: 20}}>
-
-                    </Col>
-                    <Col flex={1} style={{padding: 20}}>
-
+                    <Col flex='2 1' style={{padding: 20}}>
+                        <ServiceCard companyIds={companyIds} isMobile={isMobile}/>
                     </Col>
                 </Row>
             </Content>
