@@ -21,6 +21,7 @@ class CompanyModel(Company):
 
     def get_info(self):
         return {
+            "id": self.id,
             "client": f"(ID: {self.id}) {self.name }",
             "brandName": self.brand_name or "",
             "type": self.client_type_descr,

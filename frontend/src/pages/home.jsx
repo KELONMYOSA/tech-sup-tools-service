@@ -30,7 +30,7 @@ export default function Home(data) {
                             updatePhone={setPhoneNumber}
                             phone={phoneNumber}
                         />
-                        <CompanyCard companyIds={companyIds}/>
+                        <CompanyCard companyIds={companyIds} isMobile={isMobile}/>
                     </Col>
                     <Col flex={1} style={{padding: 20}}>
 

@@ -21,7 +21,7 @@ export default function SearchClientByPhoneNumber(data) {
 
                 const newOptions = response.data.map(client => ({
                     value: `${client.company.id}_${client.phone}`,
-                    label: `${client.company.name} - ${client.contact.name}`
+                    label: (<p><b>{client.company.name}</b> - {client.contact.name}</p>)
                 }));
 
                 setOptions(newOptions);
@@ -37,7 +37,10 @@ export default function SearchClientByPhoneNumber(data) {
     };
 
     const onEnter = async value => {
-        if (value.length === 10) {
+        if (10 <= value.length && value.length <= 11) {
+            if (value.length === 11) {
+                value = value.slice(1, 11)
+            }
             setIsOpen(false)
             try {
                 const response = await axios.get(
