@@ -73,7 +73,7 @@ class CompanyContactModel(CompanyContact):
                 ClientPhone.phone.like(f"%{phonenum}%"),
             )
             .order_by(position_expression, ClientPhone.phone)
-            .limit(max_results)
+            .limit(max_results * 3)
         )
 
         return self.db.execute(q_client_by_phone)
@@ -116,33 +116,4 @@ class ClientByPhoneSearchModel:
                         result_data.append(result_object)
                         company_ids.append(contact.company.id)
 
-        # - поле company.phone
-        with oracle_db() as db:
-            companies_by_phone = CompanyModel(db).search_by_phone(self.phonenum)
-            for res in companies_by_phone:
-                company = res[0]
-                result_data.append(
-                    {
-                        "company": self._get_company_data(company),
-                        "source": "company.phone",
-                    }
-                )
-
-        # - наши продаваемые номера?..
-        service_id = ServiceModel.search_by_phonenum(self.phonenum)
-        if service_id != -1:
-            with oracle_db() as db:
-                service = ServiceModel(db).get_by_id(service_id)
-
-                if service and service.company:
-                    try:  # noqa: SIM105
-                        result_data.append(
-                            {
-                                "company": self._get_company_data(service.company),
-                                "source": f"service id {int(service.id)}",
-                            }
-                        )
-                    except:  # noqa: E722
-                        pass
-
-        return result_data
+        return result_data[:self.max_results]

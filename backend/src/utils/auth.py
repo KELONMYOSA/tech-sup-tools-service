@@ -40,12 +40,12 @@ def ldap_login(username: str, password: str) -> User | None:
         attr = json.loads(conn.response_to_json())["entries"][0]["attributes"]
         conn.unbind()
         return User(
-            cn=attr["cn"][0],
-            gecos=attr["gecos"],
-            mail=attr["mail"][0],
-            telephoneNumber=attr["telephoneNumber"][0],
-            title=attr["title"][0],
-            uid=attr["uid"][0],
+            cn=attr["cn"][0] if "cn" in attr else None,
+            gecos=attr["gecos"] if "gecos" in attr else None,
+            mail=attr["mail"][0] if "mail" in attr else None,
+            telephoneNumber=attr["telephoneNumber"][0] if "telephoneNumber" in attr else None,
+            title=attr["title"][0] if "title" in attr else None,
+            uid=attr["uid"][0] if "uid" in attr else None,
         )
     else:
         conn.unbind()
