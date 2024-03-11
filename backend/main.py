@@ -12,6 +12,7 @@ app = FastAPI(
     title="Comfortel Technical Support API",
     contact={"name": "KELONMYOSA", "url": "https://t.me/KELONMYOSA"},
     version="0.0.1",
+    root_path="/api",
     docs_url="/docs",
     redoc_url="/docs/redoc",
 )
