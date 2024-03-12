@@ -5,11 +5,20 @@ import Home from "./pages/home.jsx";
 import PageNotFound from "./pages/404page.jsx";
 import {Flex, Spin} from "antd";
 import checkTokenValidity from "./utils/checkTokenValidity.js";
+import axios from "axios";
 
 export default function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isCheckingAuth, setIsCheckingAuth] = useState(true);
     const [userData, setUserData] = useState({});
+
+    axios.interceptors.request.use(async (config) => {
+        await checkTokenValidity();
+        config.headers['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
+        return config;
+    }, (error) => {
+        return Promise.reject(error);
+    });
 
     const checkToken = async () => {
         const checkData = await checkTokenValidity();

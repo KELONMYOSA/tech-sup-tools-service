@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import {Input, AutoComplete} from 'antd';
 import axios from 'axios';
-import checkTokenValidity from "../../utils/checkTokenValidity.js";
 
 export default function SearchClientByPhoneNumber(data) {
     const apiUrl = import.meta.env.VITE_API_URL
@@ -15,8 +14,7 @@ export default function SearchClientByPhoneNumber(data) {
         if (value.length >= 2 && value.length <= 10) {
             try {
                 const response = await axios.get(
-                    `${apiUrl}/search/client?phone=${value}`,
-                    {headers: {'Authorization': `Bearer ${localStorage.getItem('token')}`}},
+                    `${apiUrl}/search/client?phone=${value}`
                 );
 
                 const newOptions = response.data.map(client => ({
@@ -26,9 +24,7 @@ export default function SearchClientByPhoneNumber(data) {
 
                 setOptions(newOptions);
             } catch (error) {
-                if (error.response.status === 401) {
-                    checkTokenValidity()
-                }
+                console.error(error)
                 setOptions([]);
             }
         } else {
@@ -44,17 +40,14 @@ export default function SearchClientByPhoneNumber(data) {
             setIsOpen(false)
             try {
                 const response = await axios.get(
-                    `${apiUrl}/search/client?phone=${value}`,
-                    {headers: {'Authorization': `Bearer ${localStorage.getItem('token')}`}},
+                    `${apiUrl}/search/client?phone=${value}`
                 );
 
                 const ids = response.data.map(client => (client.company.id));
                 data.updateCompanies(ids);
                 data.updatePhone(value);
             } catch (error) {
-                if (error.response.status === 401) {
-                    checkTokenValidity()
-                }
+                console.error(error)
             }
         }
     };
@@ -79,6 +72,11 @@ export default function SearchClientByPhoneNumber(data) {
             onChange={onClear}
             onSelect={onSelect}
             onSearch={onSearch}
+            onKeyDown={(event) => {
+                if (!/[0-9]/.test(event.key)) {
+                    event.preventDefault();
+                }
+            }}
         >
             <Input.Search
                 size="large"

@@ -1,7 +1,7 @@
-import {Button, Descriptions, Modal, Table, Tooltip, Typography} from "antd";
+import {Button, Modal, Table, Tooltip, Typography} from "antd";
 import React, {useEffect, useState} from "react";
 import axios from "axios";
-import checkTokenValidity from "../../utils/checkTokenValidity.js";
+import ServiceInfo from "./serviceInfo.jsx";
 
 export default function ServiceCard(data) {
     const apiUrl = import.meta.env.VITE_API_URL
@@ -17,42 +17,22 @@ export default function ServiceCard(data) {
         for (const i in data.companyIds) {
             try {
                 const response = await axios.get(
-                    `${apiUrl}/search/service?company_id=${data.companyIds[i]}`,
-                    {headers: {'Authorization': `Bearer ${localStorage.getItem('token')}`}},
+                    `${apiUrl}/search/service?company_id=${data.companyIds[i]}`
                 );
 
                 services.push(response.data)
             } catch (error) {
-                if (error.response.status === 401) {
-                    await checkTokenValidity()
-                }
+                console.error(error)
             }
         }
         setIsGettingData(false)
         return services
     };
 
-    const getServiceInfo = async (serviceId) => {
-        try {
-            const response = await axios.get(
-                `${apiUrl}/search/service/${serviceId}`,
-                {headers: {'Authorization': `Bearer ${localStorage.getItem('token')}`}},
-            );
-
-            return response.data
-        } catch (error) {
-            if (error.response.status === 401) {
-                await checkTokenValidity()
-            }
-        }
-    };
-
     const showService = (serviceId) => {
         (async () => {
-            const contacts = await getServiceInfo(serviceId)
-            setServiceItems([<p>{JSON.stringify(contacts)}</p>])
-            setIisServiceOpen(true)
-        })();
+            await ServiceInfo({serviceId: serviceId, setServiceItems: setServiceItems, setIisServiceOpen: setIisServiceOpen})
+        })()
     }
 
     const hideService = () => {
@@ -87,12 +67,9 @@ export default function ServiceCard(data) {
                 date: service.statusDate,
                 addresses: (
                     <ul>
-                        {service.addresses.map(address => (
-                            <li>{
-                                `${address.city}, ${address.street}${address.house !== ' ' ? `, ${address.house}` : ''}
-                                ${address.building !== ' ' ? `, ${address.building}` : ''}
-                                ${address.letter !== ' ' ? ` ${address.letter}` : ''}
-                                ${address.flat !== ' ' ? `, ${address.flat}` : ''}`
+                        {service.addresses.map((address, i) => (
+                            <li key={i}>{
+                                `${address.city}${!['', ' '].includes(address.street) ? `, ${address.street}` : ''}${!['', ' '].includes(address.house) ? `, ${address.house}` : ''}${!['', ' '].includes(address.building) ? `, ${address.building}` : ''}${!['', ' '].includes(address.letter) ? ` ${address.letter}` : ''}${!['', ' '].includes(address.flat) ? `, ${address.flat}` : ''}`
                             }</li>
                         ))}
                     </ul>)
@@ -151,7 +128,7 @@ export default function ServiceCard(data) {
 
     return (
         <>
-            <Modal open={isServiceOpen} onCancel={hideService} footer={null} width={isMobile ? '95%' : '70%'}>
+            <Modal open={isServiceOpen} onCancel={hideService} footer={null} width={isMobile ? '95%' : '80%'}>
                 {serviceItems}
             </Modal>
             {!isGettingData ? <Typography.Title level={3}>Услуги</Typography.Title> : null}

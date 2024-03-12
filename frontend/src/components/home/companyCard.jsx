@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Button, Collapse, Descriptions, Flex, Modal} from 'antd';
 import axios from "axios";
-import checkTokenValidity from "../../utils/checkTokenValidity.js";
 
 export default function CompanyCard(data) {
     const apiUrl = import.meta.env.VITE_API_URL
@@ -16,7 +15,7 @@ export default function CompanyCard(data) {
         (async () => {
             const contacts = await getContacts(companyId)
             setContactsItems(contacts.map((contact, i) => (
-                <>
+                <div key={i}>
                     <Descriptions
                         key={i}
                         bordered
@@ -25,8 +24,8 @@ export default function CompanyCard(data) {
                         items={[
                             {
                                 label: 'Телефон',
-                                children: contact.phones ? <ul style={{marginLeft: 10}}>{contact.phones.map(phone => (
-                                    <li>{phone.ext ? `${phone.phone} (доб. ${phone.ext})` : phone.phone}</li>))}</ul> : "-",
+                                children: contact.phones ? <ul style={{marginLeft: 10}}>{contact.phones.map((phone, i) => (
+                                    <li key={i}>{phone.ext ? `${phone.phone} (доб. ${phone.ext})` : phone.phone}</li>))}</ul> : "-",
                             },
                             {
                                 label: 'email',
@@ -51,7 +50,7 @@ export default function CompanyCard(data) {
                         ]}
                     />
                     <br/>
-                </>
+                </div>
             )))
             setIsContactsOpen(true)
         })();
@@ -67,15 +66,12 @@ export default function CompanyCard(data) {
     const getContacts = async (companyId) => {
         try {
             const response = await axios.get(
-                `${apiUrl}/search/contact?company_id=${companyId}`,
-                {headers: {'Authorization': `Bearer ${localStorage.getItem('token')}`}},
+                `${apiUrl}/search/contact?company_id=${companyId}`
             );
 
             return response.data
         } catch (error) {
-            if (error.response.status === 401) {
-                await checkTokenValidity()
-            }
+            console.error(error)
         }
     };
 
@@ -84,15 +80,12 @@ export default function CompanyCard(data) {
         for (const i in data.companyIds) {
             try {
                 const response = await axios.get(
-                    `${apiUrl}/search/company/${data.companyIds[i]}`,
-                    {headers: {'Authorization': `Bearer ${localStorage.getItem('token')}`}},
+                    `${apiUrl}/search/company/${data.companyIds[i]}`
                 );
 
                 tempCompanies.push(response.data)
             } catch (error) {
-                if (error.response.status === 401) {
-                    await checkTokenValidity()
-                }
+                console.error(error)
             }
         }
         setIsGettingData(false)
@@ -102,6 +95,10 @@ export default function CompanyCard(data) {
     useEffect(() => {
         (async () => {
             const companies = await getCompanies();
+            if (companies.length === 0) {
+                setIsGettingData(true)
+            }
+
             setItems(companies.map(company => ({
                 label: company.client,
                 children: (
@@ -129,7 +126,7 @@ export default function CompanyCard(data) {
             <Modal open={isContactsOpen} onCancel={hideContacts} footer={null} width={isMobile ? '95%' : '70%'}>
                 {contactsItems}
             </Modal>
-            <Collapse items={items} defaultActiveKey={['0']} style={{marginTop: 20}}/>
+            {!isGettingData ? <Collapse items={items} defaultActiveKey={['0']} style={{marginTop: 20}}/> : null}
         </>
     )
 }

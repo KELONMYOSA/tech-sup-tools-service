@@ -32,24 +32,49 @@ class ServiceModel(Service):
         return subnets
 
     def __get_interfaces(self):
-        interfaces = {
-            "l2": [],
-            "l3": [],
-        }
+        interfaces = []
 
         for i in self.interfaces:
             if i.id_port is None or i.port.router is None:
                 continue
 
-            interfaces[i.port_type.lower()].append(
+            interfaces.append(
                 {
+                    "type": i.port_type,
+                    "uAddress": i.unit.address,
+                    "eDomain": i.equipment.domain,
                     "host": i.port.router.host,
                     "name": i.port.ifname,
-                    "index": int(i.port.ifindex),
                 }
             )
 
         return interfaces
+
+    @property
+    def status_string(self):  # noqa: PLR0911
+        """Строка состояния для отображения в шаблоне"""
+        if self.status_id is None:
+            return "???"
+        if int(self.status_id) == 727:  # noqa: PLR2004
+            if self.changed_status_date is not None:
+                return f"Действует с {self.changed_status_date.strftime('%d.%m.%Y %H:%M')} (изм)"
+            elif self.connected_date is not None:
+                return f"Действует с {self.connected_date.strftime('%d.%m.%Y %H:%M')} (подкл)"
+            else:
+                return "Действует (с неопределённой даты)"
+        elif int(self.status_id) == 829:  # noqa: PLR2004
+            if self.disconnect_date is not None:
+                return f"Отключена с {self.disconnect_date.strftime('%d.%m.%Y %H:%M')} (откл)"
+            elif self.changed_status_date is not None:
+                return f"Отключена с {self.changed_status_date.strftime('%d.%m.%Y %H:%M')} (изм)"
+            else:
+                return "Отключена (с неопределённой даты)"
+        elif self.changed_status_date is not None:
+            return f"{self.status_descr} c {self.changed_status_date.strftime('%d.%m.%Y %H:%M')} (изм)"
+        elif self.create_date is not None:
+            return f"{self.status_descr} c {self.create_date.strftime('%d.%m.%Y %H:%M')} (созд)"
+        else:
+            return f"{self.status_descr} (с неопределённой даты)"
 
     def get_tech_info(self):
         return {
@@ -57,6 +82,7 @@ class ServiceModel(Service):
             "typeId": int(self.id_type_service),
             "type": self.type_descr.name,
             "status": self.status_descr,
+            "statusString": self.status_string,
             "statusDate": self.changed_status_date.strftime("%Y-%m-%d")
             if self.changed_status_date
             else self.create_date.strftime("%Y-%m-%d"),
@@ -67,6 +93,45 @@ class ServiceModel(Service):
             },
             "description": self.description or None,
             "supportDescription": self.support_desc or None,
+            "rentServices": [
+                {
+                    "id": r.id,
+                    "type": r.type_descr,
+                    "status": r.status_descr,
+                    "companyName": r.company.name,
+                    "companyId": r.company.id,
+                    "isDelete": r.is_delete,
+                }
+                for r in self.rent_services
+            ],
+            "rentedFor": [
+                {
+                    "id": r.id,
+                    "type": r.type_descr,
+                    "status": r.status_descr,
+                    "companyName": r.company.name,
+                    "companyId": r.company.id,
+                    "isDelete": r.is_delete,
+                }
+                for r in self.rented_for
+            ],
+            "pack": [
+                {
+                    "id": p.id,
+                    "type": p.type_descr,
+                    "status": p.status_descr,
+                }
+                for p in self.pack
+            ],
+            "packServices": [
+                {
+                    "id": p.id,
+                    "type": p.type_descr,
+                    "status": p.status_descr,
+                    "companyId": p.company.id,
+                }
+                for p in self.pack_services
+            ],
             "companyId": int(self.id_company),
             "company": self.company.name,
             "companyTypeDesc": self.company.client_type_descr,
@@ -74,12 +139,30 @@ class ServiceModel(Service):
             "document": self.document.dog_num if self.document else None,
             "manager": self.company.manager,
             "managerService": self.company.manager_service or None,
-            "contactIds": [contact.id for contact in self.company.contacts if contact.client.is_delete == "N"],
             "vlans": self.vlans,
             "addresses": self.__get_addresses(),
             "subnets": self.__get_subnets(),
             "interfaces": self.__get_interfaces(),
             "speed": self.speed,
+            "phoneVats": {
+                "atsType": self.phone_vats.ats_type.name
+                if self.phone_vats and self.phone_vats.ats_type
+                else "Не задано",
+                "cityLine": self.phone_vats.city_line if self.phone_vats else "Не задано",
+                "innerLine": self.phone_vats.inner_line if self.phone_vats else "Не задано",
+            },
+            "phoneLines": [
+                {
+                    "targetIn": line.target_in,
+                    "targetOut": line.target_out,
+                    "phone": line.phone if line.phone == line.phone_end else f"{line.phone} - {line.phone_end}",
+                    "typeMobile": line.type_mobile,
+                    "typeMgMn": line.type_mg_mn,
+                    "typeSpb": line.type_spb,
+                    "comm": line.comm or "",
+                }
+                for line in self.phone_lines
+            ],
         }
 
     def get_brief_info(self):

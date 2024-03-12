@@ -23,9 +23,9 @@ export default function Home(data) {
                 }
                 <Navbar userData={data.userData}/>
             </Header>
-            <Content>
+            <Content style={{minHeight: 'calc(100vh - 65px)'}}>
                 <Row>
-                    <Col flex='1 2' style={{padding: 20}}>
+                    <Col xs={{flex: '100%'}} md={{flex: '1 2'}} style={{padding: 20}}>
                         <SearchClientByPhoneNumber
                             updateCompanies={setCompanyIds}
                             updatePhone={setPhoneNumber}
