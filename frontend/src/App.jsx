@@ -13,12 +13,28 @@ export default function App() {
     const [userData, setUserData] = useState({});
 
     axios.interceptors.request.use(async (config) => {
-        await checkTokenValidity();
         config.headers['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
         return config;
     }, (error) => {
         return Promise.reject(error);
     });
+
+    axios.interceptors.response.use(
+        response => response,
+        async error => {
+            const originalRequest = error.config;
+            if (error.response.status === 401 && !originalRequest._retry) {
+                originalRequest._retry = true;
+                await checkTokenValidity();
+
+                axios.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
+                originalRequest.headers['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
+
+                return axios(originalRequest);
+            }
+            return Promise.reject(error);
+        }
+    )
 
     const checkToken = async () => {
         const checkData = await checkTokenValidity();

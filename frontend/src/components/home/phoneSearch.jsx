@@ -73,7 +73,7 @@ export default function SearchClientByPhoneNumber(data) {
             onSelect={onSelect}
             onSearch={onSearch}
             onKeyDown={(event) => {
-                if (!/[0-9]/.test(event.key)) {
+                if (!/[0-9]/.test(event.key) && !['Delete', 'Backspace', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
                     event.preventDefault();
                 }
             }}
