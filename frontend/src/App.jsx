@@ -6,11 +6,15 @@ import PageNotFound from "./pages/404page.jsx";
 import {Flex, Spin} from "antd";
 import checkTokenValidity from "./utils/checkTokenValidity.js";
 import axios from "axios";
+import Service from "./pages/service.jsx";
+import useWindowSize from "./utils/useWindowSize.js";
 
 export default function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isCheckingAuth, setIsCheckingAuth] = useState(true);
     const [userData, setUserData] = useState({});
+
+    const isMobile = useWindowSize().width < 992
 
     axios.interceptors.request.use(async (config) => {
         config.headers['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
@@ -58,7 +62,8 @@ export default function App() {
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/" element={isAuthenticated ? <Home userData={userData}/> : <Navigate to="/auth"/>}/>
+                <Route path="/" element={isAuthenticated ? <Home userData={userData} isMobile={isMobile}/> : <Navigate to="/auth"/>}/>
+                <Route path="/service/:serviceId" element={isAuthenticated ? <Service userData={userData} isMobile={isMobile}/> : <Navigate to="/auth"/>}/>
                 <Route path="/auth" element={isAuthenticated ? <Navigate to="/"/> : <Auth/>}/>
                 <Route path="*" element={<PageNotFound/>}/>
             </Routes>

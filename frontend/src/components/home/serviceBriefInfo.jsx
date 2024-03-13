@@ -1,8 +1,8 @@
-import {Card, Col, Collapse, Descriptions, List, Row, Table, Tabs} from "antd";
+import {Card, Col, Collapse, Descriptions, List, Row, Table} from "antd";
 import React from "react";
 import axios from "axios";
 
-export default async function ServiceInfo(data) {
+export default async function ServiceBriefInfo(data) {
     const apiUrl = import.meta.env.VITE_API_URL
     const serviceId = data.serviceId
 
@@ -167,7 +167,6 @@ export default async function ServiceInfo(data) {
     if (service.interfaces.length > 0) {
         interfacesTable = (
             <Collapse
-                defaultActiveKey={0}
                 items={[{
                     label: 'Интерфейсы',
                     children: (
@@ -221,7 +220,6 @@ export default async function ServiceInfo(data) {
     if (service.subnets.length > 0) {
         ipList = (
             <Collapse
-                defaultActiveKey={0}
                 items={[{
                     label: 'IP',
                     children: (
@@ -240,7 +238,6 @@ export default async function ServiceInfo(data) {
     if (service.typeId === 370) {
         telData = (
             <Collapse
-                defaultActiveKey={0}
                 items={[{
                     label: 'Телефония',
                     children: (
@@ -372,99 +369,9 @@ export default async function ServiceInfo(data) {
 
     return (
         [true,
-            <Row key={1}>
-                <Col key={1} xs={24} md={10} lg={7} style={{padding: 20}}>
-                    <Card key={1} title="Общие сведения">
-                        <Descriptions
-                            size='small'
-                            column={1}
-                            items={[
-                                {
-                                    label: 'Компания',
-                                    children: `(ID: ${service.companyId}) ${service.company} (${service.companyTypeDesc.name})`,
-                                },
-                                {
-                                    label: 'Провайдер',
-                                    children: `(ID: ${service.provider.id}) ${service.provider.name}`,
-                                },
-                                {
-                                    label: 'Торговая марка',
-                                    children: service.companyBrandName || '-',
-                                },
-                                {
-                                    label: 'Услуга',
-                                    children: (<p>{'\u0028'}ID: <a target="_blank"
-                                                                   href={`https://boss.comfortel.pro/index.phtml?service_id=${service.id}&url_fav=1&mid=154&pid=404&module_mode=open&company_id=${service.companyId}&oid=1163`}>{service.id}</a>) {service.type}
-                                    </p>),
-                                },
-                                {
-                                    label: 'Договор',
-                                    children: service.document || '???',
-                                },
-                                {
-                                    label: 'Направление',
-                                    children: service.isProvider ? 'Покупка' : 'Продажа',
-                                },
-                                {
-                                    label: 'Статус',
-                                    children: service.statusString,
-                                    contentStyle: service.status.id === 727 ? {color: 'green'} : {color: 'red'}
-                                },
-                                {
-                                    label: 'Менеджер',
-                                    children: service.manager ? `${service.manager.lname || ''} ${service.manager.fname || ''} ${service.manager.mname || ''}` : '-',
-                                },
-                                {
-                                    label: (
-                                        <>
-                                            Персональный
-                                            <br/>
-                                            менеджер
-                                            <br/>
-                                        </>
-                                    ),
-                                    children: service.managerService ? `${service.managerService.lname || ''} ${service.managerService.fname || ''} ${service.managerService.mname || ''}` : '-',
-                                },
-                            ]}
-                        />
-                    </Card>
-                    <Card key={2} title="Адреса" style={{marginTop: 20}}>
-                        <ul style={{marginLeft: 10}}>
-                            {service.addresses.map((address, i) => (
-                                <li key={i}>{
-                                    `${address.city}${!['', ' '].includes(address.street) ? `, ${address.street}` : ''}${!['', ' '].includes(address.house) ? `, ${address.house}` : ''}${!['', ' '].includes(address.building) ? `, ${address.building}` : ''}${!['', ' '].includes(address.letter) ? ` ${address.letter}` : ''}${!['', ' '].includes(address.flat) ? `, ${address.flat}` : ''}`
-                                }</li>
-                            ))}
-                        </ul>
-                    </Card>
-                    <Card key={3} title="Примечания" style={{marginTop: 20}}>
-                        <Tabs
-                            defaultActiveKey="1"
-                            items={[
-                                {
-                                    key: '1',
-                                    label: 'Менеджерское',
-                                    children: (
-                                        <pre style={{overflowX: 'scroll'}}>
-                                                {service.description || '---'}
-                                            </pre>
-                                    ),
-                                },
-                                {
-                                    key: '2',
-                                    label: 'Техническое',
-                                    children: (
-                                        <pre style={{overflowX: 'scroll'}}>
-                                                {service.supportDescription || '---'}
-                                            </pre>
-                                    ),
-                                },
-                            ]}
-                        />
-                    </Card>
-                </Col>
-                <Col key={2} xs={24} md={14} lg={17} style={{padding: 20}}>
-                    <Card title="Технические параметры">
+            <Row style={{width: '100%'}}>
+                <Col style={{width: '100%'}}>
+                    <Card size='small' title="Технические параметры" style={{width: '100%'}}>
                         {rentServices}
                         {rentedFor}
                         {pack}

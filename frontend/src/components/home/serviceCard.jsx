@@ -1,16 +1,16 @@
-import {Button, Modal, Table, Tooltip, Typography} from "antd";
-import React, {useEffect, useState} from "react";
+import {Button, Input, Space, Table, Tooltip, Typography} from "antd";
+import React, {useEffect, useRef, useState} from "react";
 import axios from "axios";
-import ServiceInfo from "./serviceInfo.jsx";
+import ServiceBriefInfo from "./serviceBriefInfo.jsx";
+import {SearchOutlined} from "@ant-design/icons";
 
 export default function ServiceCard(data) {
     const apiUrl = import.meta.env.VITE_API_URL
-    const isMobile = data.isMobile
 
     const [isGettingData, setIsGettingData] = useState(true);
     const [serviceTable, setServiceTable] = useState(null);
-    const [isServiceOpen, setIisServiceOpen] = useState(false);
-    const [serviceItems, setServiceItems] = useState([]);
+    const [expandedData, setExpandedData] = useState({});
+    const searchInput = useRef(null);
 
     const getServices = async () => {
         let services = []
@@ -29,24 +29,95 @@ export default function ServiceCard(data) {
         return services
     };
 
-    const showService = (serviceId) => {
-        (async () => {
-            await ServiceInfo({serviceId: serviceId, setServiceItems: setServiceItems, setIisServiceOpen: setIisServiceOpen})
-        })()
-    }
+    const handleExpand = async (expanded, record) => {
+        if (expanded) {
+            const briefInfo = await ServiceBriefInfo({serviceId: record.key});
+            setExpandedData(prevExpandedData => ({
+                ...prevExpandedData,
+                [record.key]: briefInfo[1]
+            }));
+        }
+    };
 
-    const hideService = () => {
-        (async () => {
-            setServiceItems([])
-            setIisServiceOpen(false)
-        })();
-    }
+    const handleSearch = (selectedKeys, confirm, dataIndex) => {
+        confirm();
+        setSearchText(selectedKeys[0]);
+        setSearchedColumn(dataIndex);
+    };
+
+    const handleReset = (clearFilters) => {
+        clearFilters();
+        setSearchText('');
+    };
+
+    const getColumnSearchProps = (dataIndex) => ({
+        filterDropdown: ({setSelectedKeys, selectedKeys, confirm, clearFilters, close}) => (
+            <div
+                style={{
+                    padding: 8,
+                }}
+                onKeyDown={(e) => e.stopPropagation()}
+            >
+                <Input
+                    ref={searchInput}
+                    value={selectedKeys[0]}
+                    onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+                    onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+                    style={{
+                        marginBottom: 8,
+                        display: 'block',
+                    }}
+                />
+                <Space>
+                    <Button
+                        type="primary"
+                        onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+                        icon={<SearchOutlined/>}
+                        size="small"
+                        style={{
+                            width: 90,
+                        }}
+                    >
+                        Найти
+                    </Button>
+                    <Button
+                        onClick={() => clearFilters && handleReset(clearFilters)}
+                        size="small"
+                        style={{
+                            width: 90,
+                        }}
+                    >
+                        Сброс
+                    </Button>
+                </Space>
+            </div>
+        ),
+        filterIcon: (filtered) => (
+            <SearchOutlined
+                style={{
+                    color: filtered ? '#1677ff' : undefined,
+                }}
+            />
+        ),
+        onFilter: (value, record) =>
+            JSON.stringify(record[dataIndex]).toLowerCase().includes(value.toLowerCase()),
+        onFilterDropdownOpenChange: (visible) => {
+            if (visible) {
+                setTimeout(() => searchInput.current?.select(), 100);
+            }
+        },
+        render: (text) => text
+    });
 
     useEffect(() => {
         (async () => {
             const services = await getServices();
             if (services.length === 0) {
                 setIsGettingData(true)
+                if (Object.keys(expandedData).length !== 0) {
+                    setExpandedData({})
+                }
+                return
             }
 
             let allServices = []
@@ -55,11 +126,16 @@ export default function ServiceCard(data) {
                 allServices = allServices.concat(services[i].disabled)
             }
 
+            const typeFilters = ([...new Set(allServices.map(s => s.type))].map(t => ({
+                text: t,
+                value: t,
+            })))
+
             const servicesData = allServices.map(service => ({
                 key: service.id,
                 id: (
                     <Tooltip title="Подробнее">
-                        <Button type='text' onClick={() => showService(service.id)}>{service.id}</Button>
+                        <Button type='text' href={`/service/${service.id}`} target='_blank'>{service.id}</Button>
                     </Tooltip>
                 ),
                 type: service.type,
@@ -72,7 +148,9 @@ export default function ServiceCard(data) {
                                 `${address.city}${!['', ' '].includes(address.street) ? `, ${address.street}` : ''}${!['', ' '].includes(address.house) ? `, ${address.house}` : ''}${!['', ' '].includes(address.building) ? `, ${address.building}` : ''}${!['', ' '].includes(address.letter) ? ` ${address.letter}` : ''}${!['', ' '].includes(address.flat) ? `, ${address.flat}` : ''}`
                             }</li>
                         ))}
-                    </ul>)
+                    </ul>),
+                manageComm: service.description,
+                techComm: service.supportDescription,
             }))
 
             setServiceTable(
@@ -85,8 +163,10 @@ export default function ServiceCard(data) {
                             sorter: (a, b) => a.key - b.key,
                         },
                         {
-                            title: 'Название',
-                            dataIndex: 'type'
+                            title: 'Тип',
+                            dataIndex: 'type',
+                            filters: typeFilters,
+                            onFilter: (value, record) => record.type.startsWith(value),
                         },
                         {
                             title: 'Статус',
@@ -110,17 +190,56 @@ export default function ServiceCard(data) {
                         },
                         {
                             title: 'Адреса',
-                            dataIndex: 'addresses'
+                            dataIndex: 'addresses',
+                            width: 400,
+                            ...getColumnSearchProps('addresses'),
+                        },
+                        {
+                            title: 'Менеджерское',
+                            dataIndex: 'manageComm',
+                            ellipsis: {
+                                showTitle: false,
+                            },
+                            render: (manageComm) => (
+                                <Tooltip placement="topLeft" title={manageComm}>
+                                    {manageComm}
+                                </Tooltip>
+                            ),
+                        },
+                        {
+                            title: 'Техническое',
+                            dataIndex: 'techComm',
+                            ellipsis: {
+                                showTitle: false,
+                            },
+                            render: (techComm) => (
+                                <Tooltip placement="topLeft" title={techComm}>
+                                    {techComm}
+                                </Tooltip>
+                            ),
                         },
                     ]}
+                    expandable={{
+                        expandedRowRender: record => {
+                            const data = expandedData[record.key];
+                            return data ? (
+                                <div>{data}</div>
+                            ) : (
+                                <div>Загрузка...</div>
+                            );
+                        },
+                        onExpand: handleExpand,
+                    }}
                     dataSource={servicesData}
+                    size='small'
+                    pagination={false}
                     scroll={{
-                        x: 900
+                        x: 1200
                     }}
                 />
             )
         })();
-    }, [data.companyIds]);
+    }, [data.companyIds, expandedData]);
 
     if (isGettingData) {
         return <></>
@@ -128,9 +247,6 @@ export default function ServiceCard(data) {
 
     return (
         <>
-            <Modal open={isServiceOpen} onCancel={hideService} footer={null} width={isMobile ? '95%' : '80%'}>
-                {serviceItems}
-            </Modal>
             {!isGettingData ? <Typography.Title level={3}>Услуги</Typography.Title> : null}
             {serviceTable}
         </>

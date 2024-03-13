@@ -17,12 +17,8 @@ async function checkTokenValidity() {
             userData = await response.json();
         } else {
             // Если токен просрочен, попытка обновить его
-            const refreshResponse = await fetch(apiUrl + '/auth/refresh', {
+            const refreshResponse = await fetch(apiUrl + `/auth/refresh?refresh_token=${localStorage.getItem('refreshToken')}`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({refreshToken: localStorage.getItem('refreshToken')}),
             });
 
             if (refreshResponse.ok) {

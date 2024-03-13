@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Collapse, Descriptions, Flex, Modal} from 'antd';
+import {Button, Collapse, Descriptions, Flex, List, Modal, Table} from 'antd';
 import axios from "axios";
 
 export default function CompanyCard(data) {
@@ -24,8 +24,9 @@ export default function CompanyCard(data) {
                         items={[
                             {
                                 label: 'Телефон',
-                                children: contact.phones ? <ul style={{marginLeft: 10}}>{contact.phones.map((phone, i) => (
-                                    <li key={i}>{phone.ext ? `${phone.phone} (доб. ${phone.ext})` : phone.phone}</li>))}</ul> : "-",
+                                children: contact.phones ?
+                                    <ul style={{marginLeft: 10}}>{contact.phones.map((phone, i) => (
+                                        <li key={i}>{phone.ext ? `${phone.phone} (доб. ${phone.ext})` : phone.phone}</li>))}</ul> : "-",
                             },
                             {
                                 label: 'email',
@@ -97,22 +98,17 @@ export default function CompanyCard(data) {
             const companies = await getCompanies();
             if (companies.length === 0) {
                 setIsGettingData(true)
+                return
             }
 
-            setItems(companies.map(company => ({
-                label: company.client,
-                children: (
-                    <Flex justify="space-between" style={{width: '100%'}}>
-                        <div>
-                            <p><b>Клиент:</b> {company.client}</p>
-                            {company.brandName ? <p><b>Торговая марка:</b> {company.brandName}</p> : null}
-                            <p><b>Тип:</b> {company.type.name}</p>
-                            <p><b>Статус:</b> {company.status.name}</p>
-                            <p><b>Провайдер:</b> {company.provider}</p>
-                        </div>
-                        <Button onClick={() => showContacts(company.id)}>Контакты</Button>
-                    </Flex>
-                )
+            setItems(companies.map((company, i) => ({
+                key: i,
+                client: company.client,
+                brand: company.brandName,
+                type: company.type.name,
+                status: company.status.name,
+                provider: company.provider,
+                contactsButton: <Button onClick={() => showContacts(company.id)}>Контакты</Button>,
             })))
         })();
     }, [data.companyIds]);
@@ -126,7 +122,48 @@ export default function CompanyCard(data) {
             <Modal open={isContactsOpen} onCancel={hideContacts} footer={null} width={isMobile ? '95%' : '70%'}>
                 {contactsItems}
             </Modal>
-            {!isGettingData ? <Collapse items={items} defaultActiveKey={['0']} style={{marginTop: 20}}/> : null}
+            {!isGettingData ? <Collapse
+                size='small'
+                items={[{
+                    label: <b>Компании</b>,
+                    children: (
+                        <Table
+                            dataSource={items}
+                            size='small'
+                            scroll={{
+                                x: 500
+                            }}
+                            pagination={false}
+                            columns={[
+                                {
+                                    title: 'Клиент',
+                                    dataIndex: 'client'
+                                },
+                                {
+                                    title: 'Торговая марка',
+                                    dataIndex: 'brand'
+                                },
+                                {
+                                    title: 'Тип',
+                                    dataIndex: 'type'
+                                },
+                                {
+                                    title: 'Статус',
+                                    dataIndex: 'status'
+                                },
+                                {
+                                    title: 'Провайдер',
+                                    dataIndex: 'provider'
+                                },
+                                {
+                                    title: '',
+                                    dataIndex: 'contactsButton'
+                                },
+                            ]}
+                        />
+                    )
+                }]}
+            /> : null}
         </>
     )
 }
