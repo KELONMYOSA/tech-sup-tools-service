@@ -9,6 +9,8 @@ export default function ServiceCard(data) {
 
     const [isGettingData, setIsGettingData] = useState(true);
     const [serviceTable, setServiceTable] = useState(null);
+    const [countServicesActive, setCountServicesActive] = useState(0);
+    const [countServicesDisabled, setCountServicesDisabled] = useState(0);
     const [expandedData, setExpandedData] = useState({});
     const searchInput = useRef(null);
 
@@ -121,12 +123,24 @@ export default function ServiceCard(data) {
             }
 
             let allServices = []
+            let active = 0
+            let disabled = 0
             for (const i in services) {
                 allServices = allServices.concat(services[i].active)
                 allServices = allServices.concat(services[i].disabled)
+                active = active + services[i].active.length
+                disabled = disabled + services[i].disabled.length
             }
 
+            setCountServicesActive(active)
+            setCountServicesDisabled(disabled)
+
             const typeFilters = ([...new Set(allServices.map(s => s.type))].map(t => ({
+                text: t,
+                value: t,
+            })))
+
+            const statusFilters = ([...new Set(allServices.map(s => s.status.name))].map(t => ({
                 text: t,
                 value: t,
             })))
@@ -134,7 +148,7 @@ export default function ServiceCard(data) {
             const servicesData = allServices.map(service => ({
                 key: service.id,
                 id: (
-                    <Tooltip title="Подробнее">
+                    <Tooltip title={`(ID: ${service.companyId}) ${service.company}`}>
                         <Button type='text' href={`/service/${service.id}`} target='_blank'>{service.id}</Button>
                     </Tooltip>
                 ),
@@ -149,8 +163,14 @@ export default function ServiceCard(data) {
                             }</li>
                         ))}
                     </ul>),
-                manageComm: service.description,
-                techComm: service.supportDescription,
+                manageComm: (
+                    <Tooltip placement="topLeft" title={service.description}>
+                        {service.description}
+                    </Tooltip>),
+                techComm: (
+                    <Tooltip placement="topLeft" title={service.supportDescription}>
+                        {service.supportDescription}
+                    </Tooltip>),
             }))
 
             setServiceTable(
@@ -171,16 +191,7 @@ export default function ServiceCard(data) {
                         {
                             title: 'Статус',
                             dataIndex: 'status',
-                            filters: [
-                                {
-                                    text: 'Действует',
-                                    value: 'Действует',
-                                },
-                                {
-                                    text: 'Отключена',
-                                    value: 'Отключена',
-                                },
-                            ],
+                            filters: statusFilters,
                             defaultFilteredValue: ['Действует'],
                             onFilter: (value, record) => record.status.startsWith(value),
                         },
@@ -200,11 +211,7 @@ export default function ServiceCard(data) {
                             ellipsis: {
                                 showTitle: false,
                             },
-                            render: (manageComm) => (
-                                <Tooltip placement="topLeft" title={manageComm}>
-                                    {manageComm}
-                                </Tooltip>
-                            ),
+                            ...getColumnSearchProps('manageComm'),
                         },
                         {
                             title: 'Техническое',
@@ -212,11 +219,7 @@ export default function ServiceCard(data) {
                             ellipsis: {
                                 showTitle: false,
                             },
-                            render: (techComm) => (
-                                <Tooltip placement="topLeft" title={techComm}>
-                                    {techComm}
-                                </Tooltip>
-                            ),
+                            ...getColumnSearchProps('techComm'),
                         },
                     ]}
                     expandable={{
@@ -247,7 +250,8 @@ export default function ServiceCard(data) {
 
     return (
         <>
-            {!isGettingData ? <Typography.Title level={3}>Услуги</Typography.Title> : null}
+            {!isGettingData ? <Typography.Title
+                level={3}>{`Услуги (Действует: ${countServicesActive}, Отключено: ${countServicesDisabled})`}</Typography.Title> : null}
             {serviceTable}
         </>
     )

@@ -28,6 +28,7 @@ export default async function ServiceInfo(data) {
     if (service.rentServices.length > 0) {
         rentServices = (
             <Collapse
+                size='small'
                 items={[{
                     label: 'Арендованные услуги:',
                     children: (
@@ -76,6 +77,7 @@ export default async function ServiceInfo(data) {
     if (service.rentedFor.length > 0) {
         rentedFor = (
             <Collapse
+                size='small'
                 items={[{
                     label: 'Арендована для:',
                     children: (
@@ -124,6 +126,7 @@ export default async function ServiceInfo(data) {
     if (service.pack.length > 0) {
         pack = (
             <Collapse
+                size='small'
                 items={[{
                     label: 'Входит в пакет:',
                     children: (
@@ -168,6 +171,7 @@ export default async function ServiceInfo(data) {
         interfacesTable = (
             <Collapse
                 defaultActiveKey={0}
+                size='small'
                 items={[{
                     label: 'Интерфейсы',
                     children: (
@@ -222,6 +226,7 @@ export default async function ServiceInfo(data) {
         ipList = (
             <Collapse
                 defaultActiveKey={0}
+                size='small'
                 items={[{
                     label: 'IP',
                     children: (
@@ -241,6 +246,7 @@ export default async function ServiceInfo(data) {
         telData = (
             <Collapse
                 defaultActiveKey={0}
+                size='small'
                 items={[{
                     label: 'Телефония',
                     children: (
@@ -325,6 +331,7 @@ export default async function ServiceInfo(data) {
     if (service.typeId === 4534) {
         packData = (
             <Collapse
+                size='small'
                 items={[{
                     label: 'Услуги, входящие в пакет',
                     children: (
@@ -471,8 +478,8 @@ export default async function ServiceInfo(data) {
                         {packData}
                         <Descriptions
                             size='small'
+                            column={4}
                             style={{marginTop: 10}}
-                            column={1}
                             items={[
                                 {
                                     label: 'Скорость',
@@ -485,6 +492,22 @@ export default async function ServiceInfo(data) {
                                             <a key={i} target='_blank'
                                                href={`http://10.3.1.8:13080/viz/${vlan.vlan}`}>{vlan.vlan} </a>
                                         ))
+                                    ),
+                                },
+                                {
+                                    label: 'Сервисные документы',
+                                    span: {xs: 2},
+                                    children: (
+                                        <ul style={{listStyle: "none"}}>
+                                            {service.serviceDocs.map((doc, i) => (
+                                                <li key={i}>
+                                                    <a target='_blank'
+                                                       href={`https://boss.comfortel.pro/service_docs/${serviceId}/${doc}`}>
+                                                        {doc}
+                                                    </a>
+                                                </li>
+                                            ))}
+                                        </ul>
                                     ),
                                 },
                             ]}

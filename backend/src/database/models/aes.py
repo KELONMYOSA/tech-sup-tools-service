@@ -440,8 +440,10 @@ class ServiceDocument(OracleBase):
     created_date = Column(oracle.DATE())  # "CREATED_DATE" DATE DEFAULT sysdate,
     created_user = Column(oracle.NUMBER(9, 0), ForeignKey("IFS_KERNEL.CLIENT.id"))  # "CREATED_USER" NUMBER,
     is_delete = Column(oracle.VARCHAR2(1), server_default=text("N"))  # "IS_DELETE" VARCHAR2(1) DEFAULT 'N',
-    deleted_date = Column(oracle.DATE())  # "DELETE_DATE" DATE,
+    delete_date = Column(oracle.DATE())  # "DELETE_DATE" DATE,
     delete_user = Column(oracle.NUMBER(9, 0), ForeignKey("IFS_KERNEL.CLIENT.id"))  # "DELETE_USER" NUMBER,
+
+    service = relationship("Service", foreign_keys=[service_id], backref=backref("service_documents"))
 
 
 class ServiceLocalConnectLine(OracleBase):

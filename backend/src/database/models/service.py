@@ -163,6 +163,11 @@ class ServiceModel(Service):
                 }
                 for line in self.phone_lines
             ],
+            "serviceDocs": [
+                doc.document
+                for doc in self.service_documents
+                if doc.is_delete == "N" and not doc.document.endswith(".vsdx")
+            ],
         }
 
     def get_brief_info(self):
@@ -177,4 +182,6 @@ class ServiceModel(Service):
             "description": self.description or None,
             "supportDescription": self.support_desc or None,
             "addresses": self.__get_addresses(),
+            "company": self.company.name,
+            "companyId": int(self.id_company),
         }
