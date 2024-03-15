@@ -1,6 +1,8 @@
 import React, {useState} from 'react';
-import {Input, AutoComplete} from 'antd';
+import {Input, AutoComplete, Dropdown} from 'antd';
 import axios from 'axios';
+import {SearchOutlined} from "@ant-design/icons";
+import styles from '../../index.module.less'
 
 export default function SearchBar(data) {
     const apiUrl = import.meta.env.VITE_API_URL
@@ -62,7 +64,29 @@ export default function SearchBar(data) {
     const onClear = () => {
         data.updateCompanies([])
         data.updateService(null)
+        data.updateSearchText('')
+        data.updateSearchMode('all')
     };
+
+    const onSearchModeClick = (e) => {
+        data.updateSearchMode(e.key)
+    };
+
+    const searchMods = [
+        {
+            label: 'Везде',
+            key: 'all',
+        },
+        {
+            label: 'ID Услуги',
+            key: 'serviceId',
+        },
+    ]
+
+    const searchMode2Text = {
+        all: 'Поиск компании или услуги',
+        serviceId: 'Поиск: ID Услуги'
+    }
 
     return (
         <AutoComplete
@@ -76,10 +100,21 @@ export default function SearchBar(data) {
         >
             <Input.Search
                 size="large"
-                placeholder="Поиск компании или услуги"
+                placeholder={searchMode2Text[data.searchMode]}
                 onSearch={onEnter}
                 allowClear
-                enterButton
+                enterButton={
+                    <Dropdown.Button
+                        menu={{
+                            items: searchMods,
+                            onClick: onSearchModeClick,
+                        }}
+                        type='primary'
+                        rootClassName={styles.custom_search_button}
+                    >
+                        <SearchOutlined />
+                    </Dropdown.Button>
+                }
             />
         </AutoComplete>
     );

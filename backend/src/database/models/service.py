@@ -166,7 +166,7 @@ class ServiceModel(Service):
             "serviceDocs": [
                 doc.document
                 for doc in self.service_documents
-                if doc.is_delete == "N" and not doc.document.endswith(".vsdx")
+                if doc.is_delete == "N" and (doc.document and not doc.document.endswith(".vsdx"))
             ],
         }
 

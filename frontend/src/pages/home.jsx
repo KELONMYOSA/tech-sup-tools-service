@@ -10,6 +10,7 @@ export default function Home(data) {
     const [companyIds, setCompanyIds] = useState([]);
     const [serviceId, setServiceId] = useState(null);
     const [searchText, setSearchText] = useState('');
+    const [searchMode, setSearchMode] = useState('all');
 
     const isMobile = data.isMobile
 
@@ -55,7 +56,9 @@ export default function Home(data) {
                             updateCompanies={setCompanyIds}
                             updateService={setServiceId}
                             updateSearchText={setSearchText}
+                            updateSearchMode={setSearchMode}
                             searchText={searchText}
+                            searchMode={searchMode}
                         />
                     </Col>
                     <Col order={2} xs={{flex: '50px'}} md={{flex:'0 1 330px'}} style={{height: '100%'}}>
