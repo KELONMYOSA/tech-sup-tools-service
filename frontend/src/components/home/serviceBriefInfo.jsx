@@ -1,6 +1,7 @@
-import {Card, Col, Collapse, Descriptions, List, Row, Table} from "antd";
+import {Col, Descriptions, List, Row, Table} from "antd";
 import React from "react";
 import axios from "axios";
+import styles from '../../index.module.less'
 
 export default async function ServiceBriefInfo(data) {
     const apiUrl = import.meta.env.VITE_API_URL
@@ -32,6 +33,7 @@ export default async function ServiceBriefInfo(data) {
                     <Table
                         pagination={false}
                         size='small'
+                        className={styles.small_font_table}
                         bordered
                         dataSource={
                             service.interfaces.map((i, n) => (
@@ -81,6 +83,7 @@ export default async function ServiceBriefInfo(data) {
                         size='small'
                         header={<b>IP</b>}
                         bordered
+                        className={styles.small_font_list}
                         dataSource={service.subnets}
                         renderItem={(item) => <List.Item>{item}</List.Item>}
                     />
@@ -96,6 +99,7 @@ export default async function ServiceBriefInfo(data) {
                 <Descriptions
                     size='small'
                     style={{marginTop: 10}}
+                    className={styles.small_font_descriptions}
                     items={[
                         {
                             label: 'Тип подключения',
@@ -113,6 +117,7 @@ export default async function ServiceBriefInfo(data) {
                 />
                 <Table
                     pagination={false}
+                    className={styles.small_font_table}
                     size='small'
                     scroll={{
                         x: 500
@@ -172,6 +177,7 @@ export default async function ServiceBriefInfo(data) {
                     <Descriptions
                         size='small'
                         column={4}
+                        className={styles.small_font_descriptions}
                         style={{marginTop: 10}}
                         items={[
                             {

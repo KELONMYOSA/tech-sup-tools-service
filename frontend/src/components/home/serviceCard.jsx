@@ -3,6 +3,7 @@ import React, {useEffect, useRef, useState} from "react";
 import axios from "axios";
 import ServiceBriefInfo from "./serviceBriefInfo.jsx";
 import {SearchOutlined} from "@ant-design/icons";
+import styles from '../../index.module.less'
 
 export default function ServiceCard(data) {
     const apiUrl = import.meta.env.VITE_API_URL
@@ -175,6 +176,7 @@ export default function ServiceCard(data) {
 
             setServiceTable(
                 <Table
+                    className={styles.contrast_collapse_background}
                     columns={[
                         {
                             title: 'ID',
