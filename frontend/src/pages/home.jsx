@@ -1,14 +1,15 @@
 import {Col, Layout, Row, Typography} from "antd";
 import {Content, Header} from "antd/es/layout/layout.js";
 import Navbar from "../components/home/navbar.jsx";
-import SearchClientByPhoneNumber from "../components/home/phoneSearch.jsx";
 import {useState} from "react";
 import CompanyCard from "../components/home/companyCard.jsx";
 import ServiceCard from "../components/home/serviceCard.jsx";
+import SearchBar from "../components/home/searchBar.jsx";
 
 export default function Home(data) {
     const [companyIds, setCompanyIds] = useState([]);
-    const [phoneNumber, setPhoneNumber] = useState('');
+    const [serviceId, setServiceId] = useState(null);
+    const [searchText, setSearchText] = useState('');
 
     const isMobile = data.isMobile
 
@@ -21,7 +22,7 @@ export default function Home(data) {
             </Row>
             <Row>
                 <Col flex='auto' style={{padding: 20}}>
-                    <ServiceCard companyIds={companyIds}/>
+                    <ServiceCard companyIds={companyIds} serviceId={serviceId}/>
                 </Col>
             </Row>
         </>
@@ -50,10 +51,11 @@ export default function Home(data) {
                              backgroundColor: 'white'
                          }}
                     >
-                        <SearchClientByPhoneNumber
+                        <SearchBar
                             updateCompanies={setCompanyIds}
-                            updatePhone={setPhoneNumber}
-                            phone={phoneNumber}
+                            updateService={setServiceId}
+                            updateSearchText={setSearchText}
+                            searchText={searchText}
                         />
                     </Col>
                     <Col order={2} xs={{flex: '50px'}} md={{flex:'0 1 330px'}} style={{height: '100%'}}>

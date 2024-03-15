@@ -1,4 +1,4 @@
-import {Col, Descriptions, List, Row, Table} from "antd";
+import {Col, Descriptions, Flex, List, Row, Table} from "antd";
 import React from "react";
 import axios from "axios";
 import styles from '../../index.module.less'
@@ -10,7 +10,7 @@ export default async function ServiceBriefInfo(data) {
     const getServiceInfo = async (serviceId) => {
         try {
             const response = await axios.get(
-                `${apiUrl}/search/service/${serviceId}`
+                `${apiUrl}/service/full/${serviceId}`
             );
 
             return response.data
@@ -28,8 +28,8 @@ export default async function ServiceBriefInfo(data) {
     let interfacesTable
     if (service.interfaces.length > 0) {
         interfacesTable = (
-            <Col flex='1 1'>
-                <div style={{marginLeft: -40, marginBottom: 10, marginTop: 10}}>
+            <Col>
+                <div style={{marginLeft: -20, marginBottom: 10, marginTop: 10}}>
                     <Table
                         pagination={false}
                         size='small'
@@ -77,8 +77,8 @@ export default async function ServiceBriefInfo(data) {
     let ipList
     if (service.subnets.length > 0) {
         ipList = (
-            <Col flex='1 1'>
-                <div style={interfacesTable === undefined ? {marginBottom: 10} : {marginLeft: 30, marginBottom: 10}}>
+            <Col>
+                <div style={{marginLeft: 20, marginBottom: 10}}>
                     <List
                         size='small'
                         header={<b>IP</b>}
@@ -96,128 +96,134 @@ export default async function ServiceBriefInfo(data) {
     if (service.typeId === 370) {
         telData = (
             <>
-                <Descriptions
-                    size='small'
-                    style={{marginTop: 10}}
-                    className={styles.small_font_descriptions}
-                    items={[
-                        {
-                            label: 'Тип подключения',
-                            children: service.phoneVats.atsType
-                        },
-                        {
-                            label: 'Городских линий',
-                            children: service.phoneVats.cityLine
-                        },
-                        {
-                            label: 'Внутренних линий',
-                            children: service.phoneVats.innerLine
-                        },
-                    ]}
-                />
-                <Table
-                    pagination={false}
-                    className={styles.small_font_table}
-                    size='small'
-                    scroll={{
-                        x: 500
-                    }}
-                    dataSource={
-                        service.phoneLines.map((p, i) => (
+                <Row style={{marginLeft: 20, marginBottom: 10}}>
+                    <Col>
+                    <Descriptions
+                        size='small'
+                        bordered
+                        className={styles.small_font_descriptions}
+                        items={[
                             {
-                                key: i,
-                                targetIn: p.targetIn === 'Y' ? 'Да' : 'Нет',
-                                targetOut: p.targetOut === 'Y' ? 'Да' : 'Нет',
-                                phone: p.phone,
-                                typeMobile: p.typeMobile === 'Y' ? 'Да' : 'Нет',
-                                typeMgMn: p.typeMgMn === 'Y' ? 'Да' : 'Нет',
-                                typeSpb: p.typeSpb === 'Y' ? 'Да' : 'Нет',
-                                comm: p.comm,
-                            }
-                        ))}
-                    columns={[
-                        {
-                            title: 'Вх.',
-                            dataIndex: 'targetIn',
-                        },
-                        {
-                            title: 'Исх.',
-                            dataIndex: 'targetOut',
-                        },
-                        {
-                            title: '',
-                            dataIndex: 'phone',
-                        },
-                        {
-                            title: 'Моб.',
-                            dataIndex: 'typeMobile',
-                        },
-                        {
-                            title: 'МГ/МН',
-                            dataIndex: 'typeMgMn',
-                        },
-                        {
-                            title: 'СПб',
-                            dataIndex: 'typeSpb',
-                        },
-                        {
-                            title: 'Комментарии',
-                            dataIndex: 'comm',
-                        },
-                    ]}
-                />
+                                label: 'Тип подключения',
+                                children: service.phoneVats.atsType
+                            },
+                            {
+                                label: 'Городских линий',
+                                children: service.phoneVats.cityLine
+                            },
+                            {
+                                label: 'Внутренних линий',
+                                children: service.phoneVats.innerLine
+                            },
+                        ]}
+                    />
+                        <Table
+                            pagination={false}
+                            className={styles.small_font_table}
+                            size='small'
+                            scroll={{
+                                x: 500
+                            }}
+                            dataSource={
+                                service.phoneLines.map((p, i) => (
+                                    {
+                                        key: i,
+                                        targetIn: p.targetIn === 'Y' ? 'Да' : 'Нет',
+                                        targetOut: p.targetOut === 'Y' ? 'Да' : 'Нет',
+                                        phone: p.phone,
+                                        typeMobile: p.typeMobile === 'Y' ? 'Да' : 'Нет',
+                                        typeMgMn: p.typeMgMn === 'Y' ? 'Да' : 'Нет',
+                                        typeSpb: p.typeSpb === 'Y' ? 'Да' : 'Нет',
+                                        comm: p.comm,
+                                    }
+                                ))}
+                            columns={[
+                                {
+                                    title: 'Вх.',
+                                    dataIndex: 'targetIn',
+                                },
+                                {
+                                    title: 'Исх.',
+                                    dataIndex: 'targetOut',
+                                },
+                                {
+                                    title: '',
+                                    dataIndex: 'phone',
+                                },
+                                {
+                                    title: 'Моб.',
+                                    dataIndex: 'typeMobile',
+                                },
+                                {
+                                    title: 'МГ/МН',
+                                    dataIndex: 'typeMgMn',
+                                },
+                                {
+                                    title: 'СПб',
+                                    dataIndex: 'typeSpb',
+                                },
+                                {
+                                    title: 'Комментарии',
+                                    dataIndex: 'comm',
+                                },
+                            ]}
+                        />
+                    </Col>
+                </Row>
             </>
         )
     }
 
     return (
         [true,
-            <Row style={{width: '100%'}}>
-                <Col style={{width: '100%'}}>
-                    <Descriptions
-                        size='small'
-                        column={4}
-                        className={styles.small_font_descriptions}
-                        style={{marginTop: 10}}
-                        items={[
-                            {
-                                label: 'Скорость',
-                                children: service.speed === 0 ? '- ? -' : service.speed,
-                            },
-                            {
-                                label: 'Vlan(s)',
-                                children: (
-                                    service.vlans.map((vlan, i) => (
-                                        <a key={i} target='_blank'
-                                           href={`http://10.3.1.8:13080/viz/${vlan.vlan}`}>{vlan.vlan} </a>
-                                    ))
-                                ),
-                            },
-                            {
-                                label: 'Сервисные документы',
-                                span: {xs: 2},
-                                children: (
-                                    <ul style={{listStyle: "none"}}>
-                                        {service.serviceDocs.map((doc, i) => (
-                                            <li key={i}>
-                                                <a target='_blank'
-                                                   href={`https://boss.comfortel.pro/service_docs/${serviceId}/${doc}`}>
-                                                    {doc}
-                                                </a>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                ),
-                            },
-                        ]}
-                    />
-                    <Row style={{width: '100%'}}>
-                        {interfacesTable}
-                        {ipList}
-                    </Row>
-                    {telData}
-                </Col>
-            </Row>
+            <Flex>
+                <Descriptions
+                    size='small'
+                    column={4}
+                    className={styles.small_font_descriptions}
+                    bordered
+                    items={[
+                        {
+                            label: 'Скорость',
+                            children: service.speed === 0 ? '- ? -' : service.speed,
+                        },
+                        {
+                            label: 'Vlan(s)',
+                            children: (
+                                <ul style={{listStyle: "none"}}>
+                                    {service.vlans.map((vlan, i) => (
+                                        <li key={i}>
+                                            <a target='_blank'
+                                               href={`http://10.3.1.8:13080/viz/${vlan.vlan}`}>{vlan.vlan} </a>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ),
+                        },
+                        {
+                            label: 'Сервисные документы',
+                            span: {xs: 2},
+                            children: (
+                                <ul style={{listStyle: "none"}}>
+                                    {service.serviceDocs.map((doc, i) => (
+                                        <li key={i}>
+                                            <a target='_blank'
+                                               href={`https://boss.comfortel.pro/service_docs/${serviceId}/${doc}`}>
+                                                {doc}
+                                            </a>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ),
+                        },
+                    ]}
+                />
+                <Row>
+                    {interfacesTable}
+                    {ipList}
+                </Row>
+                {telData}
+            </Flex>
         ]
     )
 }

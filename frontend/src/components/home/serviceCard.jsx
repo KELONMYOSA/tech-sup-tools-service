@@ -17,12 +17,22 @@ export default function ServiceCard(data) {
 
     const getServices = async () => {
         let services = []
-        for (const i in data.companyIds) {
+        if (data.serviceId === null) {
+            for (const i in data.companyIds) {
+                try {
+                    const response = await axios.get(
+                        `${apiUrl}/service/brief?company_id=${data.companyIds[i]}`
+                    );
+                    services.push(response.data)
+                } catch (error) {
+                    console.error(error)
+                }
+            }
+        } else {
             try {
                 const response = await axios.get(
-                    `${apiUrl}/search/service?company_id=${data.companyIds[i]}`
+                    `${apiUrl}/service/brief?id=${data.serviceId}`
                 );
-
                 services.push(response.data)
             } catch (error) {
                 console.error(error)
@@ -44,13 +54,10 @@ export default function ServiceCard(data) {
 
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
-        setSearchText(selectedKeys[0]);
-        setSearchedColumn(dataIndex);
     };
 
     const handleReset = (clearFilters) => {
         clearFilters();
-        setSearchText('');
     };
 
     const getColumnSearchProps = (dataIndex) => ({

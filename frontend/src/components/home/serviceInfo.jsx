@@ -9,7 +9,7 @@ export default async function ServiceInfo(data) {
     const getServiceInfo = async (serviceId) => {
         try {
             const response = await axios.get(
-                `${apiUrl}/search/service/${serviceId}`
+                `${apiUrl}/service/full/${serviceId}`
             );
 
             return response.data
@@ -488,10 +488,14 @@ export default async function ServiceInfo(data) {
                                 {
                                     label: 'Vlan(s)',
                                     children: (
-                                        service.vlans.map((vlan, i) => (
-                                            <a key={i} target='_blank'
-                                               href={`http://10.3.1.8:13080/viz/${vlan.vlan}`}>{vlan.vlan} </a>
-                                        ))
+                                        <ul style={{listStyle: "none"}}>
+                                            {service.vlans.map((vlan, i) => (
+                                                <li key={i}>
+                                                    <a target='_blank'
+                                                       href={`http://10.3.1.8:13080/viz/${vlan.vlan}`}>{vlan.vlan} </a>
+                                                </li>
+                                            ))}
+                                        </ul>
                                     ),
                                 },
                                 {

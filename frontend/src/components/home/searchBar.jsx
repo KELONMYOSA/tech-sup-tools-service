@@ -2,34 +2,34 @@ import React, {useState} from 'react';
 import {Input, AutoComplete} from 'antd';
 import axios from 'axios';
 
-export default function SearchClientByPhoneNumber(data) {
+export default function SearchBar(data) {
     const apiUrl = import.meta.env.VITE_API_URL
 
     const [options, setOptions] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
 
     const onSearch = async value => {
-        data.updatePhone(value)
+        data.updateSearchText(value)
         setIsOpen(true)
-        if (value.length >= 2 && value.length <= 10) {
+        let newOptions = []
+        if (value.length >= 3) {
             try {
                 const response = await axios.get(
-                    `${apiUrl}/search/client?phone=${value}`
+                    `${apiUrl}/search/company?phone=${value}&max_results=5`
                 );
 
-                const newOptions = response.data.map(client => ({
-                    value: `${client.company.id}_${client.phone}`,
-                    label: (<p><b>{client.company.name}</b> - {client.contact.name}</p>)
-                }));
-
-                setOptions(newOptions);
+                newOptions.push({
+                    label: 'Телефон',
+                    options: response.data.map(client => ({
+                        value: `${client.company.id}_${client.phone}`,
+                        label: (<p>{client.phone} - {client.company.name}</p>)
+                    }))
+                })
             } catch (error) {
                 console.error(error)
-                setOptions([]);
             }
-        } else {
-            setOptions([]);
         }
+        setOptions(newOptions);
     };
 
     const onEnter = async value => {
@@ -40,12 +40,12 @@ export default function SearchClientByPhoneNumber(data) {
             setIsOpen(false)
             try {
                 const response = await axios.get(
-                    `${apiUrl}/search/client?phone=${value}`
+                    `${apiUrl}/search/company?phone=${value}`
                 );
 
                 const ids = response.data.map(client => (client.company.id));
                 data.updateCompanies(ids);
-                data.updatePhone(value);
+                data.updateSearchText(value);
             } catch (error) {
                 console.error(error)
             }
@@ -56,31 +56,27 @@ export default function SearchClientByPhoneNumber(data) {
         const result = value.split('_')
         setIsOpen(false)
         data.updateCompanies([parseInt(result[0])]);
-        data.updatePhone(result[1]);
+        data.updateSearchText(result[1]);
     };
 
     const onClear = () => {
         data.updateCompanies([])
+        data.updateService(null)
     };
 
     return (
         <AutoComplete
             style={{width: '100%'}}
             open={isOpen}
-            value={data.phone}
+            value={data.searchText}
             options={options}
             onChange={onClear}
             onSelect={onSelect}
             onSearch={onSearch}
-            onKeyDown={(event) => {
-                if (!/[0-9]/.test(event.key) && !['Delete', 'Backspace', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
-                    event.preventDefault();
-                }
-            }}
         >
             <Input.Search
                 size="large"
-                placeholder="Номер телефона"
+                placeholder="Поиск компании или услуги"
                 onSearch={onEnter}
                 allowClear
                 enterButton

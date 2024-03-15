@@ -67,7 +67,7 @@ export default function CompanyCard(data) {
     const getContacts = async (companyId) => {
         try {
             const response = await axios.get(
-                `${apiUrl}/search/contact?company_id=${companyId}`
+                `${apiUrl}/contact?company_id=${companyId}`
             );
 
             return response.data
@@ -81,7 +81,7 @@ export default function CompanyCard(data) {
         for (const i in data.companyIds) {
             try {
                 const response = await axios.get(
-                    `${apiUrl}/search/company/${data.companyIds[i]}`
+                    `${apiUrl}/company/${data.companyIds[i]}`
                 );
 
                 tempCompanies.push(response.data)
