@@ -14,7 +14,7 @@ export default function Service(data) {
 
     useEffect(() => {
         (async () => {
-            const serviceItems = await ServiceInfo({serviceId: serviceId})
+            const serviceItems = await ServiceInfo({serviceId: serviceId, pdfWidth: data.windowWidth * 0.6})
             if (serviceItems[0]) {
                 setServiceItems(
                     <Layout>

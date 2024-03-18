@@ -81,11 +81,16 @@ export default function SearchBar(data) {
             label: 'ID Услуги',
             key: 'serviceId',
         },
+        {
+            label: 'Номер телефона',
+            key: 'phone',
+        },
     ]
 
     const searchMode2Text = {
         all: 'Поиск компании или услуги',
-        serviceId: 'Поиск: ID Услуги'
+        serviceId: 'Поиск: ID Услуги',
+        phone: 'Поиск: Номер телефона'
     }
 
     return (

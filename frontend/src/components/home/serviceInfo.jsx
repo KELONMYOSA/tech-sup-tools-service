@@ -1,6 +1,9 @@
-import {Card, Col, Collapse, Descriptions, List, Row, Table, Tabs} from "antd";
+import {Card, Col, Descriptions, List, Row, Table, Tabs} from "antd";
 import React from "react";
 import axios from "axios";
+import {Document, Page, pdfjs} from "react-pdf";
+import 'react-pdf/dist/Page/TextLayer.css'
+import 'react-pdf/dist/Page/AnnotationLayer.css';
 
 export default async function ServiceInfo(data) {
     const apiUrl = import.meta.env.VITE_API_URL
@@ -27,353 +30,332 @@ export default async function ServiceInfo(data) {
     let rentServices
     if (service.rentServices.length > 0) {
         rentServices = (
-            <Collapse
-                size='small'
-                items={[{
-                    label: 'Арендованные услуги:',
-                    children: (
-                        <Table
-                            pagination={false}
-                            size='small'
-                            scroll={{
-                                x: 500
-                            }}
-                            dataSource={
-                                service.rentServices.map((s, i) => (
-                                    {
-                                        key: i,
-                                        id: <a href={`/service/${s.id}`} target='_blank'>{s.id}</a>,
-                                        type: s.type.name,
-                                        company: `(ID: ${s.companyId}) ${s.companyName}`,
-                                        status: s.status.name,
-                                    }
-                                ))}
-                            columns={[
-                                {
-                                    title: 'ID Услуги',
-                                    dataIndex: 'id',
-                                },
-                                {
-                                    title: 'Название',
-                                    dataIndex: 'type',
-                                },
-                                {
-                                    title: 'Компания',
-                                    dataIndex: 'company',
-                                },
-                                {
-                                    title: 'Статус',
-                                    dataIndex: 'status',
-                                },
-                            ]}
-                        />
-                    )
-                }]}
-            />
+            <Card title='Арендованные услуги:' size='small'>
+                <Table
+                    pagination={false}
+                    size='small'
+                    scroll={{
+                        x: 500
+                    }}
+                    dataSource={
+                        service.rentServices.map((s, i) => (
+                            {
+                                key: i,
+                                id: <a href={`/service/${s.id}`} target='_blank'>{s.id}</a>,
+                                type: s.type.name,
+                                company: `(ID: ${s.companyId}) ${s.companyName}`,
+                                status: s.status.name,
+                            }
+                        ))}
+                    columns={[
+                        {
+                            title: 'ID Услуги',
+                            dataIndex: 'id',
+                        },
+                        {
+                            title: 'Название',
+                            dataIndex: 'type',
+                        },
+                        {
+                            title: 'Компания',
+                            dataIndex: 'company',
+                        },
+                        {
+                            title: 'Статус',
+                            dataIndex: 'status',
+                        },
+                    ]}
+                />
+            </Card>
         )
     }
 
     let rentedFor
     if (service.rentedFor.length > 0) {
         rentedFor = (
-            <Collapse
-                size='small'
-                items={[{
-                    label: 'Арендована для:',
-                    children: (
-                        <Table
-                            pagination={false}
-                            size='small'
-                            scroll={{
-                                x: 500
-                            }}
-                            dataSource={
-                                service.rentedFor.map((s, i) => (
-                                    {
-                                        key: i,
-                                        id: <a href={`/service/${s.id}`} target='_blank'>{s.id}</a>,
-                                        type: s.type.name,
-                                        company: `(ID: ${s.companyId}) ${s.companyName}`,
-                                        status: s.status.name,
-                                    }
-                                ))}
-                            columns={[
-                                {
-                                    title: 'ID Услуги',
-                                    dataIndex: 'id',
-                                },
-                                {
-                                    title: 'Название',
-                                    dataIndex: 'type',
-                                },
-                                {
-                                    title: 'Компания',
-                                    dataIndex: 'company',
-                                },
-                                {
-                                    title: 'Статус',
-                                    dataIndex: 'status',
-                                },
-                            ]}
-                        />
-                    )
-                }]}
-            />
+            <Card title='Арендована для:' size='small'>
+                <Table
+                    pagination={false}
+                    size='small'
+                    scroll={{
+                        x: 500
+                    }}
+                    dataSource={
+                        service.rentedFor.map((s, i) => (
+                            {
+                                key: i,
+                                id: <a href={`/service/${s.id}`} target='_blank'>{s.id}</a>,
+                                type: s.type.name,
+                                company: `(ID: ${s.companyId}) ${s.companyName}`,
+                                status: s.status.name,
+                            }
+                        ))}
+                    columns={[
+                        {
+                            title: 'ID Услуги',
+                            dataIndex: 'id',
+                        },
+                        {
+                            title: 'Название',
+                            dataIndex: 'type',
+                        },
+                        {
+                            title: 'Компания',
+                            dataIndex: 'company',
+                        },
+                        {
+                            title: 'Статус',
+                            dataIndex: 'status',
+                        },
+                    ]}
+                />
+            </Card>
         )
     }
 
     let pack
     if (service.pack.length > 0) {
         pack = (
-            <Collapse
-                size='small'
-                items={[{
-                    label: 'Входит в пакет:',
-                    children: (
-                        <Table
-                            pagination={false}
-                            size='small'
-                            scroll={{
-                                x: 500
-                            }}
-                            dataSource={
-                                service.pack.map((p, i) => (
-                                    {
-                                        key: i,
-                                        id: <a href={`/service/${p.id}`} target='_blank'>{p.id}</a>,
-                                        type: p.type.name,
-                                        status: p.status.name,
-                                    }
-                                ))}
-                            columns={[
-                                {
-                                    title: 'ID Услуги',
-                                    dataIndex: 'id',
-                                },
-                                {
-                                    title: 'Название',
-                                    dataIndex: 'type',
-                                },
-                                {
-                                    title: 'Статус',
-                                    dataIndex: 'status',
-                                },
-                            ]}
-                        />
-                    )
-                }]}
-            />
+            <Card title='Входит в пакет:' size='small'>
+                <Table
+                    pagination={false}
+                    size='small'
+                    scroll={{
+                        x: 500
+                    }}
+                    dataSource={
+                        service.pack.map((p, i) => (
+                            {
+                                key: i,
+                                id: <a href={`/service/${p.id}`} target='_blank'>{p.id}</a>,
+                                type: p.type.name,
+                                status: p.status.name,
+                            }
+                        ))}
+                    columns={[
+                        {
+                            title: 'ID Услуги',
+                            dataIndex: 'id',
+                        },
+                        {
+                            title: 'Название',
+                            dataIndex: 'type',
+                        },
+                        {
+                            title: 'Статус',
+                            dataIndex: 'status',
+                        },
+                    ]}
+                />
+            </Card>
         )
     }
 
     let interfacesTable
     if (service.interfaces.length > 0) {
         interfacesTable = (
-            <Collapse
-                defaultActiveKey={0}
-                size='small'
-                items={[{
-                    label: 'Интерфейсы',
-                    children: (
-                        <Table
-                            pagination={false}
-                            size='small'
-                            scroll={{
-                                x: 500
-                            }}
-                            dataSource={
-                                service.interfaces.map((i, n) => (
-                                    {
-                                        key: n,
-                                        portType: i.type,
-                                        unitAddress: `${i.uAddress.city}${!['', ' ', null].includes(i.uAddress.street) ? `, ${i.uAddress.street}` : ''}${!['', ' ', null].includes(i.uAddress.house) ? `, ${i.uAddress.house}` : ''}${!['', ' ', null].includes(i.uAddress.building) ? `, ${i.uAddress.building}` : ''}${!['', ' ', null].includes(i.uAddress.letter) ? ` ${i.uAddress.letter}` : ''}${!['', ' ', null].includes(i.uAddress.flat) ? `, ${i.uAddress.flat}` : ''}`,
-                                        equipmentDomain: i.eDomain,
-                                        portHost: i.host,
-                                        iName: i.name,
-                                    }
-                                ))}
-                            columns={[
-                                {
-                                    title: 'Тип',
-                                    dataIndex: 'portType',
-                                },
-                                {
-                                    title: 'Адрес узла',
-                                    dataIndex: 'unitAddress',
-                                },
-                                {
-                                    title: 'Оборудование',
-                                    dataIndex: 'equipmentDomain',
-                                },
-                                {
-                                    title: 'IP',
-                                    dataIndex: 'portHost',
-                                },
-                                {
-                                    title: 'Интерфейс',
-                                    dataIndex: 'iName',
-                                },
-                            ]}
-                        />
-                    )
-                }]}
-            />
+            <Card title='Интерфейсы' size='small'>
+                <Table
+                    pagination={false}
+                    size='small'
+                    scroll={{
+                        x: 500
+                    }}
+                    dataSource={
+                        service.interfaces.map((i, n) => (
+                            {
+                                key: n,
+                                portType: i.type,
+                                unitAddress: `${i.uAddress.city}${!['', ' ', null].includes(i.uAddress.street) ? `, ${i.uAddress.street}` : ''}${!['', ' ', null].includes(i.uAddress.house) ? `, ${i.uAddress.house}` : ''}${!['', ' ', null].includes(i.uAddress.building) ? `, ${i.uAddress.building}` : ''}${!['', ' ', null].includes(i.uAddress.letter) ? ` ${i.uAddress.letter}` : ''}${!['', ' ', null].includes(i.uAddress.flat) ? `, ${i.uAddress.flat}` : ''}`,
+                                equipmentDomain: i.eDomain,
+                                portHost: i.host,
+                                iName: i.name,
+                            }
+                        ))}
+                    columns={[
+                        {
+                            title: 'Тип',
+                            dataIndex: 'portType',
+                        },
+                        {
+                            title: 'Адрес узла',
+                            dataIndex: 'unitAddress',
+                        },
+                        {
+                            title: 'Оборудование',
+                            dataIndex: 'equipmentDomain',
+                        },
+                        {
+                            title: 'IP',
+                            dataIndex: 'portHost',
+                        },
+                        {
+                            title: 'Интерфейс',
+                            dataIndex: 'iName',
+                        },
+                    ]}
+                />
+            </Card>
         )
     }
 
     let ipList
     if (service.subnets.length > 0) {
         ipList = (
-            <Collapse
-                defaultActiveKey={0}
-                size='small'
-                items={[{
-                    label: 'IP',
-                    children: (
-                        <List
-                            size="small"
-                            dataSource={service.subnets}
-                            renderItem={(item) => <List.Item>{item}</List.Item>}
-                        />
-                    )
-                }]}
-            />
+            <Card title='IP' size='small'>
+                <List
+                    size="small"
+                    dataSource={service.subnets}
+                    renderItem={(item) => <List.Item>{item}</List.Item>}
+                />
+            </Card>
         )
     }
 
     let telData
     if (service.typeId === 370) {
         telData = (
-            <Collapse
-                defaultActiveKey={0}
-                size='small'
-                items={[{
-                    label: 'Телефония',
-                    children: (
-                        <>
-                            <Descriptions
-                                size='small'
-                                style={{marginTop: 10}}
-                                column={1}
-                                items={[
-                                    {
-                                        label: 'Тип подключения',
-                                        children: service.phoneVats.atsType
-                                    },
-                                    {
-                                        label: 'Городских линий',
-                                        children: service.phoneVats.cityLine
-                                    },
-                                    {
-                                        label: 'Внутренних линий',
-                                        children: service.phoneVats.innerLine
-                                    },
-                                ]}
-                            />
-                            <Table
-                                pagination={false}
-                                size='small'
-                                scroll={{
-                                    x: 500
-                                }}
-                                dataSource={
-                                    service.phoneLines.map((p, i) => (
-                                        {
-                                            key: i,
-                                            targetIn: p.targetIn === 'Y' ? 'Да' : 'Нет',
-                                            targetOut: p.targetOut === 'Y' ? 'Да' : 'Нет',
-                                            phone: p.phone,
-                                            typeMobile: p.typeMobile === 'Y' ? 'Да' : 'Нет',
-                                            typeMgMn: p.typeMgMn === 'Y' ? 'Да' : 'Нет',
-                                            typeSpb: p.typeSpb === 'Y' ? 'Да' : 'Нет',
-                                            comm: p.comm,
-                                        }
-                                    ))}
-                                columns={[
-                                    {
-                                        title: 'Вх.',
-                                        dataIndex: 'targetIn',
-                                    },
-                                    {
-                                        title: 'Исх.',
-                                        dataIndex: 'targetOut',
-                                    },
-                                    {
-                                        title: '',
-                                        dataIndex: 'phone',
-                                    },
-                                    {
-                                        title: 'Моб.',
-                                        dataIndex: 'typeMobile',
-                                    },
-                                    {
-                                        title: 'МГ/МН',
-                                        dataIndex: 'typeMgMn',
-                                    },
-                                    {
-                                        title: 'СПб',
-                                        dataIndex: 'typeSpb',
-                                    },
-                                    {
-                                        title: 'Комментарии',
-                                        dataIndex: 'comm',
-                                    },
-                                ]}
-                            />
-                        </>
-                    )
-                }]}
-            />
+            <Card title='Телефония' size='small'>
+                <>
+                    <Descriptions
+                        size='small'
+                        style={{marginTop: 10}}
+                        column={1}
+                        items={[
+                            {
+                                label: 'Тип подключения',
+                                children: service.phoneVats.atsType
+                            },
+                            {
+                                label: 'Городских линий',
+                                children: service.phoneVats.cityLine
+                            },
+                            {
+                                label: 'Внутренних линий',
+                                children: service.phoneVats.innerLine
+                            },
+                        ]}
+                    />
+                    <Table
+                        pagination={false}
+                        size='small'
+                        scroll={{
+                            x: 500
+                        }}
+                        dataSource={
+                            service.phoneLines.map((p, i) => (
+                                {
+                                    key: i,
+                                    targetIn: p.targetIn === 'Y' ? 'Да' : 'Нет',
+                                    targetOut: p.targetOut === 'Y' ? 'Да' : 'Нет',
+                                    phone: p.phone,
+                                    typeMobile: p.typeMobile === 'Y' ? 'Да' : 'Нет',
+                                    typeMgMn: p.typeMgMn === 'Y' ? 'Да' : 'Нет',
+                                    typeSpb: p.typeSpb === 'Y' ? 'Да' : 'Нет',
+                                    comm: p.comm,
+                                }
+                            ))}
+                        columns={[
+                            {
+                                title: 'Вх.',
+                                dataIndex: 'targetIn',
+                            },
+                            {
+                                title: 'Исх.',
+                                dataIndex: 'targetOut',
+                            },
+                            {
+                                title: '',
+                                dataIndex: 'phone',
+                            },
+                            {
+                                title: 'Моб.',
+                                dataIndex: 'typeMobile',
+                            },
+                            {
+                                title: 'МГ/МН',
+                                dataIndex: 'typeMgMn',
+                            },
+                            {
+                                title: 'СПб',
+                                dataIndex: 'typeSpb',
+                            },
+                            {
+                                title: 'Комментарии',
+                                dataIndex: 'comm',
+                            },
+                        ]}
+                    />
+                </>
+            </Card>
         )
     }
 
     let packData
     if (service.typeId === 4534) {
         packData = (
-            <Collapse
-                size='small'
-                items={[{
-                    label: 'Услуги, входящие в пакет',
-                    children: (
-                        <Table
-                            pagination={false}
-                            size='small'
-                            scroll={{
-                                x: 500
-                            }}
-                            dataSource={
-                                service.packServices.map((p, i) => (
-                                    {
-                                        key: i,
-                                        id: <a href={`/service/${p.id}`} target='_blank'>{p.id}</a>,
-                                        type: p.type.name,
-                                        status: p.status.name,
-                                        aes: (
-                                            <a href={`https://boss.comfortel.pro/index.phtml?service_id=${p.id}&url_fav=1&mid=154&pid=404&module_mode=open&company_id=${p.companyId}&oid=1163`}>AES</a>),
-                                    }
-                                ))}
-                            columns={[
-                                {
-                                    title: 'ID',
-                                    dataIndex: 'id',
-                                },
-                                {
-                                    title: 'Тип услуги',
-                                    dataIndex: 'type',
-                                },
-                                {
-                                    title: 'Статус',
-                                    dataIndex: 'status',
-                                },
-                                {
-                                    title: '',
-                                    dataIndex: 'aes',
-                                },
-                            ]}
-                        />
-                    )
-                }]}
-            />
+            <Card title='Услуги, входящие в пакет' size='small'>
+                <Table
+                    pagination={false}
+                    size='small'
+                    scroll={{
+                        x: 500
+                    }}
+                    dataSource={
+                        service.packServices.map((p, i) => (
+                            {
+                                key: i,
+                                id: <a href={`/service/${p.id}`} target='_blank'>{p.id}</a>,
+                                type: p.type.name,
+                                status: p.status.name,
+                                aes: (
+                                    <a href={`https://boss.comfortel.pro/index.phtml?service_id=${p.id}&url_fav=1&mid=154&pid=404&module_mode=open&company_id=${p.companyId}&oid=1163`}>AES</a>),
+                            }
+                        ))}
+                    columns={[
+                        {
+                            title: 'ID',
+                            dataIndex: 'id',
+                        },
+                        {
+                            title: 'Тип услуги',
+                            dataIndex: 'type',
+                        },
+                        {
+                            title: 'Статус',
+                            dataIndex: 'status',
+                        },
+                        {
+                            title: '',
+                            dataIndex: 'aes',
+                        },
+                    ]}
+                />
+            </Card>
+        )
+    }
+
+    pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+        'pdfjs-dist/build/pdf.worker.min.js',
+        import.meta.url,
+    ).toString();
+
+    let serviceDocs
+    if (service.serviceDocs.length > 0) {
+        serviceDocs = (
+            <Card title='Схема' size='small'>
+                {
+                    service.serviceDocs.map((doc, i) => {
+                        if (doc.indexOf(".pdf", doc.length - 4) !== -1) {
+                            return (
+                                <Document key={i} file={`${apiUrl}/service_docs/${serviceId}/${doc}`}>
+                                    <Page width={data.pdfWidth} pageNumber={1}/>
+                                </Document>
+                            )
+                        }
+                    })
+                }
+            </Card>
         )
     }
 
@@ -479,7 +461,8 @@ export default async function ServiceInfo(data) {
                         <Descriptions
                             size='small'
                             column={4}
-                            style={{marginTop: 10}}
+                            bordered
+                            style={{marginTop: 10, marginBottom: 10}}
                             items={[
                                 {
                                     label: 'Скорость',
@@ -519,6 +502,7 @@ export default async function ServiceInfo(data) {
                         {interfacesTable}
                         {ipList}
                         {telData}
+                        {serviceDocs}
                     </Card>
                 </Col>
             </Row>
