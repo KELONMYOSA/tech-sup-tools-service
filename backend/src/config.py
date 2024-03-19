@@ -14,5 +14,7 @@ class Settings(BaseSettings):
 
     ORACLE_DB_URL: str
 
+    ES_URL: str
+
 
 settings = Settings()

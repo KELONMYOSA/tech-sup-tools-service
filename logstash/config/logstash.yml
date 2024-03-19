@@ -1,0 +1,3 @@
+pipeline.workers: 4
+pipeline.batch.size: 125
+log.level: info

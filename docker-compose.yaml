@@ -9,6 +9,8 @@ services:
       dockerfile: Dockerfile-backend
     ports:
       - "5000:5000"
+    networks:
+      - tech-sup-net
     restart: unless-stopped
 
   frontend:
@@ -19,6 +21,52 @@ services:
       dockerfile: Dockerfile-frontend
     ports:
       - "5001:5001"
-    restart: unless-stopped
+    networks:
+      - tech-sup-net
     depends_on:
       - backend
+    restart: unless-stopped
+
+  elasticsearch:
+    image: elasticsearch:8.12.2
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - network.host=0.0.0.0
+      - xpack.security.enabled=false
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    networks:
+      - tech-sup-net
+    restart: unless-stopped
+
+  logstash:
+    image: logstash-oracle
+    container_name: logstash
+    build:
+      context: .
+      dockerfile: Dockerfile-logstash
+    environment:
+      - ORACLE_DB_HOST=${ORACLE_DB_HOST}
+      - ORACLE_DB_PORT=${ORACLE_DB_PORT}
+      - ORACLE_DB_SID=${ORACLE_DB_SID}
+      - ORACLE_DB_USER=${ORACLE_DB_USER}
+      - ORACLE_DB_PASSWORD=${ORACLE_DB_PASSWORD}
+    volumes:
+      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
+      - ./elasticsearch/init-es.sh:/usr/share/elasticsearch/init-es.sh
+    command: /bin/bash -c "/usr/share/elasticsearch/init-es.sh && /usr/local/bin/docker-entrypoint"
+    networks:
+      - tech-sup-net
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
+
+volumes:
+  esdata:
+    driver: local
+
+networks:
+  tech-sup-net:
+    driver: bridge

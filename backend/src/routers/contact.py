@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from src.models.user import User
 from src.utils.auth import get_current_user
-from src.utils.clients import get_contacts_by_company_id
+from src.utils.company import get_contacts_by_company_id
 
 router = APIRouter(
     prefix="/contact",

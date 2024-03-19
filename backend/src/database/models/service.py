@@ -42,7 +42,7 @@ class ServiceModel(Service):
                 {
                     "type": i.port_type,
                     "uAddress": i.unit.address,
-                    "eDomain": i.equipment.domain,
+                    "eDomain": i.equipment.domain if i.equipment else None,
                     "host": i.port.router.host,
                     "name": i.port.ifname,
                 }

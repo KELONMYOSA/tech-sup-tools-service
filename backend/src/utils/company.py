@@ -1,13 +1,5 @@
 from src.database.db import oracle_db
-from src.database.models.client import ClientByPhoneSearchModel, CompanyModel
-
-
-def get_client_by_phone(phone_num: str, max_results: int = 10) -> list | None:
-    search = ClientByPhoneSearchModel(phone_num, max_results)
-    if search:
-        return search.get_data()
-    else:
-        return None
+from src.database.models.company import CompanyModel
 
 
 def get_company_by_id(company_id: int) -> dict | None:

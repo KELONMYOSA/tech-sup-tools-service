@@ -1,0 +1,15 @@
+FROM logstash:8.12.2
+
+USER root
+
+WORKDIR /opt/oracle
+
+RUN apt-get update && apt-get install -y libaio1 wget unzip && apt-get install -y gcc\
+  && wget https://download.oracle.com/otn_software/linux/instantclient/2113000/instantclient-basiclite-linux.x64-21.13.0.0.0dbru.zip \
+  && unzip instantclient-basiclite-linux.x64-21.13.0.0.0dbru.zip \
+  && rm -f instantclient-basiclite-linux.x64-21.13.0.0.0dbru.zip \
+  && cd /opt/oracle/instantclient* \
+  && echo /opt/oracle/instantclient* > /etc/ld.so.conf.d/oracle-instantclient.conf \
+  && ldconfig
+
+USER logstash
