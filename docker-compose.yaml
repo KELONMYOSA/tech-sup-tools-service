@@ -56,7 +56,7 @@ services:
       - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
       - ./logstash/pipeline:/usr/share/logstash/pipeline
       - ./elasticsearch/init-es.sh:/usr/share/elasticsearch/init-es.sh
-    command: /bin/bash -c "/usr/share/elasticsearch/init-es.sh && /usr/local/bin/docker-entrypoint"
+    command: /bin/bash -c "chmod +x /usr/share/elasticsearch/init-es.sh && /usr/share/elasticsearch/init-es.sh && /usr/local/bin/docker-entrypoint"
     networks:
       - tech-sup-net
     depends_on:
