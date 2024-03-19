@@ -46,6 +46,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-logstash
+    user: root
     environment:
       - ORACLE_DB_HOST=${ORACLE_DB_HOST}
       - ORACLE_DB_PORT=${ORACLE_DB_PORT}
