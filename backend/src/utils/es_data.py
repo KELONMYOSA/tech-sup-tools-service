@@ -82,15 +82,14 @@ class ESDataManager:
             self.company_ids.add(company_id)
             self.service_ids.add(service_id)
 
-            if service_status in self.service_statuses:
-                self.service_statuses[service_status] += 1
-            else:
-                self.service_statuses[service_status] = 1
-
             if service_id in data_map:
                 data_map[service_id].add_data(item)
             else:
                 data_map[service_id] = ESData(item)
+                if service_status in self.service_statuses:
+                    self.service_statuses[service_status] += 1
+                else:
+                    self.service_statuses[service_status] = 1
         self.data = list(data_map.values())
 
     def make_response(self):
