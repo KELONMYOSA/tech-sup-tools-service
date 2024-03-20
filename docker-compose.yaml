@@ -36,6 +36,9 @@ services:
       - xpack.security.enabled=false
     volumes:
       - esdata:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
     networks:
       - tech-sup-net
     restart: unless-stopped
