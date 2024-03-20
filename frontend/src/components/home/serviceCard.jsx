@@ -1,46 +1,15 @@
 import {Button, Input, Space, Table, Tooltip, Typography} from "antd";
 import React, {useEffect, useRef, useState} from "react";
-import axios from "axios";
 import ServiceBriefInfo from "./serviceBriefInfo.jsx";
 import {SearchOutlined} from "@ant-design/icons";
 import styles from '../../index.module.less'
 
 export default function ServiceCard(data) {
-    const apiUrl = import.meta.env.VITE_API_URL
-
     const [isGettingData, setIsGettingData] = useState(true);
     const [serviceTable, setServiceTable] = useState(null);
-    const [countServicesActive, setCountServicesActive] = useState(0);
-    const [countServicesDisabled, setCountServicesDisabled] = useState(0);
     const [expandedData, setExpandedData] = useState({});
+    const [serviceStatuses, setServiceStatuses] = useState(null);
     const searchInput = useRef(null);
-
-    const getServices = async () => {
-        let services = []
-        if (data.serviceId === null) {
-            for (const i in data.companyIds) {
-                try {
-                    const response = await axios.get(
-                        `${apiUrl}/service/brief?company_id=${data.companyIds[i]}`
-                    );
-                    services.push(response.data)
-                } catch (error) {
-                    console.error(error)
-                }
-            }
-        } else {
-            try {
-                const response = await axios.get(
-                    `${apiUrl}/service/brief?id=${data.serviceId}`
-                );
-                services.push(response.data)
-            } catch (error) {
-                console.error(error)
-            }
-        }
-        setIsGettingData(false)
-        return services
-    };
 
     const handleExpand = async (expanded, record) => {
         if (expanded) {
@@ -121,63 +90,81 @@ export default function ServiceCard(data) {
 
     useEffect(() => {
         (async () => {
-            const services = await getServices();
-            if (services.length === 0) {
+            if (data.servicesData === null) {
                 setIsGettingData(true)
                 if (Object.keys(expandedData).length !== 0) {
                     setExpandedData({})
                 }
                 return
+            } else {
+                setIsGettingData(false)
             }
 
-            let allServices = []
-            let active = 0
-            let disabled = 0
-            for (const i in services) {
-                allServices = allServices.concat(services[i].active)
-                allServices = allServices.concat(services[i].disabled)
-                active = active + services[i].active.length
-                disabled = disabled + services[i].disabled.length
+            const typeFilters = data.servicesData.stats.service_types.map(t => ({
+                text: t,
+                value: t,
+            }))
+
+            const statusFilters = []
+            for (const [key, value] of Object.entries(data.servicesData.stats.service_statuses)) {
+                statusFilters.push(
+                    {
+                        text: key,
+                        value: key,
+                    }
+                )
             }
 
-            setCountServicesActive(active)
-            setCountServicesDisabled(disabled)
+            const companyFilters = []
+            for (const [key, value] of Object.entries(data.servicesData.stats.company_id2name)) {
+                companyFilters.push(
+                    {
+                        text: `(ID: ${key}) ${value}`,
+                        value: `(ID: ${key}) ${value}`,
+                    }
+                )
+            }
 
-            const typeFilters = ([...new Set(allServices.map(s => s.type))].map(t => ({
-                text: t,
-                value: t,
-            })))
+            let statuses = Object.keys(data.servicesData.stats.service_statuses).map(function(key) {
+                return [key, data.servicesData.stats.service_statuses[key]];
+            });
+            statuses.sort(function(first, second) {
+                return second[1] - first[1];
+            });
+            statuses = statuses.map(s => `${s[0]}: ${s[1]}`)
+            setServiceStatuses(statuses.join(', '))
 
-            const statusFilters = ([...new Set(allServices.map(s => s.status.name))].map(t => ({
-                text: t,
-                value: t,
-            })))
-
-            const servicesData = allServices.map(service => ({
-                key: service.id,
+            const servicesData = data.servicesData.data.map(service => ({
+                key: service.service_id,
                 id: (
-                    <Tooltip title={`(ID: ${service.companyId}) ${service.company}`}>
-                        <Button type='text' href={`/service/${service.id}`} target='_blank'>{service.id}</Button>
+                    <Tooltip title='Подробнее'>
+                        <Button type='link' href={`/service/${service.service_id}`}
+                                target='_blank'>{service.service_id}</Button>
                     </Tooltip>
                 ),
-                type: service.type,
-                status: service.status.name,
-                date: service.statusDate,
+                company: (
+                    <Tooltip title='Подробнее'>
+                        <a type='text' href={`/company/${service.company_id}`}
+                                target='_blank'>{`(ID: ${service.company_id}) ${service.company_name}`}</a>
+                    </Tooltip>
+                ),
+                type: service.service_type,
+                status: service.service_status,
                 addresses: (
                     <ul>
-                        {service.addresses.map((address, i) => (
+                        {service.service_address.map((address, i) => (
                             <li key={i}>{
-                                `${address.city}${!['', ' '].includes(address.street) ? `, ${address.street}` : ''}${!['', ' '].includes(address.house) ? `, ${address.house}` : ''}${!['', ' '].includes(address.building) ? `, ${address.building}` : ''}${!['', ' '].includes(address.letter) ? ` ${address.letter}` : ''}${!['', ' '].includes(address.flat) ? `, ${address.flat}` : ''}`
+                                address
                             }</li>
                         ))}
                     </ul>),
                 manageComm: (
-                    <Tooltip placement="topLeft" title={service.description}>
-                        {service.description}
+                    <Tooltip placement="topLeft" title={service.service_description}>
+                        {service.service_description}
                     </Tooltip>),
                 techComm: (
-                    <Tooltip placement="topLeft" title={service.supportDescription}>
-                        {service.supportDescription}
+                    <Tooltip placement="topLeft" title={service.service_support_description}>
+                        {service.service_support_description}
                     </Tooltip>),
             }))
 
@@ -188,8 +175,13 @@ export default function ServiceCard(data) {
                         {
                             title: 'ID',
                             dataIndex: 'id',
-                            defaultSortOrder: 'descend',
                             sorter: (a, b) => a.key - b.key,
+                        },
+                        {
+                            title: 'Компания',
+                            dataIndex: 'company',
+                            filters: companyFilters,
+                            onFilter: (value, record) => JSON.stringify(record.company).indexOf(value) >= 0,
                         },
                         {
                             title: 'Тип',
@@ -203,10 +195,6 @@ export default function ServiceCard(data) {
                             filters: statusFilters,
                             defaultFilteredValue: ['Действует'],
                             onFilter: (value, record) => record.status.startsWith(value),
-                        },
-                        {
-                            title: 'Дата',
-                            dataIndex: 'date'
                         },
                         {
                             title: 'Адреса',
@@ -251,7 +239,7 @@ export default function ServiceCard(data) {
                 />
             )
         })();
-    }, [data.companyIds, expandedData]);
+    }, [data.servicesData, expandedData]);
 
     if (isGettingData) {
         return <></>
@@ -260,7 +248,7 @@ export default function ServiceCard(data) {
     return (
         <>
             {!isGettingData ? <Typography.Title
-                level={3}>{`Услуги (Действует: ${countServicesActive}, Отключено: ${countServicesDisabled})`}</Typography.Title> : null}
+                level={3}>{serviceStatuses}</Typography.Title> : null}
             {serviceTable}
         </>
     )

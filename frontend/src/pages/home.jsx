@@ -2,31 +2,20 @@ import {Col, Layout, Row, Typography} from "antd";
 import {Content, Header} from "antd/es/layout/layout.js";
 import Navbar from "../components/home/navbar.jsx";
 import {useState} from "react";
-import CompanyCard from "../components/home/companyCard.jsx";
 import ServiceCard from "../components/home/serviceCard.jsx";
 import SearchBar from "../components/home/searchBar.jsx";
 
 export default function Home(data) {
-    const [companyIds, setCompanyIds] = useState([]);
-    const [serviceId, setServiceId] = useState(null);
-    const [searchText, setSearchText] = useState('');
-    const [searchMode, setSearchMode] = useState('all');
+    const [servicesData, setServicesData] = useState(null);
 
     const isMobile = data.isMobile
 
     const pageContent = (
-        <>
-            <Row>
-                <Col flex='auto' style={{paddingLeft: 20, paddingRight: 20, paddingTop: 20}}>
-                    <CompanyCard companyIds={companyIds} isMobile={isMobile}/>
-                </Col>
-            </Row>
-            <Row>
-                <Col flex='auto' style={{padding: 20}}>
-                    <ServiceCard companyIds={companyIds} serviceId={serviceId}/>
-                </Col>
-            </Row>
-        </>
+        <Row>
+            <Col flex='auto' style={{padding: 20}}>
+                <ServiceCard servicesData={servicesData}/>
+            </Col>
+        </Row>
     )
 
     return (
@@ -53,12 +42,7 @@ export default function Home(data) {
                          }}
                     >
                         <SearchBar
-                            updateCompanies={setCompanyIds}
-                            updateService={setServiceId}
-                            updateSearchText={setSearchText}
-                            updateSearchMode={setSearchMode}
-                            searchText={searchText}
-                            searchMode={searchMode}
+                            updateServicesData={setServicesData}
                         />
                     </Col>
                     <Col order={2} xs={{flex: '50px'}} md={{flex:'0 1 330px'}} style={{height: '100%'}}>

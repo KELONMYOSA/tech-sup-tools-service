@@ -12,7 +12,7 @@ export default async function ServiceInfo(data) {
     const getServiceInfo = async (serviceId) => {
         try {
             const response = await axios.get(
-                `${apiUrl}/service/full/${serviceId}`
+                `${apiUrl}/service/${serviceId}`
             );
 
             return response.data
