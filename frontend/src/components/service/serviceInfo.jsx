@@ -370,7 +370,9 @@ export default async function ServiceInfo(data) {
                             items={[
                                 {
                                     label: 'Компания',
-                                    children: `(ID: ${service.companyId}) ${service.company} (${service.companyTypeDesc.name})`,
+                                    children: (<a target="_blank" href={`/company/${service.companyId}`}>
+                                        (ID: {service.companyId}) {service.company} ({service.companyTypeDesc.name})
+                                    </a>),
                                 },
                                 {
                                     label: 'Провайдер',
@@ -382,9 +384,9 @@ export default async function ServiceInfo(data) {
                                 },
                                 {
                                     label: 'Услуга',
-                                    children: (<p>{'\u0028'}ID: <a target="_blank"
-                                                                   href={`https://boss.comfortel.pro/index.phtml?service_id=${service.id}&url_fav=1&mid=154&pid=404&module_mode=open&company_id=${service.companyId}&oid=1163`}>{service.id}</a>) {service.type}
-                                    </p>),
+                                    children: (<a target="_blank" href={`https://boss.comfortel.pro/index.phtml?service_id=${service.id}&url_fav=1&mid=154&pid=404&module_mode=open&company_id=${service.companyId}&oid=1163`}>
+                                        (ID: {service.id}) {service.type}
+                                    </a>),
                                 },
                                 {
                                     label: 'Договор',
@@ -460,7 +462,6 @@ export default async function ServiceInfo(data) {
                         {packData}
                         <Descriptions
                             size='small'
-                            column={4}
                             bordered
                             style={{marginTop: 10, marginBottom: 10}}
                             items={[

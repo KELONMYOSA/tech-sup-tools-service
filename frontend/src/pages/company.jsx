@@ -1,22 +1,22 @@
 import {useParams} from "react-router-dom";
-import ServiceInfo from "../components/service/serviceInfo.jsx";
 import React, {useEffect, useState} from "react";
 import {Flex, Layout, Spin, Typography} from "antd";
 import Navbar from "../components/navbar.jsx";
 import {Content, Header} from "antd/es/layout/layout.js";
 import PageNotFound from "./404page.jsx";
+import CompanyInfo from "../components/company/companyInfo.jsx";
 
-export default function Service(data) {
-    const {serviceId} = useParams();
+export default function Company(data) {
+    const {companyId} = useParams();
     const isMobile = data.isMobile
     const [isLoading, setIsLoading] = useState(true);
-    const [serviceItems, setServiceItems] = useState(true);
+    const [companyItems, setCompanyItems] = useState(true);
 
     useEffect(() => {
         (async () => {
-            const serviceItems = await ServiceInfo({serviceId: serviceId, pdfWidth: data.windowWidth * 0.6})
-            if (serviceItems[0]) {
-                setServiceItems(
+            const companyItems = await CompanyInfo({companyId: companyId})
+            if (companyItems[0]) {
+                setCompanyItems(
                     <Layout>
                         <Header style={{display: 'flex', alignItems: 'center', padding: 0, backgroundColor: 'white'}}>
                             <a href="/" style={{marginLeft: 10, height: '70%'}}>
@@ -24,18 +24,18 @@ export default function Service(data) {
                             </a>
                             {!isMobile &&
                                 <div style={{display: 'flex', width: '100%', marginLeft: 20, paddingTop: 5}}>
-                                    <Typography.Title level={3}>{`Услуга ID: ${serviceId}`}</Typography.Title>
+                                    <Typography.Title level={3}>{`Компания ID: ${companyId}`}</Typography.Title>
                                 </div>
                             }
                             <Navbar userData={data.userData}/>
                         </Header>
                         <Content style={{minHeight: 'calc(100vh - 65px)'}}>
-                            {serviceItems[1]}
+                            {companyItems[1]}
                         </Content>
                     </Layout>
                 )
             } else {
-                setServiceItems(<PageNotFound/>)
+                setCompanyItems(<PageNotFound/>)
             }
             setIsLoading(false)
         })()
@@ -49,5 +49,5 @@ export default function Service(data) {
         )
     }
 
-    return serviceItems
+    return companyItems
 }
