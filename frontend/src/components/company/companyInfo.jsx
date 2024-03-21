@@ -59,7 +59,7 @@ export default async function CompanyInfo(data) {
     const getContacts = async (companyId) => {
         try {
             const response = await axios.get(
-                `${apiUrl}/contact?company_id=${companyId}`
+                `${apiUrl}/contact/byCompany/${companyId}`
             );
 
             return response.data

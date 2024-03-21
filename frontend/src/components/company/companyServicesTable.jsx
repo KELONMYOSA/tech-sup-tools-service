@@ -15,7 +15,7 @@ export default function CompanyServicesTable(data) {
     const getServices = async () => {
         try {
             const response = await axios.get(
-                `${apiUrl}/service?company_id=${data.companyId}`
+                `${apiUrl}/service/byCompany/${data.companyId}`
             );
             setIsGettingData(false)
             return response.data

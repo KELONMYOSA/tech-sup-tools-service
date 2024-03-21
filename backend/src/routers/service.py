@@ -23,7 +23,7 @@ async def service_by_id(service_id: int, _: User = Depends(get_current_user)):  
 
 
 # Поиск всех услуг по id компании
-@router.get("/")
+@router.get("/byCompany/{company_id}")
 async def services_by_company_id(company_id: int, _: User = Depends(get_current_user)):  # noqa: B008
     result = get_services_by_company_id(company_id)
     if not result:

@@ -11,7 +11,7 @@ router = APIRouter(
 
 
 # Поиск контактов по id компании
-@router.get("/")
+@router.get("/byCompany/{company_id}")
 async def contacts_by_company_id(company_id: int, _: User = Depends(get_current_user)):  # noqa: B008
     result = get_contacts_by_company_id(company_id)
     if not result:
