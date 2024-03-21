@@ -225,7 +225,32 @@ async def search_company_by_phone(phone: str, max_results: int = 10, _: User = D
 
 @router.get("/all")
 async def search_all(text: str, max_results: int = 10, _: User = Depends(get_current_user)):  # noqa: B008
-    query = {"size": max_results, "query": {"multi_match": {"query": text, "fields": "*"}}}
+    query = {
+        "size": max_results,
+        "query": {
+            "bool": {
+                "should": [
+                    {
+                        "multi_match": {
+                            "query": text,
+                            "fields": "*",
+                            "type": "best_fields",
+                        }
+                    },
+                    {"wildcard": {"company_name": {"value": f"*{text}*"}}},
+                    {"wildcard": {"service_address": {"value": f"*{text}*"}}},
+                    {"wildcard": {"company_address": {"value": f"*{text}*"}}},
+                    {"wildcard": {"service_interface_host": {"value": f"*{text}*"}}},
+                    {"wildcard": {"company_phone": {"value": f"*{text}*"}}},
+                    {"wildcard": {"client_phone": {"value": f"*{text}*"}}},
+                    {"wildcard": {"service_phone": {"value": f"*{text}*"}}},
+                    {"wildcard": {"service_phone_end": {"value": f"*{text}*"}}},
+                ],
+                "minimum_should_match": 1,
+            }
+        },
+    }
+
     response = es.search(index="company_service_index", body=query)
     if response["hits"]["total"]["value"] == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Company or service not found")

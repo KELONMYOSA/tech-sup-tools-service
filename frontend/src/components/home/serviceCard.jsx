@@ -253,7 +253,7 @@ export default function ServiceCard(data) {
     return (
         <>
             {!isGettingData ? <Typography.Title
-                level={3}>{serviceStatuses}</Typography.Title> : null}
+                level={5}>{serviceStatuses}</Typography.Title> : null}
             {serviceTable}
         </>
     )
