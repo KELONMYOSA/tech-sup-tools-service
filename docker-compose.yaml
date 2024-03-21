@@ -42,6 +42,15 @@ services:
     networks:
       - tech-sup-net
     restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s http://localhost:9200",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
 
   logstash:
     image: logstash-oracle
@@ -66,6 +75,15 @@ services:
     depends_on:
       - elasticsearch
     restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s http://localhost:9600",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
 
 volumes:
   esdata:
