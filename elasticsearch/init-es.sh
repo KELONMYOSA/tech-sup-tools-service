@@ -13,8 +13,8 @@ curl -X PUT "http://elasticsearch:9200/_template/company_service_template" -H 'C
 {
   "index_patterns": ["company_service_index*"],
   "settings": {
-    "number_of_shards": 3,
-    "number_of_replicas": 1
+    "number_of_shards": 1,
+    "number_of_replicas": 0
   }
 }
 '

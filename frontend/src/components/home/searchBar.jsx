@@ -120,7 +120,7 @@ export default function SearchBar(data) {
                     for (const [key, val] of Object.entries(response.data.stats.company_id2name)) {
                         childOptions.push(
                             {
-                                value: `companyName_${key}`,
+                                value: `companyName_${key}&&&${val}`,
                                 label: highlightText(val, value)
                             }
                         )
@@ -416,8 +416,11 @@ export default function SearchBar(data) {
 
         if (result[0] === 'companyName') {
             try {
+                const keyVal = result[1].split('&&&')
+                setSearchText(keyVal[1])
+
                 const response = await axios.get(
-                    `${apiUrl}/search/company/id/${result[1]}?max_results=10000`
+                    `${apiUrl}/search/company/id/${keyVal[0]}?max_results=10000`
                 );
 
                 data.updateServicesData(response.data)
@@ -449,10 +452,10 @@ export default function SearchBar(data) {
 
         if (result[0] === 'cAddress') {
             try {
-                const company_id = result[1].split('&&&')[0]
-                setSearchText(company_id)
+                const keyVal = result[1].split('&&&')
+                setSearchText(keyVal[1])
                 const response = await axios.get(
-                    `${apiUrl}/search/company/id/${company_id}?max_results=10000`
+                    `${apiUrl}/search/company/id/${keyVal[0]}?max_results=10000`
                 );
 
                 data.updateServicesData(response.data)
