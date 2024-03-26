@@ -452,7 +452,7 @@ export default async function ServiceInfo(data) {
                                     key: '1',
                                     label: 'Менеджерское',
                                     children: (
-                                        <pre style={{overflowX: 'scroll'}}>
+                                        <pre style={{overflowX: 'scroll', paddingBottom: 10}}>
                                                 {service.description || '---'}
                                             </pre>
                                     ),
@@ -461,7 +461,7 @@ export default async function ServiceInfo(data) {
                                     key: '2',
                                     label: 'Техническое',
                                     children: (
-                                        <pre style={{overflowX: 'scroll'}}>
+                                        <pre style={{overflowX: 'scroll', paddingBottom: 10}}>
                                                 {service.supportDescription || '---'}
                                             </pre>
                                     ),

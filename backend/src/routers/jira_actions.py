@@ -36,7 +36,7 @@ async def issues_by_service_id(service_id: int, _: User = Depends(get_current_us
 
 
 # Создание задачи в SUPPORT
-@router.post("/")
+@router.post("")
 async def support_issue_create(data: JIRAIssueCreateData, _: User = Depends(get_current_user)):  # noqa: B008
     _check_jira(jira)
     data.project = "SUPPORT"
