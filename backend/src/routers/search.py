@@ -235,6 +235,17 @@ async def search_by_vlan(vlan: str, max_results: int = 10, _: User = Depends(get
     return data.make_response(vlan, "vlan")
 
 
+@router.get("/service/equipment/{equip}")
+async def search_by_equipment(equip: str, max_results: int = 10, _: User = Depends(get_current_user)):  # noqa: B008
+    query = {"size": max_results, "query": {"match": {"service_interface_equipment": equip}}}
+    response = es.search(index="company_service_index", body=query)
+    if response["hits"]["total"]["value"] == 0:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service not found")
+    data = ESDataManager()
+    data.create_from_response(response["hits"]["hits"])
+    return data.make_response(equip, "equipment")
+
+
 @router.get("/all")
 async def search_all(text: str, max_results: int = 10, _: User = Depends(get_current_user)):  # noqa: B008
     query = {

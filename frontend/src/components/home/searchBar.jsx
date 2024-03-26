@@ -1,9 +1,9 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {Input, AutoComplete, Dropdown} from 'antd';
+import {Input, AutoComplete, Row, Col} from 'antd';
 import axios from 'axios';
-import {SearchOutlined} from "@ant-design/icons";
-import styles from '../../index.module.less'
 import Highlighter from "react-highlight-words"
+import SearchModeSelector from "./searchModeSelector.jsx";
+import {combineResponses} from "./combineResponses.js";
 
 export default function SearchBar(data) {
     const apiUrl = import.meta.env.VITE_API_URL
@@ -11,11 +11,13 @@ export default function SearchBar(data) {
     const [options, setOptions] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [searchMode, setSearchMode] = useState('all');
+    const [searchMode, setSearchMode] = useState(['all']);
+    const [selectedTags, setSelectedTags] = useState(['all']);
     const [searchText, setSearchText] = useState('');
     const [timer, setTimer] = useState(null);
     const shouldSearchRef = useRef(true);
     const [textChangedBySelect, setTextChangedBySelect] = useState(false);
+    const searchModeSelectorRef = useRef();
 
     useEffect(() => {
         const search = data.searchParams.get('search')
@@ -39,11 +41,11 @@ export default function SearchBar(data) {
         let newOptions = []
         if (value.length > 0) {
             let max_res = 100
-            if (searchMode === 'all') {
+            if (searchMode.includes('all')) {
                 max_res = 10
             }
 
-            if (['all', 'serviceId'].includes(searchMode) && !isNaN(+value)) {
+            if ((searchMode.includes('serviceId') || searchMode.includes('all')) && !isNaN(+value)) {
                 try {
                     const response = await axios.get(
                         `${apiUrl}/search/service/id/${value}?max_results=${max_res}`
@@ -52,7 +54,7 @@ export default function SearchBar(data) {
                     newOptions.push({
                         label: 'ID Услуги',
                         options: response.data.data.map(c => ({
-                            value: `serviceId_${c.search_value}`,
+                            value: `serviceId_|_${c.search_value}`,
                             label: highlightText(`${c.search_value} - (${c.service_type}) ${c.company_name}`, value)
                         }))
                     })
@@ -60,7 +62,7 @@ export default function SearchBar(data) {
                 }
             }
 
-            if (['all', 'companyId'].includes(searchMode) && !isNaN(+value)) {
+            if ((searchMode.includes('companyId') || searchMode.includes('all')) && !isNaN(+value)) {
                 try {
                     const response = await axios.get(
                         `${apiUrl}/search/company/id/${value}?max_results=${max_res}`
@@ -70,7 +72,7 @@ export default function SearchBar(data) {
                     for (const [key, val] of Object.entries(response.data.stats.company_id2name)) {
                         childOptions.push(
                             {
-                                value: `companyId_${key}`,
+                                value: `companyId_|_${key}`,
                                 label: highlightText(`${key} - ${val}`, value)
                             }
                         )
@@ -84,7 +86,7 @@ export default function SearchBar(data) {
                 }
             }
 
-            if (['all', 'ip'].includes(searchMode)) {
+            if (searchMode.includes('ip') || searchMode.includes('all')) {
                 try {
                     const response = await axios.get(
                         `${apiUrl}/search/service/ip?ip=${value}&max_results=${max_res}`
@@ -103,7 +105,7 @@ export default function SearchBar(data) {
                     for (const [key, val] of Object.entries(companyIp2Name)) {
                         childOptions.push(
                             {
-                                value: `ip_${key}`,
+                                value: `ip_|_${key}`,
                                 label: highlightText(`${key} - ${[...val].join(', ')}`, value)
                             }
                         )
@@ -117,7 +119,7 @@ export default function SearchBar(data) {
                 }
             }
 
-            if (['all', 'companyName'].includes(searchMode)) {
+            if (searchMode.includes('companyName') || searchMode.includes('all')) {
                 try {
                     const response = await axios.get(
                         `${apiUrl}/search/company/name?name=${value}&max_results=${max_res}`
@@ -127,7 +129,7 @@ export default function SearchBar(data) {
                     for (const [key, val] of Object.entries(response.data.stats.company_id2name)) {
                         childOptions.push(
                             {
-                                value: `companyName_${key}&&&${val}`,
+                                value: `companyName_|_${key}&&&${val}`,
                                 label: highlightText(val, value)
                             }
                         )
@@ -141,7 +143,7 @@ export default function SearchBar(data) {
                 }
             }
 
-            if (['all', 'vlan'].includes(searchMode) && !isNaN(+value)) {
+            if ((searchMode.includes('vlan') || searchMode.includes('all')) && !isNaN(+value)) {
                 try {
                     const response = await axios.get(
                         `${apiUrl}/search/service/vlan/${value}?max_results=${max_res}`
@@ -160,7 +162,7 @@ export default function SearchBar(data) {
                     for (const [key, val] of Object.entries(companyVlan2Name)) {
                         childOptions.push(
                             {
-                                value: `vlan_${key}`,
+                                value: `vlan_|_${key}`,
                                 label: highlightText(`${key} - ${[...val].join(', ')}`, value)
                             }
                         )
@@ -174,7 +176,40 @@ export default function SearchBar(data) {
                 }
             }
 
-            phoneIf: if (['all', 'phone'].includes(searchMode) && !isNaN(+value)) {
+            if (searchMode.includes('equipment') || searchMode.includes('all')) {
+                try {
+                    const response = await axios.get(
+                        `${apiUrl}/search/service/equipment/${value}?max_results=${max_res}`
+                    );
+
+                    let companyEquip2Name = {}
+                    response.data.data.map(c => {
+                        if (c.search_value in companyEquip2Name) {
+                            companyEquip2Name[c.search_value].add(c.company_name)
+                        } else {
+                            companyEquip2Name[c.search_value] = new Set([c.company_name])
+                        }
+                    })
+
+                    const childOptions = []
+                    for (const [key, val] of Object.entries(companyEquip2Name)) {
+                        childOptions.push(
+                            {
+                                value: `equipment_|_${key}`,
+                                label: highlightText(`${key} - ${[...val].join(', ')}`, value)
+                            }
+                        )
+                    }
+
+                    newOptions.push({
+                        label: 'Оборудование',
+                        options: childOptions
+                    })
+                } catch (error) {
+                }
+            }
+
+            phoneIf: if ((searchMode.includes('phone') || searchMode.includes('all')) && !isNaN(+value)) {
                 if (value.length > 11) {
                     break phoneIf
                 }
@@ -201,7 +236,7 @@ export default function SearchBar(data) {
                     for (const [key, val] of Object.entries(companyPhone2Name)) {
                         childOptions.push(
                             {
-                                value: `cPhone_${key}`,
+                                value: `cPhone_|_${key}`,
                                 label: highlightText(`${key} - ${[...val].join(', ')}`, phoneNum)
                             }
                         )
@@ -232,7 +267,7 @@ export default function SearchBar(data) {
                     for (const [key, val] of Object.entries(companyPhone2Name)) {
                         childOptions.push(
                             {
-                                value: `sPhone_${key}`,
+                                value: `sPhone_|_${key}`,
                                 label: highlightText(`${key} - ${[...val].join(', ')}`, phoneNum)
                             }
                         )
@@ -246,7 +281,7 @@ export default function SearchBar(data) {
                 }
             }
 
-            if (['all', 'address'].includes(searchMode)) {
+            if (searchMode.includes('address') || searchMode.includes('all')) {
                 try {
                     const response = await axios.get(
                         `${apiUrl}/search/company/address?address=${value}&max_results=${max_res}`
@@ -265,7 +300,7 @@ export default function SearchBar(data) {
                     for (const [key, val] of Object.entries(companyAddress2Name)) {
                         childOptions.push(
                             {
-                                value: `cAddress_${val[0]}&&&${key}`,
+                                value: `cAddress_|_${val[0]}&&&${key}`,
                                 label: highlightText(`${key} - ${[...val[1]].join(', ')}`, value)
                             }
                         )
@@ -296,7 +331,7 @@ export default function SearchBar(data) {
                     for (const [key, val] of Object.entries(companyAddress2Name)) {
                         childOptions.push(
                             {
-                                value: `sAddress_${key}`,
+                                value: `sAddress_|_${key}`,
                                 label: highlightText(`${key} - ${[...val].join(', ')}`, value)
                             }
                         )
@@ -317,7 +352,7 @@ export default function SearchBar(data) {
 
     const onEnter = async value => {
         if (value.length > 0) {
-            data.updateSearchParams({search: `${searchMode}_${value}`})
+            data.updateSearchParams({search: `${searchMode}_|_${value}`})
         }
     };
 
@@ -326,11 +361,16 @@ export default function SearchBar(data) {
     };
 
     const searchData = async value => {
-        const result = value.split('_')
+        const result = value.split('_|_')
+        const selectedMods = result[0].split(',')
+        const selectedValue = result[1]
         setIsOpen(false)
-        setSearchText(result[1])
+        setSearchText(selectedValue)
         setTextChangedBySelect(true)
         data.updateContentIsLoading(true)
+
+        setSearchMode(selectedMods)
+        searchModeSelectorRef.current.setSelectedCategories(selectedMods)
 
         if (timer) {
             clearTimeout(timer)
@@ -338,143 +378,185 @@ export default function SearchBar(data) {
         }
         shouldSearchRef.current = false
 
-        if (result[0] === 'serviceId') {
+        const responses = []
+
+        if (selectedMods.includes('serviceId')) {
             try {
                 const response = await axios.get(
-                    `${apiUrl}/search/service/id/${result[1]}?max_results=10000`
+                    `${apiUrl}/search/service/id/${selectedValue}?max_results=10000`
                 );
 
-                data.updateServicesData(response.data)
+                responses.push(response.data)
             } catch (error) {
             }
         }
 
-        if (result[0] === 'companyId') {
+        if (selectedMods.includes('companyId')) {
             try {
                 const response = await axios.get(
-                    `${apiUrl}/search/company/id/${result[1]}?max_results=10000`
+                    `${apiUrl}/search/company/id/${selectedValue}?max_results=10000`
                 );
 
-                data.updateServicesData(response.data)
+                responses.push(response.data)
             } catch (error) {
             }
         }
 
-        if (result[0] === 'ip') {
+        if (selectedMods.includes('ip')) {
             try {
                 const response = await axios.get(
-                    `${apiUrl}/search/service/ip?ip=${result[1]}&max_results=10000`
+                    `${apiUrl}/search/service/ip?ip=${selectedValue}&max_results=10000`
                 );
 
-                data.updateServicesData(response.data)
+                responses.push(response.data)
             } catch (error) {
             }
         }
 
-        if (result[0] === 'companyName') {
+        if (selectedMods.includes('companyName')) {
             try {
-                const keyVal = result[1].split('&&&')
+                const keyVal = selectedValue.split('&&&')
+                let response
+
+                if (keyVal.length === 1) {
+                    response = await axios.get(
+                        `${apiUrl}/search/company/name?name=${keyVal[0]}&max_results=10000`
+                    )
+                } else {
+                    setSearchText(keyVal[1])
+                    response = await axios.get(
+                        `${apiUrl}/search/company/id/${keyVal[0]}?max_results=10000`
+                    )
+                }
+
+                responses.push(response.data)
+            } catch (error) {
+            }
+        }
+
+        if (selectedMods.includes('vlan')) {
+            try {
+                const response = await axios.get(
+                    `${apiUrl}/search/service/vlan/${selectedValue}?max_results=10000`
+                );
+
+                responses.push(response.data)
+            } catch (error) {
+            }
+        }
+
+        if (selectedMods.includes('equipment')) {
+            try {
+                const response = await axios.get(
+                    `${apiUrl}/search/service/equipment/${selectedValue}?max_results=10000`
+                );
+
+                responses.push(response.data)
+            } catch (error) {
+            }
+        }
+
+        phoneIf: if (selectedMods.includes('phone')) {
+            if (selectedValue.length > 11) {
+                break phoneIf
+            }
+            let phoneNum = selectedValue
+            if (selectedValue.length === 11) {
+                phoneNum = phoneNum.slice(1)
+            }
+            try {
+                const response = await axios.get(
+                    `${apiUrl}/search/phone?phone=${phoneNum}&max_results=10000`
+                );
+
+                responses.push(response.data)
+            } catch (error) {
+            }
+        }
+
+        cPhoneIf: if (selectedMods.includes('cPhone')) {
+            if (selectedValue.length > 11) {
+                break cPhoneIf
+            }
+            let phoneNum = selectedValue
+            if (selectedValue.length === 11) {
+                phoneNum = phoneNum.slice(1)
+            }
+            try {
+                const response = await axios.get(
+                    `${apiUrl}/search/company/phone?phone=${phoneNum}&max_results=10000`
+                );
+
+                responses.push(response.data)
+            } catch (error) {
+            }
+        }
+
+        sPhoneIf: if (selectedMods.includes('sPhone')) {
+            if (selectedValue.length > 11) {
+                break sPhoneIf
+            }
+            let phoneNum = selectedValue
+            if (selectedValue.length === 11) {
+                phoneNum = phoneNum.slice(1)
+            }
+            try {
+                const response = await axios.get(
+                    `${apiUrl}/search/service/phone?phone=${phoneNum}&max_results=10000`
+                );
+
+                responses.push(response.data)
+            } catch (error) {
+            }
+        }
+
+        if (selectedMods.includes('address')) {
+            try {
+                const response = await axios.get(
+                    `${apiUrl}/search/address?address=${selectedValue}&max_results=10000`
+                );
+
+                responses.push(response.data)
+            } catch (error) {
+            }
+        }
+
+        if (selectedMods.includes('cAddress')) {
+            try {
+                const keyVal = selectedValue.split('&&&')
                 setSearchText(keyVal[1])
-
                 const response = await axios.get(
                     `${apiUrl}/search/company/id/${keyVal[0]}?max_results=10000`
                 );
 
-                data.updateServicesData(response.data)
+                responses.push(response.data)
             } catch (error) {
             }
         }
 
-        if (result[0] === 'vlan') {
+        if (selectedMods.includes('sAddress')) {
             try {
                 const response = await axios.get(
-                    `${apiUrl}/search/service/vlan/${result[1]}?max_results=10000`
+                    `${apiUrl}/search/service/address?address=${selectedValue}&max_results=10000`
                 );
 
-                data.updateServicesData(response.data)
+                responses.push(response.data)
             } catch (error) {
             }
         }
 
-        if (result[0] === 'phone') {
+        if (selectedMods.includes('all')) {
             try {
                 const response = await axios.get(
-                    `${apiUrl}/search/phone?phone=${result[1]}&max_results=10000`
+                    `${apiUrl}/search/all?text=${selectedValue}&max_results=10000`
                 );
 
-                data.updateServicesData(response.data)
+                responses.push(response.data)
             } catch (error) {
             }
         }
 
-        if (result[0] === 'cPhone') {
-            try {
-                const response = await axios.get(
-                    `${apiUrl}/search/company/phone?phone=${result[1]}&max_results=10000`
-                );
-
-                data.updateServicesData(response.data)
-            } catch (error) {
-            }
-        }
-
-        if (result[0] === 'sPhone') {
-            try {
-                const response = await axios.get(
-                    `${apiUrl}/search/service/phone?phone=${result[1]}&max_results=10000`
-                );
-
-                data.updateServicesData(response.data)
-            } catch (error) {
-            }
-        }
-
-        if (result[0] === 'address') {
-            try {
-                const response = await axios.get(
-                    `${apiUrl}/search/address?address=${result[1]}&max_results=10000`
-                );
-
-                data.updateServicesData(response.data)
-            } catch (error) {
-            }
-        }
-
-        if (result[0] === 'cAddress') {
-            try {
-                const keyVal = result[1].split('&&&')
-                setSearchText(keyVal[1])
-                const response = await axios.get(
-                    `${apiUrl}/search/company/id/${keyVal[0]}?max_results=10000`
-                );
-
-                data.updateServicesData(response.data)
-            } catch (error) {
-            }
-        }
-
-        if (result[0] === 'sAddress') {
-            try {
-                const response = await axios.get(
-                    `${apiUrl}/search/service/address?address=${result[1]}&max_results=10000`
-                );
-
-                data.updateServicesData(response.data)
-            } catch (error) {
-            }
-        }
-
-        if (result[0] === 'all') {
-            try {
-                const response = await axios.get(
-                    `${apiUrl}/search/all?text=${result[1]}&max_results=10000`
-                );
-
-                data.updateServicesData(response.data)
-            } catch (error) {
-            }
-        }
-
+        data.updateServicesData(combineResponses(responses))
         data.updateContentIsLoading(false)
     }
 
@@ -485,7 +567,7 @@ export default function SearchBar(data) {
 
         let timeout = 750
         if (searchMode === 'all') {
-            timeout = 1500
+            timeout = 1000
         }
 
         const newTimer = setTimeout(() => {
@@ -522,89 +604,83 @@ export default function SearchBar(data) {
         }
     };
 
-    const onSearchModeClick = (e) => {
-        setSearchMode(e.key)
-    };
+    useEffect(() => {
+        setSearchMode(selectedTags);
+    }, [selectedTags]);
 
     const searchMods = [
         {
             label: 'Везде',
             key: 'all',
-        },
-        {
-            type: 'divider',
+            selected: true,
         },
         {
             label: 'ID Услуги',
             key: 'serviceId',
+            selected: false,
         },
         {
             label: 'ID Компании',
             key: 'companyId',
+            selected: false,
         },
         {
             label: 'IP',
             key: 'ip',
+            selected: false,
         },
         {
             label: 'Vlan',
             key: 'vlan',
+            selected: false,
+        },
+        {
+            label: 'Оборудование',
+            key: 'equipment',
+            selected: false,
         },
         {
             label: 'Название компании',
             key: 'companyName',
+            selected: false,
         },
         {
             label: 'Адрес',
             key: 'address',
+            selected: false,
         },
         {
             label: 'Номер телефона',
             key: 'phone',
+            selected: false,
         },
     ]
 
-    const searchMode2Text = {
-        all: 'Поиск компании или услуги',
-        serviceId: 'Поиск: ID Услуги',
-        companyId: 'Поиск: ID Компании',
-        ip: 'Поиск: IP',
-        vlan: 'Поиск: Vlan',
-        companyName: 'Поиск: Название компании',
-        address: 'Поиск: Адрес улуги или компании',
-        phone: 'Поиск: Номер телефона'
-    }
-
     return (
-        <AutoComplete
-            style={{width: '100%'}}
-            open={isOpen}
-            value={searchText}
-            options={options}
-            onChange={onChange}
-            onSelect={onSelect}
-        >
-            <Input.Search
-                size="large"
-                placeholder={searchMode2Text[searchMode]}
-                onSearch={onEnter}
-                allowClear
-                enterButton={
-                    <Dropdown.Button
-                        menu={{
-                            items: searchMods,
-                            selectable: true,
-                            defaultSelectedKeys: ['all'],
-                            onClick: onSearchModeClick,
-                        }}
-                        type='primary'
+        <Row style={{height: '100%', width: '100%'}}>
+            <Col flex='auto' style={{alignContent: 'center'}}>
+                <AutoComplete
+                    style={{width: '100%'}}
+                    open={isOpen}
+                    value={searchText}
+                    options={options}
+                    onChange={onChange}
+                    onSelect={onSelect}
+                >
+                    <Input.Search
+                        style={{marginTop: -10, paddingLeft: 10, paddingRight: 10, width: '100%'}}
+                        size="large"
+                        placeholder='Поиск компании или услуги'
+                        onSearch={onEnter}
+                        allowClear
                         loading={isLoading}
-                        rootClassName={styles.custom_search_button}
-                    >
-                        <SearchOutlined/>
-                    </Dropdown.Button>
-                }
-            />
-        </AutoComplete>
+                        enterButton
+                    />
+                </AutoComplete>
+            </Col>
+            <Col style={{alignSelf: 'center'}}>
+                <SearchModeSelector ref={searchModeSelectorRef} initialCategories={searchMods} onChange={setSelectedTags}/>
+            </Col>
+        </Row>
     );
 }

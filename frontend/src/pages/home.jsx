@@ -1,7 +1,7 @@
-import {Col, Flex, Layout, Row, Spin, Typography} from "antd";
+import {Col, Flex, Layout, Row, Spin} from "antd";
 import {Content, Header} from "antd/es/layout/layout.js";
 import Navbar from "../components/navbar.jsx";
-import React, {useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import ServiceCard from "../components/home/serviceCard.jsx";
 import SearchBar from "../components/home/searchBar.jsx";
 import {useSearchParams} from "react-router-dom";
@@ -9,20 +9,30 @@ import {useSearchParams} from "react-router-dom";
 export default function Home(data) {
     const [servicesData, setServicesData] = useState(null);
     const [pageContentIsLoading, setPageContentIsLoading] = useState(false);
+    const [headerHeight, setHeaderHeight] = useState('65px');
+    const headerRef = useRef(null);
 
     const [searchParams, setSearchParams] = useSearchParams()
 
-    const isMobile = data.isMobile
+    useEffect(() => {
+        const resizeObserver = new ResizeObserver(entries => {
+            for (let entry of entries) {
+                setHeaderHeight(`${entry.contentRect.height}px`);
+            }
+        });
+        if (headerRef.current) {
+            resizeObserver.observe(headerRef.current);
+        }
+        return () => resizeObserver.disconnect();
+    }, []);
 
     let pageContent
     if (pageContentIsLoading) {
-        pageContent = isMobile ?
-            <Flex justify="center" align="center" style={{width: '100%', height: 'calc(100vh - 130px)'}}>
-                <Spin/>
-            </Flex> :
-            <Flex justify="center" align="center" style={{width: '100%', height: 'calc(100vh - 65px)'}}>
+        pageContent = (
+            <Flex justify="center" align="center" style={{width: '100%', height: `calc(100vh - ${headerHeight})`}}>
                 <Spin/>
             </Flex>
+        )
     } else {
         pageContent = (
             <Row>
@@ -35,28 +45,16 @@ export default function Home(data) {
 
     return (
         <Layout>
-            <Header style={{display: 'flex', alignItems: 'center', padding: 0, backgroundColor: 'white'}}>
-                <Row justify='space-between' align='middle' style={{height: '65px', width: '100%'}}>
-                    <Col order={0} style={{height: '100%'}}>
-                        <Row align='middle' xs={{flex: '50px'}} md={{flex: '0 1 350px'}}
-                             style={{marginLeft: 10, height: '100%'}}>
+            <Header ref={headerRef}
+                    style={{display: 'flex', padding: 0, backgroundColor: 'white', minHeight: '65px', height: 'auto'}}>
+                <Row justify='space-between' align='middle' style={{minHeight: '65px', width: '100%'}}>
+                    <Col order={0}>
+                        <Row align='middle' flex='auto'
+                             style={{marginLeft: 10, height: '65px'}}>
                             <img src='/logo.png' height='70%'/>
-                            {!isMobile &&
-                                <div style={{marginLeft: 20, paddingTop: 5}}>
-                                    <Typography.Title level={3}>Техническая поддержка</Typography.Title>
-                                </div>
-                            }
                         </Row>
                     </Col>
-                    <Col xs={{span: 24, order: 3}} lg={{span: 7, order: 1}} xl={9} xxl={8}
-                         style={{
-                             paddingLeft: 20,
-                             paddingRight: 20,
-                             paddingBottom: 10,
-                             marginTop: -10,
-                             backgroundColor: 'white'
-                         }}
-                    >
+                    <Col xs={{order: 3, span: 24}} xxl={{order: 1, span: 20}}>
                         <SearchBar
                             updateServicesData={setServicesData}
                             updateContentIsLoading={setPageContentIsLoading}
@@ -64,19 +62,14 @@ export default function Home(data) {
                             updateSearchParams={setSearchParams}
                         />
                     </Col>
-                    <Col order={2} xs={{flex: '50px'}} md={{flex: '0 1 330px'}} style={{height: '100%'}}>
+                    <Col order={2} style={{height: '65px'}}>
                         <Navbar userData={data.userData}/>
                     </Col>
                 </Row>
             </Header>
-            {isMobile ?
-                <Content style={{minHeight: 'calc(100vh - 130px)', marginTop: 65}}>
-                    {pageContent}
-                </Content> :
-                <Content style={{minHeight: 'calc(100vh - 65px)'}}>
-                    {pageContent}
-                </Content>
-            }
+            <Content style={{minHeight: `calc(100vh - ${headerHeight})`}}>
+                {pageContent}
+            </Content>
         </Layout>
     )
 }

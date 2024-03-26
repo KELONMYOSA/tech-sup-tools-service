@@ -28,6 +28,11 @@ class ESData:
         self.service_vlan = (
             [initial_data["_source"].get("service_vlan")] if initial_data["_source"].get("service_vlan") else []
         )
+        self.service_interface_equipment = (
+            [initial_data["_source"].get("service_interface_equipment")]
+            if initial_data["_source"].get("service_interface_equipment")
+            else []
+        )
         self.company_id = initial_data["_source"].get("company_id")
         self.company_name = initial_data["_source"].get("company_name")
         self.company_brand_name = initial_data["_source"].get("company_brand_name")
@@ -60,6 +65,11 @@ class ESData:
         if data["_source"].get("service_vlan") and data["_source"].get("service_vlan") not in self.service_vlan:
             self.service_vlan.append(data["_source"].get("service_vlan"))
         if (
+            data["_source"].get("service_interface_equipment")
+            and data["_source"].get("service_interface_equipment") not in self.service_interface_equipment
+        ):
+            self.service_interface_equipment.append(data["_source"].get("service_interface_equipment"))
+        if (
             data["_source"].get("company_address")
             and data["_source"].get("company_address") not in self.company_address
         ):
@@ -68,7 +78,9 @@ class ESData:
             self.client_phone.append(data["_source"].get("client_phone"))
 
     def to_dict(
-        self, search_text: str, search_type: Literal["c_id", "s_id", "c_name", "address", "ip", "phone", "vlan", "all"]
+        self,
+        search_text: str,
+        search_type: Literal["c_id", "s_id", "c_name", "address", "ip", "phone", "vlan", "equipment", "all"],
     ) -> dict:
         return {
             "search_value": self._find_value_by_search_type(search_text, search_type),
@@ -85,7 +97,7 @@ class ESData:
     def _find_value_by_search_type(
         self,
         search_string: str,
-        search_type: Literal["c_id", "s_id", "c_name", "address", "ip", "phone", "vlan", "all"],
+        search_type: Literal["c_id", "s_id", "c_name", "address", "ip", "phone", "vlan", "equipment", "all"],
     ) -> str:
         search_args = {
             "c_id": [self.company_id],
@@ -95,6 +107,7 @@ class ESData:
             "ip": [self.service_subnet, self.service_interface_host],
             "phone": [self.company_phone, self.client_phone, self.service_phone, self.service_phone_end],
             "vlan": [self.service_vlan],
+            "equipment": [self.service_interface_equipment],
             "all": [
                 self.company_id,
                 self.service_id,
@@ -171,7 +184,9 @@ class ESDataManager:
         self.data = list(data_map.values())
 
     def make_response(
-        self, search_text: str, search_type: Literal["c_id", "s_id", "c_name", "address", "ip", "phone", "vlan", "all"]
+        self,
+        search_text: str,
+        search_type: Literal["c_id", "s_id", "c_name", "address", "ip", "phone", "vlan", "equipment", "all"],
     ) -> dict:
         response = {
             "stats": {

@@ -18,6 +18,7 @@ export default function Service(data) {
     const {serviceId} = useParams();
     const isMobile = data.isMobile
     const apiUrl = import.meta.env.VITE_API_URL
+    const jiraUrl = import.meta.env.VITE_JIRA_URL
 
     const [isLoading, setIsLoading] = useState(true);
     const [serviceItems, setServiceItems] = useState(true);
@@ -67,7 +68,6 @@ export default function Service(data) {
                 }
                 extraFields["components"] = values.components.map(id => ({id: id}))
                 const body = {
-                    priority: values.priority,
                     summary: values.summary,
                     description: values.description,
                     service_id: parseInt(serviceId),
@@ -80,6 +80,7 @@ export default function Service(data) {
                     );
 
                     showSuccess(`Задача создана - ${response.data.key}`)
+                    window.open(`${jiraUrl}/browse/${response.data.key}`,'_blank')
                 } catch (error) {
                     showAlert(error.response.data.detail)
                 }
@@ -169,15 +170,6 @@ export default function Service(data) {
                     </Form.Item>
                     <Form.Item name="description" label="Описание" rules={[{required: true}]}>
                         <TextArea allowClear/>
-                    </Form.Item>
-                    <Form.Item name="priority" label="Приоритет">
-                        <Select>
-                            <Select.Option value="Наивысший">Наивысший</Select.Option>
-                            <Select.Option value="Высокий">Высокий</Select.Option>
-                            <Select.Option value="Средний">Средний</Select.Option>
-                            <Select.Option value="Низкий">Низкий</Select.Option>
-                            <Select.Option value="Минимальный">Минимальный</Select.Option>
-                        </Select>
                     </Form.Item>
                     <Form.Item {...tailLayout}>
                         <Space>

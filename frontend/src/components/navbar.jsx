@@ -154,7 +154,7 @@ export default function Navbar(data) {
         onClick={onClick}
         selectable={false}
         mode="horizontal"
-        style={{height: '100%', width: '100%', alignItems: 'center', justifyContent: 'end'}}
+        style={{height: '100%', width: '100%', alignItems: 'center', justifyContent: 'end', border: 0}}
         items={items}
     />
 }

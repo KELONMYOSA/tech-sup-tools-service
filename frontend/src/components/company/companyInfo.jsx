@@ -88,7 +88,7 @@ export default async function CompanyInfo(data) {
                                                 label: 'Телефон',
                                                 children: contact.phones ?
                                                     <ul style={{marginLeft: 10}}>{contact.phones.map((phone, i) => (
-                                                        <li key={i}>{phone.ext ? `${phone.phone} (доб. ${phone.ext})` : phone.phone}</li>))}</ul> : "-",
+                                                        <li key={i}>{phone.ext ? `7${phone.phone} (доб. ${phone.ext})` : `7${phone.phone}`}</li>))}</ul> : "-",
                                             },
                                             {
                                                 label: 'email',
