@@ -4,10 +4,13 @@ import Navbar from "../components/navbar.jsx";
 import React, {useState} from "react";
 import ServiceCard from "../components/home/serviceCard.jsx";
 import SearchBar from "../components/home/searchBar.jsx";
+import {useSearchParams} from "react-router-dom";
 
 export default function Home(data) {
     const [servicesData, setServicesData] = useState(null);
     const [pageContentIsLoading, setPageContentIsLoading] = useState(false);
+
+    const [searchParams, setSearchParams] = useSearchParams()
 
     const isMobile = data.isMobile
 
@@ -57,6 +60,8 @@ export default function Home(data) {
                         <SearchBar
                             updateServicesData={setServicesData}
                             updateContentIsLoading={setPageContentIsLoading}
+                            searchParams={searchParams}
+                            updateSearchParams={setSearchParams}
                         />
                     </Col>
                     <Col order={2} xs={{flex: '50px'}} md={{flex: '0 1 330px'}} style={{height: '100%'}}>

@@ -1,4 +1,4 @@
-import {Card, Col, Descriptions, List, Row, Table, Tabs} from "antd";
+import {Button, Card, Col, Descriptions, List, Row, Table, Tabs} from "antd";
 import React from "react";
 import axios from "axios";
 import {Document, Page, pdfjs} from "react-pdf";
@@ -7,6 +7,7 @@ import 'react-pdf/dist/Page/AnnotationLayer.css';
 
 export default async function ServiceInfo(data) {
     const apiUrl = import.meta.env.VITE_API_URL
+    const jiraUrl = import.meta.env.VITE_JIRA_URL
     const serviceId = data.serviceId
 
     const getServiceInfo = async (serviceId) => {
@@ -27,6 +28,20 @@ export default async function ServiceInfo(data) {
         return [false, null]
     }
 
+    const getJiraIssues = async (serviceId) => {
+        try {
+            const response = await axios.get(
+                `${apiUrl}/jira/${serviceId}`
+            );
+
+            return response.data
+        } catch (error) {
+            return []
+        }
+    };
+
+    const jira = await getJiraIssues(serviceId)
+
     let rentServices
     if (service.rentServices.length > 0) {
         rentServices = (
@@ -41,7 +56,7 @@ export default async function ServiceInfo(data) {
                         service.rentServices.map((s, i) => (
                             {
                                 key: i,
-                                id: <a href={`/service/${s.id}`} target='_blank'>{s.id}</a>,
+                                id: <a href={`/service/${s.id}`}>{s.id}</a>,
                                 type: s.type.name,
                                 company: `(ID: ${s.companyId}) ${s.companyName}`,
                                 status: s.status.name,
@@ -84,7 +99,7 @@ export default async function ServiceInfo(data) {
                         service.rentedFor.map((s, i) => (
                             {
                                 key: i,
-                                id: <a href={`/service/${s.id}`} target='_blank'>{s.id}</a>,
+                                id: <a href={`/service/${s.id}`}>{s.id}</a>,
                                 type: s.type.name,
                                 company: `(ID: ${s.companyId}) ${s.companyName}`,
                                 status: s.status.name,
@@ -127,7 +142,7 @@ export default async function ServiceInfo(data) {
                         service.pack.map((p, i) => (
                             {
                                 key: i,
-                                id: <a href={`/service/${p.id}`} target='_blank'>{p.id}</a>,
+                                id: <a href={`/service/${p.id}`}>{p.id}</a>,
                                 type: p.type.name,
                                 status: p.status.name,
                             }
@@ -305,7 +320,7 @@ export default async function ServiceInfo(data) {
                         service.packServices.map((p, i) => (
                             {
                                 key: i,
-                                id: <a href={`/service/${p.id}`} target='_blank'>{p.id}</a>,
+                                id: <a href={`/service/${p.id}`}>{p.id}</a>,
                                 type: p.type.name,
                                 status: p.status.name,
                                 aes: (
@@ -370,7 +385,7 @@ export default async function ServiceInfo(data) {
                             items={[
                                 {
                                     label: 'Компания',
-                                    children: (<a target="_blank" href={`/company/${service.companyId}`}>
+                                    children: (<a href={`/company/${service.companyId}`}>
                                         (ID: {service.companyId}) {service.company} ({service.companyTypeDesc.name})
                                     </a>),
                                 },
@@ -384,7 +399,8 @@ export default async function ServiceInfo(data) {
                                 },
                                 {
                                     label: 'Услуга',
-                                    children: (<a target="_blank" href={`https://boss.comfortel.pro/index.phtml?service_id=${service.id}&url_fav=1&mid=154&pid=404&module_mode=open&company_id=${service.companyId}&oid=1163`}>
+                                    children: (<a target="_blank"
+                                                  href={`https://boss.comfortel.pro/index.phtml?service_id=${service.id}&url_fav=1&mid=154&pid=404&module_mode=open&company_id=${service.companyId}&oid=1163`}>
                                         (ID: {service.id}) {service.type}
                                     </a>),
                                 },
@@ -452,6 +468,17 @@ export default async function ServiceInfo(data) {
                                 },
                             ]}
                         />
+                    </Card>
+                    <Card key={4} title="Jira" style={{marginTop: 20}}
+                          extra={<Button onClick={data.showIssueCreation}>Создать задачу</Button>}>
+                        <ul style={{marginLeft: 10}}>
+                            {jira.map((issue, i) => (
+                                <li key={i}>
+                                    <a target='_blank'
+                                       href={`${jiraUrl}/browse/${issue.key}`}>{`[${issue.key}] ${issue.summary} (${issue.status})`}</a>
+                                </li>
+                            ))}
+                        </ul>
                     </Card>
                 </Col>
                 <Col key={2} xs={24} md={14} lg={17} style={{padding: 20}}>

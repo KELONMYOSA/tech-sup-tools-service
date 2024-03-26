@@ -129,10 +129,10 @@ export default function ServiceCard(data) {
                 )
             }
 
-            let statuses = Object.keys(data.servicesData.stats.service_statuses).map(function(key) {
+            let statuses = Object.keys(data.servicesData.stats.service_statuses).map(function (key) {
                 return [key, data.servicesData.stats.service_statuses[key]];
             });
-            statuses.sort(function(first, second) {
+            statuses.sort(function (first, second) {
                 return second[1] - first[1];
             });
             statuses = statuses.map(s => `${s[0]}: ${s[1]}`)
@@ -142,14 +142,13 @@ export default function ServiceCard(data) {
                 key: service.service_id,
                 id: (
                     <Tooltip title='Подробнее'>
-                        <Button type='link' href={`/service/${service.service_id}`}
-                                target='_blank'>{service.service_id}</Button>
+                        <a type='text' href={`/service/${service.service_id}`}>{service.service_id}</a>
                     </Tooltip>
                 ),
                 company: (
                     <Tooltip title='Подробнее'>
-                        <a type='text' href={`/company/${service.company_id}`}
-                                target='_blank'>{`(ID: ${service.company_id}) ${service.company_name}`}</a>
+                        <a type='text'
+                           href={`/company/${service.company_id}`}>{`(ID: ${service.company_id}) ${service.company_name}`}</a>
                     </Tooltip>
                 ),
                 type: service.service_type,

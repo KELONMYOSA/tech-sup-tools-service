@@ -139,6 +139,7 @@ async def search_by_service_ip(ip: str, max_results: int = 10, _: User = Depends
                 "bool": {
                     "should": [
                         {"wildcard": {"service_subnet": f"*{int(ip_styled)}*"}},
+                        {"match": {"service_subnet": {"query": int(ip_styled), "fuzziness": "1"}}},
                         {"wildcard": {"service_interface_host": f"*{ip}*"}},
                     ],
                     "minimum_should_match": 1,
@@ -221,6 +222,17 @@ async def search_company_by_phone(phone: str, max_results: int = 10, _: User = D
     data = ESDataManager()
     data.create_from_response(response["hits"]["hits"])
     return data.make_response(phone, "phone")
+
+
+@router.get("/service/vlan/{vlan}")
+async def search_by_vlan(vlan: str, max_results: int = 10, _: User = Depends(get_current_user)):  # noqa: B008
+    query = {"size": max_results, "query": {"match": {"service_vlan": vlan}}}
+    response = es.search(index="company_service_index", body=query)
+    if response["hits"]["total"]["value"] == 0:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service not found")
+    data = ESDataManager()
+    data.create_from_response(response["hits"]["hits"])
+    return data.make_response(vlan, "vlan")
 
 
 @router.get("/all")

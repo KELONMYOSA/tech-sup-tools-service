@@ -16,5 +16,9 @@ class Settings(BaseSettings):
 
     ES_URL: str
 
+    JIRA_URL: str
+    JIRA_USER: str
+    JIRA_PASSWORD: str
+
 
 settings = Settings()

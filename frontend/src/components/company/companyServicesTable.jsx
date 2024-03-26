@@ -125,7 +125,7 @@ export default function CompanyServicesTable(data) {
                 key: service.id,
                 id: (
                     <Tooltip title='Подробнее'>
-                        <Button type='text' href={`/service/${service.id}`} target='_blank'>{service.id}</Button>
+                        <a type='text' href={`/service/${service.id}`}>{service.id}</a>
                     </Tooltip>
                 ),
                 type: service.type,

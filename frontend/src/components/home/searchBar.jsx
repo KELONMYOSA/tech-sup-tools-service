@@ -17,6 +17,13 @@ export default function SearchBar(data) {
     const shouldSearchRef = useRef(true);
     const [textChangedBySelect, setTextChangedBySelect] = useState(false);
 
+    useEffect(() => {
+        const search = data.searchParams.get('search')
+        if (search) {
+            searchData(search)
+        }
+    }, [data.searchParams])
+
     const highlightText = (text, searchText) => {
         return (
             <Highlighter
@@ -128,6 +135,39 @@ export default function SearchBar(data) {
 
                     newOptions.push({
                         label: 'Название компании',
+                        options: childOptions
+                    })
+                } catch (error) {
+                }
+            }
+
+            if (['all', 'vlan'].includes(searchMode) && !isNaN(+value)) {
+                try {
+                    const response = await axios.get(
+                        `${apiUrl}/search/service/vlan/${value}?max_results=${max_res}`
+                    );
+
+                    let companyVlan2Name = {}
+                    response.data.data.map(c => {
+                        if (c.search_value in companyVlan2Name) {
+                            companyVlan2Name[c.search_value].add(c.company_name)
+                        } else {
+                            companyVlan2Name[c.search_value] = new Set([c.company_name])
+                        }
+                    })
+
+                    const childOptions = []
+                    for (const [key, val] of Object.entries(companyVlan2Name)) {
+                        childOptions.push(
+                            {
+                                value: `vlan_${key}`,
+                                label: highlightText(`${key} - ${[...val].join(', ')}`, value)
+                            }
+                        )
+                    }
+
+                    newOptions.push({
+                        label: 'Vlan',
                         options: childOptions
                     })
                 } catch (error) {
@@ -277,98 +317,15 @@ export default function SearchBar(data) {
 
     const onEnter = async value => {
         if (value.length > 0) {
-            setIsOpen(false)
-            setTextChangedBySelect(true)
-            data.updateContentIsLoading(true)
-
-            if (timer) {
-                clearTimeout(timer)
-                setTimer(null)
-            }
-            shouldSearchRef.current = false
-
-            if (searchMode === 'serviceId' && !isNaN(+value)) {
-                try {
-                    const response = await axios.get(
-                        `${apiUrl}/search/service/id/${value}?max_results=10000`
-                    );
-
-                    data.updateServicesData(response.data)
-                } catch (error) {
-                }
-            }
-
-            if (searchMode === 'companyId' && !isNaN(+value)) {
-                try {
-                    const response = await axios.get(
-                        `${apiUrl}/search/company/id/${value}?max_results=10000`
-                    );
-
-                    data.updateServicesData(response.data)
-                } catch (error) {
-                }
-            }
-
-            if (searchMode === 'ip') {
-                try {
-                    const response = await axios.get(
-                        `${apiUrl}/search/service/ip?ip=${value}&max_results=10000`
-                    );
-
-                    data.updateServicesData(response.data)
-                } catch (error) {
-                }
-            }
-
-            if (searchMode === 'companyName') {
-                try {
-                    const response = await axios.get(
-                        `${apiUrl}/search/company/name?name=${value}&max_results=10000`
-                    );
-
-                    data.updateServicesData(response.data)
-                } catch (error) {
-                }
-            }
-
-            if (searchMode === 'phone' && !isNaN(+value)) {
-                try {
-                    const response = await axios.get(
-                        `${apiUrl}/search/phone?phone=${value}&max_results=10000`
-                    );
-
-                    data.updateServicesData(response.data)
-                } catch (error) {
-                }
-            }
-
-            if (searchMode === 'address') {
-                try {
-                    const response = await axios.get(
-                        `${apiUrl}/search/address?address=${value}&max_results=10000`
-                    );
-
-                    data.updateServicesData(response.data)
-                } catch (error) {
-                }
-            }
-
-            if (searchMode === 'all') {
-                try {
-                    const response = await axios.get(
-                        `${apiUrl}/search/all?text=${value}&max_results=10000`
-                    );
-
-                    data.updateServicesData(response.data)
-                } catch (error) {
-                }
-            }
-
-            data.updateContentIsLoading(false)
+            data.updateSearchParams({search: `${searchMode}_${value}`})
         }
     };
 
     const onSelect = async value => {
+        data.updateSearchParams({search: value})
+    };
+
+    const searchData = async value => {
         const result = value.split('_')
         setIsOpen(false)
         setSearchText(result[1])
@@ -428,6 +385,28 @@ export default function SearchBar(data) {
             }
         }
 
+        if (result[0] === 'vlan') {
+            try {
+                const response = await axios.get(
+                    `${apiUrl}/search/service/vlan/${result[1]}?max_results=10000`
+                );
+
+                data.updateServicesData(response.data)
+            } catch (error) {
+            }
+        }
+
+        if (result[0] === 'phone') {
+            try {
+                const response = await axios.get(
+                    `${apiUrl}/search/phone?phone=${result[1]}&max_results=10000`
+                );
+
+                data.updateServicesData(response.data)
+            } catch (error) {
+            }
+        }
+
         if (result[0] === 'cPhone') {
             try {
                 const response = await axios.get(
@@ -443,6 +422,17 @@ export default function SearchBar(data) {
             try {
                 const response = await axios.get(
                     `${apiUrl}/search/service/phone?phone=${result[1]}&max_results=10000`
+                );
+
+                data.updateServicesData(response.data)
+            } catch (error) {
+            }
+        }
+
+        if (result[0] === 'address') {
+            try {
+                const response = await axios.get(
+                    `${apiUrl}/search/address?address=${result[1]}&max_results=10000`
                 );
 
                 data.updateServicesData(response.data)
@@ -474,8 +464,19 @@ export default function SearchBar(data) {
             }
         }
 
+        if (result[0] === 'all') {
+            try {
+                const response = await axios.get(
+                    `${apiUrl}/search/all?text=${result[1]}&max_results=10000`
+                );
+
+                data.updateServicesData(response.data)
+            } catch (error) {
+            }
+        }
+
         data.updateContentIsLoading(false)
-    };
+    }
 
     const debounceSearch = useCallback((value) => {
         if (timer) {
@@ -512,6 +513,10 @@ export default function SearchBar(data) {
         setTextChangedBySelect(false);
         shouldSearchRef.current = true
         if (value.length === 0) {
+            data.updateSearchParams((params) => {
+                params.delete('search')
+                return params
+            })
             data.updateServicesData(null)
             setIsOpen(false)
         }
@@ -527,6 +532,9 @@ export default function SearchBar(data) {
             key: 'all',
         },
         {
+            type: 'divider',
+        },
+        {
             label: 'ID Услуги',
             key: 'serviceId',
         },
@@ -537,6 +545,10 @@ export default function SearchBar(data) {
         {
             label: 'IP',
             key: 'ip',
+        },
+        {
+            label: 'Vlan',
+            key: 'vlan',
         },
         {
             label: 'Название компании',
@@ -557,6 +569,7 @@ export default function SearchBar(data) {
         serviceId: 'Поиск: ID Услуги',
         companyId: 'Поиск: ID Компании',
         ip: 'Поиск: IP',
+        vlan: 'Поиск: Vlan',
         companyName: 'Поиск: Название компании',
         address: 'Поиск: Адрес улуги или компании',
         phone: 'Поиск: Номер телефона'
@@ -580,6 +593,8 @@ export default function SearchBar(data) {
                     <Dropdown.Button
                         menu={{
                             items: searchMods,
+                            selectable: true,
+                            defaultSelectedKeys: ['all'],
                             onClick: onSearchModeClick,
                         }}
                         type='primary'
