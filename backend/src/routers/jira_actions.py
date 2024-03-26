@@ -12,12 +12,23 @@ router = APIRouter(
 )
 
 jira_options = {"server": settings.JIRA_URL}
-jira = JIRA(options=jira_options, basic_auth=(settings.JIRA_USER, settings.JIRA_PASSWORD))
+try:
+    jira = JIRA(options=jira_options, basic_auth=(settings.JIRA_USER, settings.JIRA_PASSWORD))
+except Exception as e:
+    print("Unable connect to Jira!")
+    print(e)
+    jira = None
+
+
+def _check_jira(jira):
+    if not jira:
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Unable connect to Jira")
 
 
 # Поиск задачи в jira по id услуги
 @router.get("/{service_id}")
 async def issues_by_service_id(service_id: int, _: User = Depends(get_current_user)):  # noqa: B008
+    _check_jira(jira)
     result = get_issues_by_service_id(jira, service_id)
     if not result:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Issues not found")
@@ -27,6 +38,7 @@ async def issues_by_service_id(service_id: int, _: User = Depends(get_current_us
 # Создание задачи в SUPPORT
 @router.post("/")
 async def support_issue_create(data: JIRAIssueCreateData, _: User = Depends(get_current_user)):  # noqa: B008
+    _check_jira(jira)
     data.project = "SUPPORT"
     data.issue_type = "Задача"
     data.assignee = "tp"
