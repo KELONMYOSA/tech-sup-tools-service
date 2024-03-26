@@ -13,7 +13,7 @@ router = APIRouter(
 
 jira_options = {"server": settings.JIRA_URL}
 try:
-    jira = JIRA(options=jira_options, basic_auth=(settings.JIRA_USER, settings.JIRA_PASSWORD))
+    jira = JIRA(options=jira_options, basic_auth=(settings.JIRA_USER, settings.JIRA_PASSWORD), timeout=10)
 except Exception as e:
     print("Unable connect to Jira!")
     print(e)
