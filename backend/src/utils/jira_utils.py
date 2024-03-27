@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 
 def get_issues_by_service_id(jira: JIRA, service_id: int) -> list[dict]:
-    issues = jira.search_issues(f'"ID Услуги" = {service_id}')
+    issues = jira.search_issues(f'"ID Услуги" ~ "{service_id}"')
     return _result_list_to_dict_list(issues)
 
 
@@ -15,7 +15,7 @@ class JIRAIssueCreateData(BaseModel):
     assignee: str | None = None
     summary: str | None = None
     description: str | None = None
-    service_id: int | None = None
+    service_id: str | None = None
     extra_fields: dict | None = None
 
 
@@ -28,7 +28,7 @@ def create_issue(jira: JIRA, data: JIRAIssueCreateData) -> (bool, str):
             assignee={"name": data.assignee},
             summary=data.summary,
             description=data.description,
-            customfield_11706=data.service_id,
+            customfield_11702=data.service_id,
             **data.extra_fields,
         )
         return True, issue.key

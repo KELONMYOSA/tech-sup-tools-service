@@ -17,8 +17,16 @@ es = Elasticsearch(settings.ES_URL)
 
 
 @router.get("/company/id/{company_id}")
-async def search_by_company_id(company_id: str, max_results: int = 10, _: User = Depends(get_current_user)):  # noqa: B008
-    query = {"size": max_results, "query": {"match": {"company_id": company_id}}}
+async def search_by_company_id(
+    company_id: str,
+    max_results: int = 10,
+    exact_match: bool = False,
+    _: User = Depends(get_current_user),  # noqa: B008
+):
+    if exact_match:
+        query = {"size": max_results, "query": {"term": {"company_id": company_id}}}
+    else:
+        query = {"size": max_results, "query": {"match": {"company_id": company_id}}}
     response = es.search(index="company_service_index", body=query)
     if response["hits"]["total"]["value"] == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Company not found")
@@ -28,8 +36,16 @@ async def search_by_company_id(company_id: str, max_results: int = 10, _: User =
 
 
 @router.get("/service/id/{service_id}")
-async def search_by_service_id(service_id: str, max_results: int = 10, _: User = Depends(get_current_user)):  # noqa: B008
-    query = {"size": max_results, "query": {"match": {"service_id": service_id}}}
+async def search_by_service_id(
+    service_id: str,
+    max_results: int = 10,
+    exact_match: bool = False,
+    _: User = Depends(get_current_user),  # noqa: B008
+):
+    if exact_match:
+        query = {"size": max_results, "query": {"term": {"service_id": service_id}}}
+    else:
+        query = {"size": max_results, "query": {"match": {"service_id": service_id}}}
     response = es.search(index="company_service_index", body=query)
     if response["hits"]["total"]["value"] == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service not found")
@@ -157,21 +173,42 @@ async def search_by_service_ip(ip: str, max_results: int = 10, _: User = Depends
 
 
 @router.get("/phone")
-async def search_by_phone(phone: str, max_results: int = 10, _: User = Depends(get_current_user)):  # noqa: B008
-    query = {
-        "size": max_results,
-        "query": {
-            "bool": {
-                "should": [
-                    {"wildcard": {"company_phone": f"*{phone}*"}},
-                    {"wildcard": {"client_phone": f"*{phone}*"}},
-                    {"wildcard": {"service_phone": f"*{phone}*"}},
-                    {"wildcard": {"service_phone_end": f"*{phone}*"}},
-                ],
-                "minimum_should_match": 1,
-            }
-        },
-    }
+async def search_by_phone(
+    phone: str,
+    max_results: int = 10,
+    exact_match: bool = False,
+    _: User = Depends(get_current_user),  # noqa: B008
+):
+    if exact_match:
+        query = {
+            "size": max_results,
+            "query": {
+                "bool": {
+                    "should": [
+                        {"term": {"company_phone": phone}},
+                        {"term": {"client_phone": phone}},
+                        {"term": {"service_phone": phone}},
+                        {"term": {"service_phone_end": phone}},
+                    ],
+                    "minimum_should_match": 1,
+                }
+            },
+        }
+    else:
+        query = {
+            "size": max_results,
+            "query": {
+                "bool": {
+                    "should": [
+                        {"wildcard": {"company_phone": f"*{phone}*"}},
+                        {"wildcard": {"client_phone": f"*{phone}*"}},
+                        {"wildcard": {"service_phone": f"*{phone}*"}},
+                        {"wildcard": {"service_phone_end": f"*{phone}*"}},
+                    ],
+                    "minimum_should_match": 1,
+                }
+            },
+        }
     response = es.search(index="company_service_index", body=query)
     if response["hits"]["total"]["value"] == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Company or service not found")
@@ -181,19 +218,38 @@ async def search_by_phone(phone: str, max_results: int = 10, _: User = Depends(g
 
 
 @router.get("/service/phone")
-async def search_service_by_phone(phone: str, max_results: int = 10, _: User = Depends(get_current_user)):  # noqa: B008
-    query = {
-        "size": max_results,
-        "query": {
-            "bool": {
-                "should": [
-                    {"wildcard": {"service_phone": f"*{phone}*"}},
-                    {"wildcard": {"service_phone_end": f"*{phone}*"}},
-                ],
-                "minimum_should_match": 1,
-            }
-        },
-    }
+async def search_service_by_phone(
+    phone: str,
+    max_results: int = 10,
+    exact_match: bool = False,
+    _: User = Depends(get_current_user),  # noqa: B008
+):
+    if exact_match:
+        query = {
+            "size": max_results,
+            "query": {
+                "bool": {
+                    "should": [
+                        {"term": {"service_phone": phone}},
+                        {"term": {"service_phone_end": phone}},
+                    ],
+                    "minimum_should_match": 1,
+                }
+            },
+        }
+    else:
+        query = {
+            "size": max_results,
+            "query": {
+                "bool": {
+                    "should": [
+                        {"wildcard": {"service_phone": f"*{phone}*"}},
+                        {"wildcard": {"service_phone_end": f"*{phone}*"}},
+                    ],
+                    "minimum_should_match": 1,
+                }
+            },
+        }
     response = es.search(index="company_service_index", body=query)
     if response["hits"]["total"]["value"] == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service not found")
@@ -203,19 +259,38 @@ async def search_service_by_phone(phone: str, max_results: int = 10, _: User = D
 
 
 @router.get("/company/phone")
-async def search_company_by_phone(phone: str, max_results: int = 10, _: User = Depends(get_current_user)):  # noqa: B008
-    query = {
-        "size": max_results,
-        "query": {
-            "bool": {
-                "should": [
-                    {"wildcard": {"company_phone": f"*{phone}*"}},
-                    {"wildcard": {"client_phone": f"*{phone}*"}},
-                ],
-                "minimum_should_match": 1,
-            }
-        },
-    }
+async def search_company_by_phone(
+    phone: str,
+    max_results: int = 10,
+    exact_match: bool = False,
+    _: User = Depends(get_current_user),  # noqa: B008
+):
+    if exact_match:
+        query = {
+            "size": max_results,
+            "query": {
+                "bool": {
+                    "should": [
+                        {"term": {"company_phone": phone}},
+                        {"term": {"client_phone": phone}},
+                    ],
+                    "minimum_should_match": 1,
+                }
+            },
+        }
+    else:
+        query = {
+            "size": max_results,
+            "query": {
+                "bool": {
+                    "should": [
+                        {"wildcard": {"company_phone": f"*{phone}*"}},
+                        {"wildcard": {"client_phone": f"*{phone}*"}},
+                    ],
+                    "minimum_should_match": 1,
+                }
+            },
+        }
     response = es.search(index="company_service_index", body=query)
     if response["hits"]["total"]["value"] == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Company not found")
@@ -225,8 +300,16 @@ async def search_company_by_phone(phone: str, max_results: int = 10, _: User = D
 
 
 @router.get("/service/vlan/{vlan}")
-async def search_by_vlan(vlan: str, max_results: int = 10, _: User = Depends(get_current_user)):  # noqa: B008
-    query = {"size": max_results, "query": {"match": {"service_vlan": vlan}}}
+async def search_by_vlan(
+    vlan: str,
+    max_results: int = 10,
+    exact_match: bool = False,
+    _: User = Depends(get_current_user),  # noqa: B008
+):
+    if exact_match:
+        query = {"size": max_results, "query": {"term": {"service_vlan": vlan}}}
+    else:
+        query = {"size": max_results, "query": {"match": {"service_vlan": vlan}}}
     response = es.search(index="company_service_index", body=query)
     if response["hits"]["total"]["value"] == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service not found")
@@ -236,8 +319,16 @@ async def search_by_vlan(vlan: str, max_results: int = 10, _: User = Depends(get
 
 
 @router.get("/service/equipment/{equip}")
-async def search_by_equipment(equip: str, max_results: int = 10, _: User = Depends(get_current_user)):  # noqa: B008
-    query = {"size": max_results, "query": {"match": {"service_interface_equipment": equip}}}
+async def search_by_equipment(
+    equip: str,
+    max_results: int = 10,
+    exact_match: bool = False,
+    _: User = Depends(get_current_user),  # noqa: B008
+):
+    if exact_match:
+        query = {"size": max_results, "query": {"term": {"service_interface_equipment.keyword": equip}}}
+    else:
+        query = {"size": max_results, "query": {"match": {"service_interface_equipment": equip}}}
     response = es.search(index="company_service_index", body=query)
     if response["hits"]["total"]["value"] == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service not found")

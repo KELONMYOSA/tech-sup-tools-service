@@ -383,7 +383,7 @@ export default function SearchBar(data) {
         if (selectedMods.includes('serviceId')) {
             try {
                 const response = await axios.get(
-                    `${apiUrl}/search/service/id/${selectedValue}?max_results=10000`
+                    `${apiUrl}/search/service/id/${selectedValue}?max_results=10000&exact_match=true`
                 );
 
                 responses.push(response.data)
@@ -394,7 +394,7 @@ export default function SearchBar(data) {
         if (selectedMods.includes('companyId')) {
             try {
                 const response = await axios.get(
-                    `${apiUrl}/search/company/id/${selectedValue}?max_results=10000`
+                    `${apiUrl}/search/company/id/${selectedValue}?max_results=10000&exact_match=true`
                 );
 
                 responses.push(response.data)
@@ -437,7 +437,7 @@ export default function SearchBar(data) {
         if (selectedMods.includes('vlan')) {
             try {
                 const response = await axios.get(
-                    `${apiUrl}/search/service/vlan/${selectedValue}?max_results=10000`
+                    `${apiUrl}/search/service/vlan/${selectedValue}?max_results=10000&exact_match=true`
                 );
 
                 responses.push(response.data)
@@ -448,7 +448,7 @@ export default function SearchBar(data) {
         if (selectedMods.includes('equipment')) {
             try {
                 const response = await axios.get(
-                    `${apiUrl}/search/service/equipment/${selectedValue}?max_results=10000`
+                    `${apiUrl}/search/service/equipment/${selectedValue}?max_results=10000&exact_match=true`
                 );
 
                 responses.push(response.data)
@@ -466,7 +466,7 @@ export default function SearchBar(data) {
             }
             try {
                 const response = await axios.get(
-                    `${apiUrl}/search/phone?phone=${phoneNum}&max_results=10000`
+                    `${apiUrl}/search/phone?phone=${phoneNum}&max_results=10000&exact_match=true`
                 );
 
                 responses.push(response.data)
@@ -484,7 +484,7 @@ export default function SearchBar(data) {
             }
             try {
                 const response = await axios.get(
-                    `${apiUrl}/search/company/phone?phone=${phoneNum}&max_results=10000`
+                    `${apiUrl}/search/company/phone?phone=${phoneNum}&max_results=10000&exact_match=true`
                 );
 
                 responses.push(response.data)
@@ -502,7 +502,7 @@ export default function SearchBar(data) {
             }
             try {
                 const response = await axios.get(
-                    `${apiUrl}/search/service/phone?phone=${phoneNum}&max_results=10000`
+                    `${apiUrl}/search/service/phone?phone=${phoneNum}&max_results=10000&exact_match=true`
                 );
 
                 responses.push(response.data)

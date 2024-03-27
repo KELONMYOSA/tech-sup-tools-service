@@ -9,7 +9,7 @@ import {useSearchParams} from "react-router-dom";
 export default function Home(data) {
     const [servicesData, setServicesData] = useState(null);
     const [pageContentIsLoading, setPageContentIsLoading] = useState(false);
-    const [headerHeight, setHeaderHeight] = useState('65px');
+    const [headerHeight, setHeaderHeight] = useState('64px');
     const headerRef = useRef(null);
 
     const [searchParams, setSearchParams] = useSearchParams()
@@ -37,7 +37,7 @@ export default function Home(data) {
         pageContent = (
             <Row>
                 <Col flex='auto' style={{padding: 20}}>
-                    <ServiceCard servicesData={servicesData}/>
+                    <ServiceCard servicesData={servicesData} headerHeight={headerHeight}/>
                 </Col>
             </Row>
         )
@@ -46,7 +46,15 @@ export default function Home(data) {
     return (
         <Layout>
             <Header ref={headerRef}
-                    style={{display: 'flex', padding: 0, backgroundColor: 'white', minHeight: '65px', height: 'auto'}}>
+                    style={{
+                        position: 'sticky',
+                        top: 0,
+                        zIndex: 2,
+                        display: 'flex',
+                        padding: 0,
+                        backgroundColor: 'white',
+                        minHeight: '65px',
+                        height: 'auto'}}>
                 <Row justify='space-between' align='middle' style={{minHeight: '65px', width: '100%'}}>
                     <Col order={0}>
                         <Row align='middle' flex='auto'

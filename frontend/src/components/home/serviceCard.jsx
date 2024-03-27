@@ -1,11 +1,12 @@
-import {Button, Input, Space, Table, Tooltip, Typography} from "antd";
+import {Button, Col, Input, Row, Space, Table, Tooltip, Typography} from "antd";
 import React, {useEffect, useRef, useState} from "react";
 import ServiceBriefInfo from "./serviceBriefInfo.jsx";
-import {SearchOutlined} from "@ant-design/icons";
+import {DownOutlined, SearchOutlined, UpOutlined} from "@ant-design/icons";
 import styles from '../../index.module.less'
 
 export default function ServiceCard(data) {
     const [isGettingData, setIsGettingData] = useState(true);
+    const [isExpandedComments, setIsExpandedComments] = useState(true);
     const [serviceTable, setServiceTable] = useState(null);
     const [expandedData, setExpandedData] = useState({});
     const [serviceStatuses, setServiceStatuses] = useState(null);
@@ -154,30 +155,37 @@ export default function ServiceCard(data) {
                 type: service.service_type,
                 status: service.service_status,
                 addresses: (
-                    <ul>
+                    <ul style={{marginLeft: 10}}>
                         {service.service_address.map((address, i) => (
                             <li key={i}>{
                                 address
                             }</li>
                         ))}
                     </ul>),
-                manageComm: (
-                    <Tooltip placement="topLeft" title={service.service_description}>
-                        {service.service_description}
-                    </Tooltip>),
-                techComm: (
-                    <Tooltip placement="topLeft" title={service.service_support_description}>
-                        {service.service_support_description}
-                    </Tooltip>),
+                manageComm: isExpandedComments ? service.service_description
+                    : (
+                        <Tooltip placement="topLeft" title={service.service_description}>
+                            {service.service_description}
+                        </Tooltip>
+                    ),
+                techComm: isExpandedComments ? service.service_support_description
+                    : (
+                        <Tooltip placement="topLeft" title={service.service_support_description}>
+                            {service.service_support_description}
+                        </Tooltip>
+                    ),
             }))
 
             setServiceTable(
                 <Table
                     className={styles.contrast_collapse_background}
+                    sticky={{offsetHeader: data.headerHeight}}
                     columns={[
                         {
                             title: 'ID',
                             dataIndex: 'id',
+                            width: 80,
+                            showSorterTooltip: false,
                             sorter: (a, b) => a.key - b.key,
                         },
                         {
@@ -185,19 +193,24 @@ export default function ServiceCard(data) {
                             dataIndex: 'company',
                             filters: companyFilters,
                             onFilter: (value, record) => JSON.stringify(record.company).indexOf(value) >= 0,
+                            className: styles.column_header_filter_button,
                             filterSearch: true,
                         },
                         {
                             title: 'Тип',
                             dataIndex: 'type',
+                            width: 120,
                             filters: typeFilters,
+                            className: styles.column_header_filter_button,
                             onFilter: (value, record) => record.type.startsWith(value),
                         },
                         {
                             title: 'Статус',
                             dataIndex: 'status',
+                            width: 120,
                             filters: statusFilters,
                             defaultFilteredValue: defaultStatusFilters,
+                            className: styles.column_header_filter_button,
                             onFilter: (value, record) => record.status.startsWith(value),
                         },
                         {
@@ -209,17 +222,13 @@ export default function ServiceCard(data) {
                         {
                             title: 'Менеджерское',
                             dataIndex: 'manageComm',
-                            ellipsis: {
-                                showTitle: false,
-                            },
+                            ellipsis: isExpandedComments ? null : {showTitle: false},
                             ...getColumnSearchProps('manageComm'),
                         },
                         {
                             title: 'Техническое',
                             dataIndex: 'techComm',
-                            ellipsis: {
-                                showTitle: false,
-                            },
+                            ellipsis: isExpandedComments ? null : {showTitle: false},
                             ...getColumnSearchProps('techComm'),
                         },
                     ]}
@@ -243,7 +252,7 @@ export default function ServiceCard(data) {
                 />
             )
         })();
-    }, [data.servicesData, expandedData]);
+    }, [data.servicesData, expandedData, isExpandedComments]);
 
     if (isGettingData) {
         return <></>
@@ -251,8 +260,21 @@ export default function ServiceCard(data) {
 
     return (
         <>
-            {!isGettingData ? <Typography.Title
-                level={5}>{serviceStatuses}</Typography.Title> : null}
+            {!isGettingData ?
+                <Row justify='space-between' align='middle' style={{paddingBottom: 10}}>
+                    <Col>
+                        <Typography.Title level={5} style={{textAlign: 'center'}}>{serviceStatuses}</Typography.Title>
+                    </Col>
+                    <Col>
+                        <Button
+                            onClick={() => setIsExpandedComments(!isExpandedComments)}
+                            type='text'
+                            icon={isExpandedComments ? <UpOutlined/> : <DownOutlined/>}>
+                            {isExpandedComments ? 'Свернуть комментарии' : 'Развернуть комментарии'}
+                        </Button>
+                    </Col>
+                </Row>
+                : null}
             {serviceTable}
         </>
     )

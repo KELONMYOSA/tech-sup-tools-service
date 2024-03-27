@@ -70,7 +70,7 @@ export default function Service(data) {
                 const body = {
                     summary: values.summary,
                     description: values.description,
-                    service_id: parseInt(serviceId),
+                    service_id: serviceId,
                     extra_fields: extraFields
                 }
                 try {
