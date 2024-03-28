@@ -1,6 +1,6 @@
 import {useParams} from "react-router-dom";
 import ServiceInfo from "../components/service/serviceInfo.jsx";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {Button, Flex, Form, Layout, Modal, notification, Select, Space, Spin, Typography} from "antd";
 import Navbar from "../components/navbar.jsx";
 import {Content, Header} from "antd/es/layout/layout.js";
@@ -10,7 +10,7 @@ import {
     componentId2Field,
     componentId2Name,
     componentId2ShortName,
-    field2Variants
+    field2Variants, serviceType2componentId
 } from "../components/service/dicts.js";
 import axios from "axios";
 
@@ -23,7 +23,9 @@ export default function Service(data) {
     const [isLoading, setIsLoading] = useState(true);
     const [serviceItems, setServiceItems] = useState(true);
     const [isIssueFormOpen, setIsIssueFormOpen] = useState(false);
+    const [isVisibleAddressAdd, setIsVisibleAddressAdd] = useState(true);
     const [issueFormItems, setIssueFormItems] = useState(null);
+    const serviceFormData = useRef({});
     const [formIssueCreate] = Form.useForm();
     const [api, contextHolder] = notification.useNotification();
 
@@ -42,6 +44,14 @@ export default function Service(data) {
     }
 
     const showIssueCreation = () => {
+        setIsIssueFormOpen(true)
+    }
+
+    const hideIssueCreation = () => {
+        setIsIssueFormOpen(false)
+    }
+
+    useEffect(() => {
         const layout = {
             labelCol: {
                 span: 8,
@@ -80,22 +90,30 @@ export default function Service(data) {
                     );
 
                     showSuccess(`Задача создана - ${response.data.key}`)
-                    window.open(`${jiraUrl}/browse/${response.data.key}`,'_blank')
+                    window.open(`${jiraUrl}/browse/${response.data.key}`, '_blank')
                 } catch (error) {
                     showAlert(error.response.data.detail)
                 }
                 setIsIssueFormOpen(false)
                 onReset()
                 setIssueFormItems(null)
+                formIssueCreate.resetFields()
+                setIsVisibleAddressAdd(true)
             })()
         }
 
         const onReset = () => {
-            formIssueCreate.resetFields()
+            formIssueCreate.setFieldsValue({components: null, summary: null, description: null})
+            setIsVisibleAddressAdd(true)
         }
 
         const onComponentsChange = (value) => {
-            formIssueCreate.setFieldsValue({summary: `[${value.map(v => componentId2ShortName[v]).join(", ")}]`})
+            if (value.length === 0) {
+                formIssueCreate.setFieldsValue({summary: null})
+            } else {
+                formIssueCreate.setFieldsValue({summary: `${serviceFormData.current.company} (id=${serviceFormData.current.companyId}) [${value.map(v => componentId2ShortName[v]).join(", ")}]`})
+            }
+            setIsVisibleAddressAdd(true)
         }
 
         const filterOptionComponents = (input, option) =>
@@ -103,6 +121,16 @@ export default function Service(data) {
 
         const validateMessages = {
             required: '${label} обязательно!'
+        }
+
+        const addAddressToSummary = () => {
+            formIssueCreate.setFieldValue(
+                'summary',
+                formIssueCreate.getFieldValue('summary') + ' ' + serviceFormData.current.addresses.map((address, i) =>
+                    `${address.city}${!['', ' '].includes(address.street) ? `, ${address.street}` : ''}${!['', ' '].includes(address.house) ? `, ${address.house}` : ''}${!['', ' '].includes(address.building) ? `, ${address.building}` : ''}${!['', ' '].includes(address.letter) ? ` ${address.letter}` : ''}${!['', ' '].includes(address.flat) ? `, кв. ${address.flat}` : ''}`
+                ).join(' - ')
+            )
+            setIsVisibleAddressAdd(false)
         }
 
         setIssueFormItems(
@@ -119,7 +147,12 @@ export default function Service(data) {
                         marginRight: 50,
                         marginTop: 20
                     }}
-                    initialValues={{priority: 'Средний'}}
+                    initialValues={{
+                        components: serviceFormData.current.type in serviceType2componentId ?
+                            [serviceType2componentId[serviceFormData.current.type].toString()]
+                            : null,
+                        summary: `${serviceFormData.current.company} (id=${serviceFormData.current.companyId})${serviceFormData.current.type in serviceType2componentId ? ' [' + componentId2ShortName[serviceType2componentId[serviceFormData.current.type]] + ']' : ''}`
+                    }}
                 >
                     <Form.Item name="components" label="Компоненты" rules={[{required: true}]}>
                         <Select
@@ -164,9 +197,28 @@ export default function Service(data) {
                         }
                     </Form.Item>
                     <Form.Item name="summary" label="Название" rules={[{required: true}]}>
-                        <TextArea autoSize allowClear onPressEnter={(e) => {
-                            e.preventDefault()
-                        }}/>
+                        <TextArea
+                            autoSize
+                            allowClear
+                            onPressEnter={(e) => {
+                                e.preventDefault()
+                            }}
+                            onChange={(e) => {
+                                if (e.target.value.length === 0) {
+                                    setIsVisibleAddressAdd(true)
+                                }
+                            }}
+                        />
+                    </Form.Item>
+                    <Form.Item
+                        {...tailLayout}
+                        style={{
+                            marginBottom: '12px',
+                            marginTop: '-24px',
+                            display: isVisibleAddressAdd ? 'block' : 'none'
+                        }}
+                    >
+                        <Button type='link' size='small' style={{paddingLeft: 0}} onClick={addAddressToSummary}>Добавить адрес</Button>
                     </Form.Item>
                     <Form.Item name="description" label="Описание" rules={[{required: true}]}>
                         <TextArea allowClear/>
@@ -184,13 +236,7 @@ export default function Service(data) {
                 </Form>
             </>
         )
-        setIsIssueFormOpen(true)
-    }
-
-    const hideIssueCreation = () => {
-        setIssueFormItems(null)
-        setIsIssueFormOpen(false)
-    }
+    }, [isIssueFormOpen, isVisibleAddressAdd])
 
     useEffect(() => {
         (async () => {
@@ -199,6 +245,7 @@ export default function Service(data) {
                 pdfWidth: data.windowWidth * 0.6,
                 showIssueCreation: showIssueCreation
             })
+            serviceFormData.current = serviceItems[1]
             if (serviceItems[0]) {
                 setServiceItems(
                     <Layout>
@@ -219,7 +266,7 @@ export default function Service(data) {
                                    width={isMobile ? '90%' : '50%'}>
                                 {issueFormItems}
                             </Modal>
-                            {serviceItems[1]}
+                            {serviceItems[2]}
                         </Content>
                     </Layout>
                 )
@@ -228,7 +275,7 @@ export default function Service(data) {
             }
             setIsLoading(false)
         })()
-    }, [isIssueFormOpen]);
+    }, [issueFormItems]);
 
     if (isLoading) {
         return (

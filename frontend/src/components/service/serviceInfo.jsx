@@ -42,6 +42,24 @@ export default async function ServiceInfo(data) {
 
     const jira = await getJiraIssues(serviceId)
 
+    const jiraOpen = jira.filter((issue)=> issue.status !== 'Решено')
+    let jiraOpenIssues
+    if (jiraOpen.length > 0) {
+        jiraOpenIssues = (
+            <Card title="Открытые заявки" size='small' style={{marginBottom: 10}}>
+                <ul style={{marginLeft: 10, listStyle: 'none'}}>
+                    {jiraOpen.map((issue, i) => (
+                        <li key={i}>
+                            <a target='_blank'
+                               href={`${jiraUrl}/browse/${issue.key}`}>{`[${issue.key}] ${issue.summary} (${issue.status})`}</a>
+                        </li>
+                    ))}
+                </ul>
+            </Card>
+        )
+    }
+
+
     let rentServices
     if (service.rentServices.length > 0) {
         rentServices = (
@@ -375,7 +393,7 @@ export default async function ServiceInfo(data) {
     }
 
     return (
-        [true,
+        [true, service,
             <Row key={1}>
                 <Col key={1} xs={24} md={10} lg={7} style={{padding: 20}}>
                     <Card key={1} title="Общие сведения">
@@ -439,7 +457,7 @@ export default async function ServiceInfo(data) {
                         <ul style={{marginLeft: 10}}>
                             {service.addresses.map((address, i) => (
                                 <li key={i}>{
-                                    `${address.city}${!['', ' '].includes(address.street) ? `, ${address.street}` : ''}${!['', ' '].includes(address.house) ? `, ${address.house}` : ''}${!['', ' '].includes(address.building) ? `, ${address.building}` : ''}${!['', ' '].includes(address.letter) ? ` ${address.letter}` : ''}${!['', ' '].includes(address.flat) ? `, ${address.flat}` : ''}`
+                                    `${address.city}${!['', ' '].includes(address.street) ? `, ${address.street}` : ''}${!['', ' '].includes(address.house) ? `, ${address.house}` : ''}${!['', ' '].includes(address.building) ? `, ${address.building}` : ''}${!['', ' '].includes(address.letter) ? ` ${address.letter}` : ''}${!['', ' '].includes(address.flat) ? `, кв. ${address.flat}` : ''}`
                                 }</li>
                             ))}
                         </ul>
@@ -483,6 +501,7 @@ export default async function ServiceInfo(data) {
                 </Col>
                 <Col key={2} xs={24} md={14} lg={17} style={{padding: 20}}>
                     <Card title="Технические параметры">
+                        {jiraOpenIssues}
                         {rentServices}
                         {rentedFor}
                         {pack}
