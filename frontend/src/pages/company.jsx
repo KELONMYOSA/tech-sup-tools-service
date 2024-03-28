@@ -5,6 +5,7 @@ import Navbar from "../components/navbar.jsx";
 import {Content, Header} from "antd/es/layout/layout.js";
 import PageNotFound from "./404page.jsx";
 import CompanyInfo from "../components/company/companyInfo.jsx";
+import CopyToClipboardButton from "../utils/components.jsx";
 
 export default function Company(data) {
     const {companyId} = useParams();
@@ -23,9 +24,16 @@ export default function Company(data) {
                                 <img height='100%' src='/logo.png'/>
                             </a>
                             {!isMobile &&
-                                <div style={{display: 'flex', width: '100%', marginLeft: 20, paddingTop: 5}}>
-                                    <Typography.Title level={3}>{`Компания ID: ${companyId}`}</Typography.Title>
-                                </div>
+                                <CopyToClipboardButton
+                                    text={companyId}
+                                    type='text'
+                                    style={{marginLeft: 20}}
+                                    item={
+                                        <Typography.Title style={{marginTop: 8}}
+                                                          level={3}>{`Компания ID: ${companyId}`}
+                                        </Typography.Title>
+                                    }
+                                />
                             }
                             <Navbar userData={data.userData}/>
                         </Header>

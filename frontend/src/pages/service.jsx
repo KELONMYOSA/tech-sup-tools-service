@@ -13,6 +13,7 @@ import {
     field2Variants, serviceType2componentId
 } from "../components/service/dicts.js";
 import axios from "axios";
+import CopyToClipboardButton from "../utils/components.jsx";
 
 export default function Service(data) {
     const {serviceId} = useParams();
@@ -218,7 +219,9 @@ export default function Service(data) {
                             display: isVisibleAddressAdd ? 'block' : 'none'
                         }}
                     >
-                        <Button type='link' size='small' style={{paddingLeft: 0}} onClick={addAddressToSummary}>Добавить адрес</Button>
+                        <Button type='link' size='small' style={{paddingLeft: 0}} onClick={addAddressToSummary}>
+                            Добавить адрес
+                        </Button>
                     </Form.Item>
                     <Form.Item name="description" label="Описание" rules={[{required: true}]}>
                         <TextArea allowClear/>
@@ -254,9 +257,16 @@ export default function Service(data) {
                                 <img height='100%' src='/logo.png'/>
                             </a>
                             {!isMobile &&
-                                <div style={{display: 'flex', width: '100%', marginLeft: 20, paddingTop: 5}}>
-                                    <Typography.Title level={3}>{`Услуга ID: ${serviceId}`}</Typography.Title>
-                                </div>
+                                <CopyToClipboardButton
+                                    text={serviceId}
+                                    type='text'
+                                    style={{marginLeft: 20}}
+                                    item={
+                                        <Typography.Title style={{marginTop: 8}}
+                                                          level={3}>{`Услуга ID: ${serviceId}`}
+                                        </Typography.Title>
+                                    }
+                                />
                             }
                             <Navbar userData={data.userData}/>
                         </Header>
