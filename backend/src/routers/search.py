@@ -7,6 +7,7 @@ from src.config import settings
 from src.models.user import User
 from src.utils.auth import get_current_user
 from src.utils.es_data import ESDataManager
+from src.utils.services import get_services_by_ip
 
 router = APIRouter(
     prefix="/search",
@@ -147,6 +148,7 @@ async def search_by_company_address(address: str, max_results: int = 10, _: User
 @router.get("/service/ip")
 async def search_by_service_ip(ip: str, max_results: int = 10, _: User = Depends(get_current_user)):  # noqa: B008
     query = {"size": max_results, "query": {"wildcard": {"service_interface_host": f"*{ip}*"}}}
+    data = ESDataManager()
     try:
         ip_styled = int(ipaddress.ip_address(ip.split("/")[0]))
         if "/" in ip:
@@ -163,52 +165,14 @@ async def search_by_service_ip(ip: str, max_results: int = 10, _: User = Depends
                 },
             }
         else:
-            script_source = f"""
-String subnet = params['_source']['service_subnet'];
-if (subnet == null) return 0;
-
-int indexSlash = subnet.indexOf('/');
-String subnetIP = subnet.substring(0, indexSlash);
-String subnetMask = subnet.substring(indexSlash + 1);
-
-long storedIp = Long.parseLong(subnetIP);
-int maskLength = Integer.parseInt(subnetMask);
-
-long mask = 0xFFFFFFFFL << (32 - maskLength);
-
-long queryIp = {ip_styled}L;
-
-long network = storedIp & mask;
-long broadcast = network | ~mask;
-
-return (queryIp & mask) == (storedIp & mask) ? 1 : 0;
-        """
-            query = {
-                "size": max_results,
-                "min_score": "0.5",
-                "query": {
-                    "bool": {
-                        "should": [
-                            {
-                                "script_score": {
-                                    "query": {"match_all": {}},
-                                    "script": {"source": script_source, "lang": "painless"},
-                                }
-                            },
-                            {"wildcard": {"service_interface_host": f"*{ip}*"}},
-                        ],
-                        "minimum_should_match": 1,
-                    }
-                },
-            }
+            data.create_from_service_model_list(get_services_by_ip(ip_styled))
     except:  # noqa: E722
         pass
     response = es.search(index="company_service_index", body=query)
-    if response["hits"]["total"]["value"] == 0:
+    if response["hits"]["total"]["value"] == 0 and len(data.make_service_model_response(ip)["data"]) == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service not found")
-    data = ESDataManager()
     data.create_from_response(response["hits"]["hits"])
-    return data.make_response(ip, "ip")
+    return data.make_service_model_response(ip)
 
 
 @router.get("/phone")

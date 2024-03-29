@@ -29,3 +29,19 @@ def get_services_by_company_id(company_id: int) -> list | None:
             return None
 
         return services
+
+
+def get_services_by_ip(ip: int) -> list | None:
+    with oracle_db() as db:
+        services = ServiceModel(db).get_by_ip(ip)
+        data = []
+
+        for srv in services:
+            if srv.is_delete and srv.is_delete == "Y":
+                continue
+            data.append(srv.get_es_data())
+
+        if len(services) == 0:
+            return None
+
+        return data

@@ -3,7 +3,30 @@ from typing import Literal
 
 
 class ESData:
-    def __init__(self, initial_data):
+    def __init__(self, initial_data=None):
+        self.service_id = None
+        self.service_type = None
+        self.service_status = None
+        self.service_description = None
+        self.service_support_description = None
+        self.service_phone = None
+        self.service_phone_end = None
+        self.service_address = []
+        self.service_subnet = []
+        self.service_interface_host = []
+        self.service_vlan = []
+        self.service_interface_equipment = []
+        self.company_id = None
+        self.company_name = None
+        self.company_brand_name = None
+        self.company_phone = None
+        self.company_email = None
+        self.company_address = []
+        self.client_phone = []
+        if initial_data:
+            self.initialize_from_dict(initial_data)
+
+    def initialize_from_dict(self, initial_data):
         self.service_id = initial_data["_source"].get("service_id")
         self.service_type = initial_data["_source"].get("service_type")
         self.service_status = initial_data["_source"].get("service_status")
@@ -45,6 +68,26 @@ class ESData:
             [initial_data["_source"].get("client_phone")] if initial_data["_source"].get("client_phone") else []
         )
 
+    def initialize_from_service_model(self, service_model):
+        self.service_id = service_model["serviceId"]
+        self.service_type = service_model["type"]
+        self.service_status = service_model["status"]
+        self.service_description = service_model["desc"]
+        self.service_support_description = service_model["supDesc"]
+        self.service_address = service_model["addresses"]
+        self.service_subnet = service_model["subnet"]
+        self.company_id = service_model["cId"]
+        self.company_name = service_model["cName"]
+        return self
+
+    def add_model_data(self, service_model):
+        if service_model["addresses"]:
+            for a in service_model["addresses"]:
+                self.service_address.append(a)
+        if service_model["subnet"]:
+            for subnet in service_model["subnet"]:
+                self.service_subnet.append(subnet)
+
     def add_data(self, data):
         if (
             data["_source"].get("service_address")
@@ -76,6 +119,25 @@ class ESData:
             self.company_address.append(data["_source"].get("company_address"))
         if data["_source"].get("client_phone") and data["_source"].get("client_phone") not in self.client_phone:
             self.client_phone.append(data["_source"].get("client_phone"))
+
+    def service_model_to_dict(self, search_string):
+        search_value = ""
+        for subnet in self.service_subnet:
+            print(subnet)
+            if search_string in subnet:
+                search_value = subnet
+                break
+        return {
+            "search_value": search_value,
+            "service_id": self.service_id,
+            "service_type": self.service_type,
+            "service_status": self.service_status,
+            "service_address": self.service_address,
+            "service_description": self.service_description,
+            "service_support_description": self.service_support_description,
+            "company_id": self.company_id,
+            "company_name": self.company_name,
+        }
 
     def to_dict(
         self,
@@ -181,7 +243,47 @@ class ESDataManager:
                     self.service_statuses[service_status] = 1
                 if company_id not in self.company_id2name:
                     self.company_id2name[company_id] = company_name
-        self.data = list(data_map.values())
+        self.data += list(data_map.values())
+
+    def create_from_service_model_list(self, model_list):
+        data_map = {}
+        for item in model_list:
+            service_id = item["serviceId"]
+            company_id = item["cId"]
+            service_type = item["type"]
+            company_name = item["cName"]
+            service_status = item["status"]
+
+            self.company_ids.add(company_id)
+            self.service_ids.add(service_id)
+            self.service_types.add(service_type)
+
+            if service_id in data_map:
+                data_map[service_id].add_model_data(item)
+            else:
+                data_map[service_id] = ESData().initialize_from_service_model(item)
+                if service_status in self.service_statuses:
+                    self.service_statuses[service_status] += 1
+                else:
+                    self.service_statuses[service_status] = 1
+                if company_id not in self.company_id2name:
+                    self.company_id2name[company_id] = company_name
+        self.data += list(data_map.values())
+
+    def make_service_model_response(self, search_text: str) -> dict:
+        response = {
+            "stats": {
+                "services_count": len(self.service_ids),
+                "companies_count": len(self.company_ids),
+                "service_ids": list(self.service_ids),
+                "company_ids": list(self.company_ids),
+                "service_types": list(self.service_types),
+                "service_statuses": self.service_statuses,
+                "company_id2name": self.company_id2name,
+            },
+            "data": [item.service_model_to_dict(search_text) for item in self.data],
+        }
+        return response
 
     def make_response(
         self,

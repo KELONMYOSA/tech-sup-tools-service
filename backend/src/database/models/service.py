@@ -1,6 +1,8 @@
 import ipaddress
 
-from src.database.models.aes import Service
+from sqlalchemy import func
+
+from src.database.models.aes import NetworkCompany, Service
 
 
 class ServiceModel(Service):
@@ -9,6 +11,16 @@ class ServiceModel(Service):
 
     def get_by_id(self, id):
         return self.db.query(ServiceModel).filter(ServiceModel.id == id).first()
+
+    def get_by_ip(self, ip_long):
+        return (
+            self.db.query(ServiceModel)
+            .join(NetworkCompany, ServiceModel.id == NetworkCompany.id_service)
+            .filter(
+                ip_long >= NetworkCompany.ip, ip_long <= NetworkCompany.ip + func.power(2, 32 - NetworkCompany.mask) - 1
+            )
+            .all()
+        )
 
     def __get_addresses(self):
         addresses = []
@@ -184,4 +196,25 @@ class ServiceModel(Service):
             "addresses": self.__get_addresses(),
             "company": self.company.name,
             "companyId": int(self.id_company),
+        }
+
+    def get_es_data(self):
+        return {
+            "serviceId": self.id,
+            "type": self.type_descr.name,
+            "status": self.status_descr.name,
+            "desc": self.description,
+            "supDesc": self.support_desc,
+            "addresses": [
+                f"{a.city}"
+                f"{', ' + a.street if a.street and a.street.strip() else ''}"
+                f"{', ' + a.house if a.house and a.house.strip() else ''}"
+                f"{', корп. ' + a.building if a.building and a.building.strip() else ''}"
+                f"{', лит. ' + a.letter if a.letter and a.letter.strip() else ''}"
+                f"{', кв. ' + a.flat if a.flat and a.flat.strip() else ''}"
+                for a in self.addresses
+            ],
+            "subnet": self.__get_subnets(),
+            "cId": self.company.id,
+            "cName": self.company.name,
         }
