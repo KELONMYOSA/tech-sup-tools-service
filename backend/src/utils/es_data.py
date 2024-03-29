@@ -251,21 +251,6 @@ class ESDataManager:
                     self.company_id2name[company_id] = company_name
         self.data += list(data_map.values())
 
-    def make_service_model_response(self, search_text: str) -> dict:
-        response = {
-            "stats": {
-                "services_count": len(self.service_ids),
-                "companies_count": len(self.company_ids),
-                "service_ids": list(self.service_ids),
-                "company_ids": list(self.company_ids),
-                "service_types": list(self.service_types),
-                "service_statuses": self.service_statuses,
-                "company_id2name": self.company_id2name,
-            },
-            "data": [item.to_dict(search_text, "ip") for item in self.data],
-        }
-        return response
-
     def make_response(
         self,
         search_text: str,

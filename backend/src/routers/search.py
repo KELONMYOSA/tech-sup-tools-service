@@ -169,10 +169,10 @@ async def search_by_service_ip(ip: str, max_results: int = 10, _: User = Depends
     except:  # noqa: E722
         pass
     response = es.search(index="company_service_index", body=query)
-    if response["hits"]["total"]["value"] == 0 and len(data.make_service_model_response(ip)["data"]) == 0:
+    if response["hits"]["total"]["value"] == 0 and len(data.make_response(ip, "ip")["data"]) == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service not found")
     data.create_from_response(response["hits"]["hits"])
-    return data.make_service_model_response(ip)
+    return data.make_response(ip, "ip")
 
 
 @router.get("/phone")
