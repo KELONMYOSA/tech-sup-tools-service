@@ -120,25 +120,6 @@ class ESData:
         if data["_source"].get("client_phone") and data["_source"].get("client_phone") not in self.client_phone:
             self.client_phone.append(data["_source"].get("client_phone"))
 
-    def service_model_to_dict(self, search_string):
-        search_value = ""
-        for subnet in self.service_subnet:
-            print(subnet)
-            if search_string in subnet:
-                search_value = subnet
-                break
-        return {
-            "search_value": search_value,
-            "service_id": self.service_id,
-            "service_type": self.service_type,
-            "service_status": self.service_status,
-            "service_address": self.service_address,
-            "service_description": self.service_description,
-            "service_support_description": self.service_support_description,
-            "company_id": self.company_id,
-            "company_name": self.company_name,
-        }
-
     def to_dict(
         self,
         search_text: str,
@@ -281,7 +262,7 @@ class ESDataManager:
                 "service_statuses": self.service_statuses,
                 "company_id2name": self.company_id2name,
             },
-            "data": [item.service_model_to_dict(search_text) for item in self.data],
+            "data": [item.to_dict(search_text, "ip") for item in self.data],
         }
         return response
 
