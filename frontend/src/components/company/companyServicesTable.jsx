@@ -139,14 +139,8 @@ export default function CompanyServicesTable(data) {
                             }</li>
                         ))}
                     </ul>),
-                manageComm: (
-                    <Tooltip placement="topLeft" title={service.description}>
-                        {service.description}
-                    </Tooltip>),
-                techComm: (
-                    <Tooltip placement="topLeft" title={service.supportDescription}>
-                        {service.supportDescription}
-                    </Tooltip>),
+                manageComm: service.description,
+                techComm: service.supportDescription,
             }))
 
             setServiceTable(
@@ -156,24 +150,30 @@ export default function CompanyServicesTable(data) {
                         {
                             title: 'ID',
                             dataIndex: 'id',
+                            width: 80,
+                            showSorterTooltip: false,
                             defaultSortOrder: 'descend',
                             sorter: (a, b) => a.key - b.key,
                         },
                         {
                             title: 'Тип',
                             dataIndex: 'type',
+                            width: 120,
                             filters: typeFilters,
+                            className: styles.column_header_filter_button,
                             onFilter: (value, record) => record.type.startsWith(value),
                         },
                         {
                             title: 'Статус',
                             dataIndex: 'status',
+                            width: 120,
                             filters: statusFilters,
-                            defaultFilteredValue: ['Действует'],
+                            className: styles.column_header_filter_button,
                             onFilter: (value, record) => record.status.startsWith(value),
                         },
                         {
                             title: 'Дата',
+                            width: 120,
                             dataIndex: 'date'
                         },
                         {
@@ -185,17 +185,11 @@ export default function CompanyServicesTable(data) {
                         {
                             title: 'Менеджерское',
                             dataIndex: 'manageComm',
-                            ellipsis: {
-                                showTitle: false,
-                            },
                             ...getColumnSearchProps('manageComm'),
                         },
                         {
                             title: 'Техническое',
                             dataIndex: 'techComm',
-                            ellipsis: {
-                                showTitle: false,
-                            },
                             ...getColumnSearchProps('techComm'),
                         },
                     ]}

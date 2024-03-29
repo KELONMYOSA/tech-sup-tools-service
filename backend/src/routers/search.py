@@ -148,20 +148,59 @@ async def search_by_company_address(address: str, max_results: int = 10, _: User
 async def search_by_service_ip(ip: str, max_results: int = 10, _: User = Depends(get_current_user)):  # noqa: B008
     query = {"size": max_results, "query": {"wildcard": {"service_interface_host": f"*{ip}*"}}}
     try:
-        ip_styled = ipaddress.ip_address(ip.split("/")[0])
-        query = {
-            "size": max_results,
-            "query": {
-                "bool": {
-                    "should": [
-                        {"wildcard": {"service_subnet": f"*{int(ip_styled)}*"}},
-                        {"match": {"service_subnet": {"query": int(ip_styled), "fuzziness": "1"}}},
-                        {"wildcard": {"service_interface_host": f"*{ip}*"}},
-                    ],
-                    "minimum_should_match": 1,
-                }
-            },
-        }
+        ip_styled = int(ipaddress.ip_address(ip.split("/")[0]))
+        if "/" in ip:
+            query = {
+                "size": max_results,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {"wildcard": {"service_subnet": f"{ip_styled}*"}},
+                            {"wildcard": {"service_interface_host": f"*{ip}*"}},
+                        ],
+                        "minimum_should_match": 1,
+                    }
+                },
+            }
+        else:
+            script_source = f"""
+String subnet = params['_source']['service_subnet'];
+if (subnet == null) return 0;
+
+int indexSlash = subnet.indexOf('/');
+String subnetIP = subnet.substring(0, indexSlash);
+String subnetMask = subnet.substring(indexSlash + 1);
+
+long storedIp = Long.parseLong(subnetIP);
+int maskLength = Integer.parseInt(subnetMask);
+
+long mask = 0xFFFFFFFFL << (32 - maskLength);
+
+long queryIp = {ip_styled}L;
+
+long network = storedIp & mask;
+long broadcast = network | ~mask;
+
+return (queryIp & mask) == (storedIp & mask) ? 1 : 0;
+        """
+            query = {
+                "size": max_results,
+                "min_score": "0.5",
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "script_score": {
+                                    "query": {"match_all": {}},
+                                    "script": {"source": script_source, "lang": "painless"},
+                                }
+                            },
+                            {"wildcard": {"service_interface_host": f"*{ip}*"}},
+                        ],
+                        "minimum_should_match": 1,
+                    }
+                },
+            }
     except:  # noqa: E722
         pass
     response = es.search(index="company_service_index", body=query)

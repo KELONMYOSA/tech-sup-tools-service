@@ -41,7 +41,7 @@ class ServiceModel(Service):
             interfaces.append(
                 {
                     "type": i.port_type,
-                    "uAddress": i.unit.address,
+                    "uAddress": i.unit.address if i.unit else None,
                     "eDomain": i.equipment.domain if i.equipment else None,
                     "host": i.port.router.host,
                     "name": i.port.ifname,
