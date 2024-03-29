@@ -369,8 +369,16 @@ export default function SearchBar(data) {
         setTextChangedBySelect(true)
         data.updateContentIsLoading(true)
 
-        setSearchMode(selectedMods)
-        searchModeSelectorRef.current.setSelectedCategories(selectedMods)
+        if (selectedMods.includes('cPhone') || selectedMods.includes('sPhone')) {
+            setSearchMode(['phone'])
+            searchModeSelectorRef.current.setSelectedCategories(['phone'])
+        } else if (selectedMods.includes('cAddress') || selectedMods.includes('sAddress')) {
+            setSearchMode(['address'])
+            searchModeSelectorRef.current.setSelectedCategories(['address'])
+        } else {
+            setSearchMode(selectedMods)
+            searchModeSelectorRef.current.setSelectedCategories(selectedMods)
+        }
 
         if (timer) {
             clearTimeout(timer)
