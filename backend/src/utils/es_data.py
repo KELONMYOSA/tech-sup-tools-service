@@ -78,6 +78,7 @@ class ESData:
         self.service_subnet = service_model["subnet"]
         self.company_id = service_model["cId"]
         self.company_name = service_model["cName"]
+        self.company_brand_name = service_model["brandName"]
         return self
 
     def add_model_data(self, service_model):
@@ -135,6 +136,7 @@ class ESData:
             "service_support_description": self.service_support_description,
             "company_id": self.company_id,
             "company_name": self.company_name,
+            "company_brand_name": self.company_brand_name,
         }
 
     def _find_value_by_search_type(
@@ -197,6 +199,7 @@ class ESDataManager:
         self.company_ids = set()
         self.service_ids = set()
         self.service_types = set()
+        self.company_brand_names = set()
         self.service_statuses = {}
         self.company_id2name = {}
 
@@ -207,12 +210,14 @@ class ESDataManager:
             service_id = source["service_id"]
             company_id = source["company_id"]
             service_type = source["service_type"]
+            brand_name = source["company_brand_name"]
             company_name = source["company_name"]
             service_status = source["service_status"]
 
             self.company_ids.add(company_id)
             self.service_ids.add(service_id)
             self.service_types.add(service_type)
+            self.company_brand_names.add(brand_name)
 
             if service_id in data_map:
                 data_map[service_id].add_data(item)
@@ -232,12 +237,14 @@ class ESDataManager:
             service_id = item["serviceId"]
             company_id = item["cId"]
             service_type = item["type"]
+            brand_name = item["brandName"]
             company_name = item["cName"]
             service_status = item["status"]
 
             self.company_ids.add(company_id)
             self.service_ids.add(service_id)
             self.service_types.add(service_type)
+            self.company_brand_names.add(brand_name)
 
             if service_id in data_map:
                 data_map[service_id].add_model_data(item)
@@ -263,6 +270,7 @@ class ESDataManager:
                 "service_ids": list(self.service_ids),
                 "company_ids": list(self.company_ids),
                 "service_types": list(self.service_types),
+                "company_brand_names": list(self.company_brand_names),
                 "service_statuses": self.service_statuses,
                 "company_id2name": self.company_id2name,
             },

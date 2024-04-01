@@ -7,6 +7,7 @@ export function combineResponses(responses) {
             service_ids: new Set(),
             company_ids: new Set(),
             service_types: new Set(),
+            company_brand_names: new Set(),
             service_statuses: {},
             company_id2name: {}
         },
@@ -21,6 +22,7 @@ export function combineResponses(responses) {
             if (!combined.stats.service_ids.has(service.service_id)) {
                 combined.stats.service_ids.add(service.service_id);
                 combined.stats.service_types.add(service.service_type);
+                combined.stats.company_brand_names.add(service.company_brand_name);
                 combined.data.push(service);
 
                 // Обновляем статистику статусов услуг
@@ -47,6 +49,7 @@ export function combineResponses(responses) {
     combined.stats.service_ids = Array.from(combined.stats.service_ids);
     combined.stats.company_ids = Array.from(combined.stats.company_ids);
     combined.stats.service_types = Array.from(combined.stats.service_types);
+    combined.stats.company_brand_names = Array.from(combined.stats.company_brand_names);
 
     if (combined.data.length === 0) {
         return null;

@@ -217,4 +217,5 @@ class ServiceModel(Service):
             "subnet": self.__get_subnets(),
             "cId": self.company.id,
             "cName": self.company.name,
+            "brandName": self.company.brand_name,
         }

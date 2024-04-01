@@ -120,6 +120,11 @@ export default function ServiceCard(data) {
                 )
             }
 
+            const brandFilters = data.servicesData.stats.company_brand_names.map(t => ({
+                text: t,
+                value: t,
+            }))
+
             const companyFilters = []
             for (const [key, value] of Object.entries(data.servicesData.stats.company_id2name)) {
                 companyFilters.push(
@@ -152,6 +157,7 @@ export default function ServiceCard(data) {
                            href={`/company/${service.company_id}`}>{`(ID: ${service.company_id}) ${service.company_name}`}</a>
                     </Tooltip>
                 ),
+                brand: service.company_brand_name,
                 type: service.service_type,
                 status: service.service_status,
                 addresses: (
@@ -193,6 +199,14 @@ export default function ServiceCard(data) {
                             dataIndex: 'company',
                             filters: companyFilters,
                             onFilter: (value, record) => JSON.stringify(record.company).indexOf(value) >= 0,
+                            className: styles.column_header_filter_button,
+                            filterSearch: true,
+                        },
+                        {
+                            title: 'Торговая марка',
+                            dataIndex: 'brand',
+                            filters: brandFilters,
+                            onFilter: (value, record) => record.brand === value,
                             className: styles.column_header_filter_button,
                             filterSearch: true,
                         },

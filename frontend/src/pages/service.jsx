@@ -71,6 +71,7 @@ export default function Service(data) {
 
         const onFinish = (values) => {
             (async () => {
+                values['customfield_11255'] = '18620'
                 const extraFields = {}
                 for (const k in Object.keys(values)) {
                     if (Object.keys(values)[k].startsWith('customfield')) {
@@ -78,6 +79,7 @@ export default function Service(data) {
                     }
                 }
                 extraFields["components"] = values.components.map(id => ({id: id}))
+                extraFields["customfield_11200"] = `${serviceFormData.current.company} (id=${serviceFormData.current.companyId})`
                 const body = {
                     summary: values.summary,
                     description: values.description,
