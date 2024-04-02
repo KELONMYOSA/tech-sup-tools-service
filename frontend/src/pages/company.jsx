@@ -1,15 +1,13 @@
 import {useParams} from "react-router-dom";
 import React, {useEffect, useState} from "react";
-import {Flex, Layout, Spin, Typography} from "antd";
-import Navbar from "../components/navbar.jsx";
-import {Content, Header} from "antd/es/layout/layout.js";
+import {Flex, Spin} from "antd";
 import PageNotFound from "./404page.jsx";
 import CompanyInfo from "../components/company/companyInfo.jsx";
-import CopyToClipboardButton from "../utils/components.jsx";
+import PageTemplate from "../components/pageTemplate.jsx";
 
 export default function Company(data) {
     const {companyId} = useParams();
-    const isMobile = data.isMobile
+    const [headerHeight, setHeaderHeight] = useState('64px');
     const [isLoading, setIsLoading] = useState(true);
     const [companyItems, setCompanyItems] = useState(true);
 
@@ -18,29 +16,13 @@ export default function Company(data) {
             const companyItems = await CompanyInfo({companyId: companyId})
             if (companyItems[0]) {
                 setCompanyItems(
-                    <Layout>
-                        <Header style={{display: 'flex', alignItems: 'center', padding: 0, backgroundColor: 'white'}}>
-                            <a href="/" style={{marginLeft: 10, height: '70%'}}>
-                                <img height='100%' src='/logo.png'/>
-                            </a>
-                            {!isMobile &&
-                                <CopyToClipboardButton
-                                    text={companyId}
-                                    type='text'
-                                    style={{marginLeft: 20}}
-                                    item={
-                                        <Typography.Title style={{marginTop: 8}}
-                                                          level={3}>{`Компания ID: ${companyId}`}
-                                        </Typography.Title>
-                                    }
-                                />
-                            }
-                            <Navbar userData={data.userData}/>
-                        </Header>
-                        <Content style={{minHeight: 'calc(100vh - 65px)'}}>
-                            {companyItems[1]}
-                        </Content>
-                    </Layout>
+                    <PageTemplate
+                        isMain={false}
+                        userData={data.userData}
+                        content={companyItems[1]}
+                        headerHeight={headerHeight}
+                        setHeaderHeight={setHeaderHeight}
+                    />
                 )
             } else {
                 setCompanyItems(<PageNotFound/>)

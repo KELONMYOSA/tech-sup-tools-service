@@ -66,7 +66,7 @@ export default function App() {
             <Routes>
                 <Route path="/" element={isAuthenticated ? <Home userData={userData}/> : <Navigate to="/auth"/>}/>
                 <Route path="/service/:serviceId" element={isAuthenticated ? <Service userData={userData} isMobile={isMobile} windowWidth={windowWidth}/> : <Navigate to="/auth"/>}/>
-                <Route path="/company/:companyId" element={isAuthenticated ? <Company userData={userData} isMobile={isMobile}/> : <Navigate to="/auth"/>}/>
+                <Route path="/company/:companyId" element={isAuthenticated ? <Company userData={userData}/> : <Navigate to="/auth"/>}/>
                 <Route path="/auth" element={isAuthenticated ? <Navigate to="/"/> : <Auth/>}/>
                 <Route path="*" element={<PageNotFound/>}/>
             </Routes>

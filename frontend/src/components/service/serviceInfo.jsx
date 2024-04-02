@@ -1,9 +1,10 @@
-import {Button, Card, Col, Descriptions, List, Row, Table, Tabs} from "antd";
+import {Button, Card, Col, Descriptions, List, Row, Table, Tabs, Typography} from "antd";
 import React from "react";
 import axios from "axios";
 import {Document, Page, pdfjs} from "react-pdf";
 import 'react-pdf/dist/Page/TextLayer.css'
 import 'react-pdf/dist/Page/AnnotationLayer.css';
+import CopyToClipboardButton from "../../utils/components.jsx";
 
 export default async function ServiceInfo(data) {
     const apiUrl = import.meta.env.VITE_API_URL
@@ -42,7 +43,7 @@ export default async function ServiceInfo(data) {
 
     const jira = await getJiraIssues(serviceId)
 
-    const jiraOpen = jira.filter((issue)=> issue.status !== 'Решено')
+    const jiraOpen = jira.filter((issue) => issue.status !== 'Решено')
     let jiraOpenIssues
     if (jiraOpen.length > 0) {
         jiraOpenIssues = (
@@ -396,8 +397,22 @@ export default async function ServiceInfo(data) {
         [true, service,
             <Row key={1}>
                 <Col key={1} xs={24} md={10} lg={7} style={{padding: 20}}>
-                    <Card key={1} title="Общие сведения">
+                    <Card key={1}
+                          title={
+                              <CopyToClipboardButton
+                                  text={serviceId}
+                                  type='text'
+                                  style={{padding: 0}}
+                                  item={
+                                      <Typography.Title style={{marginTop: 8}} level={3}>
+                                          {`Услуга ID: ${serviceId}`}
+                                      </Typography.Title>
+                                  }
+                              />
+                          }
+                    >
                         <Descriptions
+                            title="Общие сведения"
                             size='small'
                             column={1}
                             items={[

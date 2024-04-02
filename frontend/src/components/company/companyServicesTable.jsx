@@ -168,6 +168,7 @@ export default function CompanyServicesTable(data) {
                             dataIndex: 'status',
                             width: 120,
                             filters: statusFilters,
+                            defaultFilteredValue: ['Действует'],
                             className: styles.column_header_filter_button,
                             onFilter: (value, record) => record.status.startsWith(value),
                         },

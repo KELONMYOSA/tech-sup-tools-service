@@ -42,7 +42,6 @@ async def support_issue_create(data: JIRAIssueCreateData, _: User = Depends(get_
     data.priority = "Средний"
     data.project = "SUPPORT"
     data.issue_type = "Задача"
-    data.assignee = "tp"
     result, msg = create_issue(jira, data)
     if not result:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=msg)

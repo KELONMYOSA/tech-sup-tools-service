@@ -1,9 +1,7 @@
 import {useParams} from "react-router-dom";
 import ServiceInfo from "../components/service/serviceInfo.jsx";
 import React, {useEffect, useRef, useState} from "react";
-import {Button, Flex, Form, Layout, Modal, notification, Select, Space, Spin, Typography} from "antd";
-import Navbar from "../components/navbar.jsx";
-import {Content, Header} from "antd/es/layout/layout.js";
+import {Button, Flex, Form, Modal, notification, Select, Space, Spin, Typography} from "antd";
 import PageNotFound from "./404page.jsx";
 import TextArea from "antd/es/input/TextArea.js";
 import {
@@ -13,11 +11,12 @@ import {
     field2Variants, serviceType2componentId
 } from "../components/service/dicts.js";
 import axios from "axios";
-import CopyToClipboardButton from "../utils/components.jsx";
+import PageTemplate from "../components/pageTemplate.jsx";
 
 export default function Service(data) {
     const {serviceId} = useParams();
     const isMobile = data.isMobile
+    const [headerHeight, setHeaderHeight] = useState('64px');
     const apiUrl = import.meta.env.VITE_API_URL
     const jiraUrl = import.meta.env.VITE_JIRA_URL
 
@@ -84,6 +83,7 @@ export default function Service(data) {
                     summary: values.summary,
                     description: values.description,
                     service_id: serviceId,
+                    assignee: data.userData.uid,
                     extra_fields: extraFields
                 }
                 try {
@@ -253,34 +253,22 @@ export default function Service(data) {
             serviceFormData.current = serviceItems[1]
             if (serviceItems[0]) {
                 setServiceItems(
-                    <Layout>
-                        <Header style={{display: 'flex', alignItems: 'center', padding: 0, backgroundColor: 'white'}}>
-                            <a href="/" style={{marginLeft: 10, height: '70%'}}>
-                                <img height='100%' src='/logo.png'/>
-                            </a>
-                            {!isMobile &&
-                                <CopyToClipboardButton
-                                    text={serviceId}
-                                    type='text'
-                                    style={{marginLeft: 20}}
-                                    item={
-                                        <Typography.Title style={{marginTop: 8}}
-                                                          level={3}>{`Услуга ID: ${serviceId}`}
-                                        </Typography.Title>
-                                    }
-                                />
-                            }
-                            <Navbar userData={data.userData}/>
-                        </Header>
-                        <Content style={{minHeight: 'calc(100vh - 65px)'}}>
-                            {contextHolder}
-                            <Modal open={isIssueFormOpen} onCancel={hideIssueCreation} footer={null}
-                                   width={isMobile ? '90%' : '50%'}>
-                                {issueFormItems}
-                            </Modal>
-                            {serviceItems[2]}
-                        </Content>
-                    </Layout>
+                    <PageTemplate
+                        isMain={false}
+                        userData={data.userData}
+                        content={
+                            <>
+                                {contextHolder}
+                                <Modal open={isIssueFormOpen} onCancel={hideIssueCreation} footer={null}
+                                       width={isMobile ? '90%' : '50%'}>
+                                    {issueFormItems}
+                                </Modal>
+                                {serviceItems[2]}
+                            </>
+                        }
+                        headerHeight={headerHeight}
+                        setHeaderHeight={setHeaderHeight}
+                    />
                 )
             } else {
                 setServiceItems(<PageNotFound/>)

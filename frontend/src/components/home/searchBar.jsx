@@ -352,12 +352,20 @@ export default function SearchBar(data) {
 
     const onEnter = async value => {
         if (value.length > 0) {
-            data.updateSearchParams({search: `${searchMode}_|_${value}`})
+            if (data.isMain) {
+                data.updateSearchParams({search: `${searchMode}_|_${value}`})
+            } else {
+                window.open(`/?search=${encodeURIComponent(`${searchMode}_|_${value}`)}`, '_self')
+            }
         }
     };
 
     const onSelect = async value => {
-        data.updateSearchParams({search: value})
+        if (data.isMain) {
+            data.updateSearchParams({search: value})
+        } else {
+            window.open(`/?search=${encodeURIComponent(value)}`, '_self')
+        }
     };
 
     const searchData = async value => {
@@ -574,7 +582,7 @@ export default function SearchBar(data) {
         }
 
         let timeout = 750
-        if (searchMode === 'all') {
+        if (searchMode === ['all']) {
             timeout = 1000
         }
 

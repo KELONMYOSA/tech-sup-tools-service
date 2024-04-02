@@ -1,7 +1,8 @@
 import axios from "axios";
-import {Card, Col, Collapse, Descriptions, Row} from "antd";
+import {Card, Col, Collapse, Descriptions, Row, Typography} from "antd";
 import React from "react";
 import CompanyServicesTable from "./companyServicesTable.jsx";
+import CopyToClipboardButton from "../../utils/components.jsx";
 
 export default async function CompanyInfo(data) {
     const apiUrl = import.meta.env.VITE_API_URL
@@ -25,7 +26,20 @@ export default async function CompanyInfo(data) {
     }
 
     const companyDescriptionItem = (
-        <Card size='small'>
+        <Card
+            title={
+                <CopyToClipboardButton
+                    text={companyId}
+                    type='text'
+                    style={{padding: 0}}
+                    item={
+                        <Typography.Title style={{marginTop: 8}} level={3}>
+                            {`Компания ID: ${companyId}`}
+                        </Typography.Title>
+                    }
+                />
+            }
+        >
             <Descriptions
                 title='Информация'
                 size='small'
