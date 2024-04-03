@@ -342,6 +342,85 @@ async def search_by_equipment(
     return data.make_response(equip, "equipment")
 
 
+@router.get("/company/fio")
+async def search_by_client_name(
+    name: str,
+    max_results: int = 10,
+    exact_match: bool = False,
+    _: User = Depends(get_current_user),  # noqa: B008
+):
+    if exact_match:
+        query = {"size": max_results, "query": {"match": {"client_name.keyword": name}}}
+    else:
+        query = {"size": max_results, "query": {"match": {"client_name": name}}}
+    response = es.search(index="company_service_index", body=query)
+    if response["hits"]["total"]["value"] == 0:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Company not found")
+    data = ESDataManager()
+    data.create_from_response(response["hits"]["hits"])
+    return data.make_response(name, "client_name")
+
+
+@router.get("/company/email")
+async def search_company_by_email(
+    email: str,
+    max_results: int = 10,
+    exact_match: bool = False,
+    _: User = Depends(get_current_user),  # noqa: B008
+):
+    if exact_match:
+        query = {
+            "size": max_results,
+            "query": {
+                "bool": {
+                    "should": [
+                        {"term": {"company_email.keyword": email}},
+                        {"term": {"client_email.keyword": email}},
+                    ],
+                    "minimum_should_match": 1,
+                }
+            },
+        }
+    else:
+        query = {
+            "size": max_results,
+            "query": {
+                "bool": {
+                    "should": [
+                        {"wildcard": {"company_email.keyword": f"*{email}*"}},
+                        {"wildcard": {"client_email.keyword": f"*{email}*"}},
+                    ],
+                    "minimum_should_match": 1,
+                }
+            },
+        }
+    response = es.search(index="company_service_index", body=query)
+    if response["hits"]["total"]["value"] == 0:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Company not found")
+    data = ESDataManager()
+    data.create_from_response(response["hits"]["hits"])
+    return data.make_response(email, "email")
+
+
+@router.get("/service/doc")
+async def search_by_service_doc(
+    doc: str,
+    max_results: int = 10,
+    exact_match: bool = False,
+    _: User = Depends(get_current_user),  # noqa: B008
+):
+    if exact_match:
+        query = {"size": max_results, "query": {"term": {"service_doc.keyword": doc}}}
+    else:
+        query = {"size": max_results, "query": {"match": {"service_doc": doc}}}
+    response = es.search(index="company_service_index", body=query)
+    if response["hits"]["total"]["value"] == 0:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service not found")
+    data = ESDataManager()
+    data.create_from_response(response["hits"]["hits"])
+    return data.make_response(doc, "s_doc")
+
+
 @router.get("/all")
 async def search_all(text: str, max_results: int = 10, _: User = Depends(get_current_user)):  # noqa: B008
     query = {

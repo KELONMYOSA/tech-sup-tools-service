@@ -9,8 +9,9 @@ class ESData:
         self.service_status = None
         self.service_description = None
         self.service_support_description = None
-        self.service_phone = None
-        self.service_phone_end = None
+        self.service_phone = []
+        self.service_phone_end = []
+        self.service_doc = None
         self.service_address = []
         self.service_subnet = []
         self.service_interface_host = []
@@ -23,6 +24,8 @@ class ESData:
         self.company_email = None
         self.company_address = []
         self.client_phone = []
+        self.client_email = []
+        self.client_name = []
         if initial_data:
             self.initialize_from_dict(initial_data)
 
@@ -32,8 +35,15 @@ class ESData:
         self.service_status = initial_data["_source"].get("service_status")
         self.service_description = initial_data["_source"].get("service_description")
         self.service_support_description = initial_data["_source"].get("service_support_description")
-        self.service_phone = initial_data["_source"].get("service_phone")
-        self.service_phone_end = initial_data["_source"].get("service_phone_end")
+        self.service_phone = (
+            [initial_data["_source"].get("service_phone")] if initial_data["_source"].get("service_phone") else []
+        )
+        self.service_phone_end = (
+            [initial_data["_source"].get("service_phone_end")]
+            if initial_data["_source"].get("service_phone_end")
+            else []
+        )
+        self.service_doc = initial_data["_source"].get("service_doc")
         self.service_address = (
             [initial_data["_source"].get("service_address")] if initial_data["_source"].get("service_address") else []
         )
@@ -67,6 +77,12 @@ class ESData:
         self.client_phone = (
             [initial_data["_source"].get("client_phone")] if initial_data["_source"].get("client_phone") else []
         )
+        self.client_email = (
+            [initial_data["_source"].get("client_email")] if initial_data["_source"].get("client_email") else []
+        )
+        self.client_name = (
+            [initial_data["_source"].get("client_name")] if initial_data["_source"].get("client_name") else []
+        )
 
     def initialize_from_service_model(self, service_model):
         self.service_id = service_model["serviceId"]
@@ -90,6 +106,13 @@ class ESData:
                 self.service_subnet.append(subnet)
 
     def add_data(self, data):
+        if data["_source"].get("service_phone") and data["_source"].get("service_phone") not in self.service_phone:
+            self.service_phone.append(data["_source"].get("service_phone"))
+        if (
+            data["_source"].get("service_phone_end")
+            and data["_source"].get("service_phone_end") not in self.service_phone_end
+        ):
+            self.service_phone_end.append(data["_source"].get("service_phone_end"))
         if (
             data["_source"].get("service_address")
             and data["_source"].get("service_address") not in self.service_address
@@ -120,11 +143,28 @@ class ESData:
             self.company_address.append(data["_source"].get("company_address"))
         if data["_source"].get("client_phone") and data["_source"].get("client_phone") not in self.client_phone:
             self.client_phone.append(data["_source"].get("client_phone"))
+        if data["_source"].get("client_email") and data["_source"].get("client_email") not in self.client_email:
+            self.client_email.append(data["_source"].get("client_email"))
+        if data["_source"].get("client_name") and data["_source"].get("client_name") not in self.client_name:
+            self.client_name.append(data["_source"].get("client_name"))
 
     def to_dict(
         self,
         search_text: str,
-        search_type: Literal["c_id", "s_id", "c_name", "address", "ip", "phone", "vlan", "equipment", "all"],
+        search_type: Literal[
+            "c_id",
+            "s_id",
+            "c_name",
+            "address",
+            "ip",
+            "phone",
+            "vlan",
+            "equipment",
+            "client_name",
+            "email",
+            "s_doc",
+            "all",
+        ],
     ) -> dict:
         return {
             "search_value": self._find_value_by_search_type(search_text, search_type),
@@ -142,7 +182,20 @@ class ESData:
     def _find_value_by_search_type(
         self,
         search_string: str,
-        search_type: Literal["c_id", "s_id", "c_name", "address", "ip", "phone", "vlan", "equipment", "all"],
+        search_type: Literal[
+            "c_id",
+            "s_id",
+            "c_name",
+            "address",
+            "ip",
+            "phone",
+            "vlan",
+            "equipment",
+            "client_name",
+            "email",
+            "s_doc",
+            "all",
+        ],
     ) -> str:
         search_args = {
             "c_id": [self.company_id],
@@ -153,6 +206,9 @@ class ESData:
             "phone": [self.company_phone, self.client_phone, self.service_phone, self.service_phone_end],
             "vlan": [self.service_vlan],
             "equipment": [self.service_interface_equipment],
+            "client_name": [self.client_name],
+            "email": [self.client_email, self.company_email],
+            "s_doc": [self.service_doc],
             "all": [
                 self.company_id,
                 self.service_id,
@@ -165,6 +221,12 @@ class ESData:
                 self.client_phone,
                 self.service_phone,
                 self.service_phone_end,
+                self.service_vlan,
+                self.service_interface_equipment,
+                self.client_name,
+                self.client_email,
+                self.company_email,
+                self.service_doc,
             ],
         }
 
@@ -261,7 +323,20 @@ class ESDataManager:
     def make_response(
         self,
         search_text: str,
-        search_type: Literal["c_id", "s_id", "c_name", "address", "ip", "phone", "vlan", "equipment", "all"],
+        search_type: Literal[
+            "c_id",
+            "s_id",
+            "c_name",
+            "address",
+            "ip",
+            "phone",
+            "vlan",
+            "equipment",
+            "client_name",
+            "email",
+            "s_doc",
+            "all",
+        ],
     ) -> dict:
         response = {
             "stats": {

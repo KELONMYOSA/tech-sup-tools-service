@@ -344,6 +344,105 @@ export default function SearchBar(data) {
                 } catch (error) {
                 }
             }
+
+            if (searchMode.includes('email') || searchMode.includes('all')) {
+                try {
+                    const response = await axios.get(
+                        `${apiUrl}/search/company/email?email=${value}&max_results=${max_res}`
+                    );
+
+                    let email2Company = {}
+                    response.data.data.map(c => {
+                        if (c.search_value in email2Company) {
+                            email2Company[c.search_value].add(c.company_name)
+                        } else {
+                            email2Company[c.search_value] = new Set([c.company_name])
+                        }
+                    })
+
+                    const childOptions = []
+                    for (const [key, val] of Object.entries(email2Company)) {
+                        childOptions.push(
+                            {
+                                value: `email_|_${key}`,
+                                label: highlightText(`${key} - ${[...val].join(', ')}`, value)
+                            }
+                        )
+                    }
+
+                    newOptions.push({
+                        label: 'Email',
+                        options: childOptions
+                    })
+                } catch (error) {
+                }
+            }
+
+            if (searchMode.includes('fio') || searchMode.includes('all')) {
+                try {
+                    const response = await axios.get(
+                        `${apiUrl}/search/company/fio?name=${value}&max_results=${max_res}`
+                    );
+
+                    let fio2Company = {}
+                    response.data.data.map(c => {
+                        if (c.search_value in fio2Company) {
+                            fio2Company[c.search_value].add(c.company_name)
+                        } else {
+                            fio2Company[c.search_value] = new Set([c.company_name])
+                        }
+                    })
+
+                    const childOptions = []
+                    for (const [key, val] of Object.entries(fio2Company)) {
+                        childOptions.push(
+                            {
+                                value: `fio_|_${key}`,
+                                label: highlightText(`${key} - ${[...val].join(', ')}`, value)
+                            }
+                        )
+                    }
+
+                    newOptions.push({
+                        label: 'ФИО',
+                        options: childOptions
+                    })
+                } catch (error) {
+                }
+            }
+
+            if (searchMode.includes('doc') || searchMode.includes('all')) {
+                try {
+                    const response = await axios.get(
+                        `${apiUrl}/search/service/doc?doc=${value}&max_results=${max_res}`
+                    );
+
+                    let doc2Company = {}
+                    response.data.data.map(c => {
+                        if (c.search_value in doc2Company) {
+                            doc2Company[c.search_value].add(c.company_name)
+                        } else {
+                            doc2Company[c.search_value] = new Set([c.company_name])
+                        }
+                    })
+
+                    const childOptions = []
+                    for (const [key, val] of Object.entries(doc2Company)) {
+                        childOptions.push(
+                            {
+                                value: `doc_|_${key}`,
+                                label: highlightText(`${key} - ${[...val].join(', ')}`, value)
+                            }
+                        )
+                    }
+
+                    newOptions.push({
+                        label: 'Договор',
+                        options: childOptions
+                    })
+                } catch (error) {
+                }
+            }
         }
         setIsLoading(false)
         setIsOpen(true)
@@ -561,6 +660,39 @@ export default function SearchBar(data) {
             }
         }
 
+        if (selectedMods.includes('email')) {
+            try {
+                const response = await axios.get(
+                    `${apiUrl}/search/company/email?email=${selectedValue}&max_results=10000&exact_match=true`
+                );
+
+                responses.push(response.data)
+            } catch (error) {
+            }
+        }
+
+        if (selectedMods.includes('fio')) {
+            try {
+                const response = await axios.get(
+                    `${apiUrl}/search/company/fio?name=${selectedValue}&max_results=10000&exact_match=true`
+                );
+
+                responses.push(response.data)
+            } catch (error) {
+            }
+        }
+
+        if (selectedMods.includes('doc')) {
+            try {
+                const response = await axios.get(
+                    `${apiUrl}/search/service/doc?doc=${selectedValue}&max_results=10000&exact_match=true`
+                );
+
+                responses.push(response.data)
+            } catch (error) {
+            }
+        }
+
         if (selectedMods.includes('all')) {
             try {
                 const response = await axios.get(
@@ -666,8 +798,23 @@ export default function SearchBar(data) {
             selected: false,
         },
         {
-            label: 'Номер телефона',
+            label: 'Телефон',
             key: 'phone',
+            selected: false,
+        },
+        {
+            label: 'Email',
+            key: 'email',
+            selected: false,
+        },
+        {
+            label: 'ФИО',
+            key: 'fio',
+            selected: false,
+        },
+        {
+            label: 'Договор',
+            key: 'doc',
             selected: false,
         },
     ]
