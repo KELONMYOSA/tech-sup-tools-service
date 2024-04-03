@@ -64,7 +64,7 @@ const SearchModeSelector = forwardRef(({ initialCategories, onChange }, ref) => 
 
             // Вызываем onChange с новым списком выбранных категорий
             const newSelectedKeys = newCategories.filter(category => category.selected).map(category => category.key);
-            onChange(newSelectedKeys);
+            setTimeout(() => onChange(newSelectedKeys), 0);
 
             return newCategories;
         });
