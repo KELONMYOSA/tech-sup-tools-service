@@ -52,7 +52,6 @@ services:
       interval: 10s
       timeout: 10s
       retries: 30
-    mem_limit: 2g
     mem_reservation: 1g
 
   logstash:
