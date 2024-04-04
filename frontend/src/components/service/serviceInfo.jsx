@@ -481,18 +481,25 @@ export default async function ServiceInfo(data) {
                         <Descriptions
                             column={1}
                             layout='vertical'
-                            style={{overflowX: 'auto'}}
                             items={[
                                 {
                                     label: 'Менеджерское',
                                     children: (
-                                        <pre style={{paddingBottom: 10}}>{service.description || '---'}</pre>
+                                        <pre style={{
+                                            paddingBottom: 10,
+                                            whiteSpace: 'pre-wrap',
+                                            wordWrap: 'break-word'
+                                        }}>{service.description || '---'}</pre>
                                     ),
                                 },
                                 {
                                     label: 'Техническое',
                                     children: (
-                                        <pre style={{paddingBottom: 10}}>{service.supportDescription || '---'}</pre>
+                                        <pre style={{
+                                            paddingBottom: 10,
+                                            whiteSpace: 'pre-wrap',
+                                            wordWrap: 'break-word'
+                                        }}>{service.supportDescription || '---'}</pre>
                                     ),
                                 },
                             ]}

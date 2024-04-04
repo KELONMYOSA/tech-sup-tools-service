@@ -9,7 +9,7 @@ import axios from "axios";
 import Service from "./pages/service.jsx";
 import useWindowSize from "./utils/useWindowSize.js";
 import Company from "./pages/company.jsx";
-import {ThemeProvider} from "antd-style";
+import {ThemeProvider, useThemeMode} from "antd-style";
 import Settings from "./pages/settings.jsx";
 
 export default function App() {
@@ -19,6 +19,22 @@ export default function App() {
 
     const windowWidth = useWindowSize().width
     const isMobile = windowWidth < 992
+
+    const {browserPrefers} = useThemeMode();
+
+    useEffect(() => {
+        if (localStorage.getItem('theme') === 'light') {
+            document.body.style.backgroundColor = '#f5f5f5'
+        } else if (localStorage.getItem('theme') === 'dark') {
+            document.body.style.backgroundColor = '#000'
+        } else {
+            if (browserPrefers === 'light') {
+                document.body.style.backgroundColor = '#f5f5f5'
+            } else {
+                document.body.style.backgroundColor = '#000'
+            }
+        }
+    }, []);
 
     axios.interceptors.request.use(async (config) => {
         config.headers['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
