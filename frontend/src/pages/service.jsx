@@ -1,7 +1,7 @@
 import {useParams} from "react-router-dom";
 import ServiceInfo from "../components/service/serviceInfo.jsx";
 import React, {useEffect, useRef, useState} from "react";
-import {Button, Flex, Form, Modal, notification, Select, Space, Spin, Typography} from "antd";
+import {Button, Flex, Form, Layout, Modal, notification, Select, Space, Spin, Typography} from "antd";
 import PageNotFound from "./404page.jsx";
 import TextArea from "antd/es/input/TextArea.js";
 import {
@@ -289,9 +289,11 @@ export default function Service(data) {
 
     if (isLoading) {
         return (
-            <Flex justify="center" align="center" style={{width: '100%', height: '100vh'}}>
-                <Spin/>
-            </Flex>
+            <Layout>
+                <Flex justify="center" align="center" style={{width: '100%', height: '100vh'}}>
+                    <Spin/>
+                </Flex>
+            </Layout>
         )
     }
 

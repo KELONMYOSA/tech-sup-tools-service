@@ -1,6 +1,6 @@
 import {useParams} from "react-router-dom";
 import React, {useEffect, useState} from "react";
-import {Flex, Spin} from "antd";
+import {Flex, Layout, Spin} from "antd";
 import PageNotFound from "./404page.jsx";
 import CompanyInfo from "../components/company/companyInfo.jsx";
 import PageTemplate from "../components/pageTemplate.jsx";
@@ -33,9 +33,11 @@ export default function Company(data) {
 
     if (isLoading) {
         return (
-            <Flex justify="center" align="center" style={{width: '100%', height: '100vh'}}>
-                <Spin/>
-            </Flex>
+            <Layout>
+                <Flex justify="center" align="center" style={{width: '100%', height: '100vh'}}>
+                    <Spin/>
+                </Flex>
+            </Layout>
         )
     }
 

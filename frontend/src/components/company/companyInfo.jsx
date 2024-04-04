@@ -59,7 +59,7 @@ export default async function CompanyInfo(data) {
                     },
                     {
                         label: 'Статус',
-                        children: company.status.name,
+                        children: company.status ? company.status.name : null,
                     },
                     {
                         label: 'Провайдер',

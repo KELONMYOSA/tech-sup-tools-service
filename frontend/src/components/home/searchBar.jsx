@@ -34,6 +34,8 @@ export default function SearchBar(data) {
                 codes: ['KeyV'],
                 isActive: (activeElement) => activeElement !== inputRef.current.input,
                 action: (activeElement) => {
+                    setSearchText(null)
+                    setIsOpen(false)
                     inputRef.current.focus();
                     searchModeSelectorRef.current.setSelectedCategories(['vlan'])
                 },
