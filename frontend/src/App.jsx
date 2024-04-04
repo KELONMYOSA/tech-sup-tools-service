@@ -9,6 +9,8 @@ import axios from "axios";
 import Service from "./pages/service.jsx";
 import useWindowSize from "./utils/useWindowSize.js";
 import Company from "./pages/company.jsx";
+import {ThemeProvider} from "antd-style";
+import Settings from "./pages/settings.jsx";
 
 export default function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -62,14 +64,39 @@ export default function App() {
     }
 
     return (
-        <BrowserRouter>
-            <Routes>
-                <Route path="/" element={isAuthenticated ? <Home userData={userData}/> : <Navigate to="/auth"/>}/>
-                <Route path="/service/:serviceId" element={isAuthenticated ? <Service userData={userData} isMobile={isMobile} windowWidth={windowWidth}/> : <Navigate to="/auth"/>}/>
-                <Route path="/company/:companyId" element={isAuthenticated ? <Company userData={userData}/> : <Navigate to="/auth"/>}/>
-                <Route path="/auth" element={isAuthenticated ? <Navigate to="/"/> : <Auth/>}/>
-                <Route path="*" element={<PageNotFound/>}/>
-            </Routes>
-        </BrowserRouter>
+        <ThemeProvider
+            defaultThemeMode={localStorage.getItem('theme') ? localStorage.getItem('theme') : 'auto'}
+            theme={(appearance) =>
+                appearance === 'light'
+                    ?
+                    {
+                        components: {
+                            Layout: {headerBg: 'white'},
+                            Table: {rowExpandedBg: '#f7fcff'}
+                        }
+                    }
+                    :
+                    {
+                        components: {
+                            Layout: {headerBg: '#141414'},
+                            Table: {rowExpandedBg: '#000c14'}
+                        }
+                    }
+            }
+        >
+            <BrowserRouter>
+                <Routes>
+                    <Route path="/" element={isAuthenticated ? <Home userData={userData}/> : <Navigate to="/auth"/>}/>
+                    <Route path="/settings" element={isAuthenticated ? <Settings userData={userData}/> : <Navigate to="/auth"/>}/>
+                    <Route path="/service/:serviceId" element={isAuthenticated ?
+                        <Service userData={userData} isMobile={isMobile} windowWidth={windowWidth}/> :
+                        <Navigate to="/auth"/>}/>
+                    <Route path="/company/:companyId"
+                           element={isAuthenticated ? <Company userData={userData}/> : <Navigate to="/auth"/>}/>
+                    <Route path="/auth" element={isAuthenticated ? <Navigate to="/"/> : <Auth/>}/>
+                    <Route path="*" element={<PageNotFound/>}/>
+                </Routes>
+            </BrowserRouter>
+        </ThemeProvider>
     )
 }

@@ -79,6 +79,7 @@ export default function Service(data) {
                 }
                 extraFields["components"] = values.components.map(id => ({id: id}))
                 extraFields["customfield_11200"] = `${serviceFormData.current.company} (id=${serviceFormData.current.companyId})`
+                extraFields["customfield_11258"] = values.complainer
                 const body = {
                     summary: values.summary,
                     description: values.description,
@@ -106,7 +107,7 @@ export default function Service(data) {
         }
 
         const onReset = () => {
-            formIssueCreate.setFieldsValue({components: null, summary: null, description: null})
+            formIssueCreate.setFieldsValue({components: null, summary: null, description: null, complainer: null})
             setIsVisibleAddressAdd(true)
         }
 
@@ -198,6 +199,15 @@ export default function Service(data) {
                                 ))
                             ) : null
                         }
+                    </Form.Item>
+                    <Form.Item name="complainer" label="Обратившееся лицо">
+                        <TextArea
+                            autoSize
+                            allowClear
+                            onPressEnter={(e) => {
+                                e.preventDefault()
+                            }}
+                        />
                     </Form.Item>
                     <Form.Item name="summary" label="Название" rules={[{required: true}]}>
                         <TextArea

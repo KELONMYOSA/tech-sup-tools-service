@@ -1,5 +1,5 @@
 import {Menu} from "antd";
-import {MenuOutlined} from "@ant-design/icons";
+import {LogoutOutlined, MenuOutlined, SettingOutlined} from "@ant-design/icons";
 
 export default function Navbar(data) {
     const userData = data.userData
@@ -9,7 +9,13 @@ export default function Navbar(data) {
             key: 'userMenu',
             children: [
                 {
+                    label: 'Настройки',
+                    icon: <SettingOutlined />,
+                    key: 'settings',
+                },
+                {
                     label: 'Выйти',
+                    icon: <LogoutOutlined />,
                     key: 'logout',
                     danger: true
                 }
@@ -147,6 +153,9 @@ export default function Navbar(data) {
             localStorage.removeItem('token');
             localStorage.removeItem('refreshToken');
             window.location.reload()
+        }
+        if (e.key === 'settings') {
+            window.open('/settings', '_self')
         }
     };
 

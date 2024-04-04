@@ -1,9 +1,10 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {Input, AutoComplete, Row, Col} from 'antd';
+import {AutoComplete, Col, Input, Row} from 'antd';
 import axios from 'axios';
 import Highlighter from "react-highlight-words"
 import SearchModeSelector from "./searchModeSelector.jsx";
 import {combineResponses} from "./combineResponses.js";
+import {setupShortcuts} from "../../utils/shortcuts.js";
 
 export default function SearchBar(data) {
     const apiUrl = import.meta.env.VITE_API_URL
@@ -18,6 +19,7 @@ export default function SearchBar(data) {
     const [textChangedBySelect, setTextChangedBySelect] = useState(false);
     const searchModeSelectorRef = useRef();
     const searchModeRef = useRef(['all']);
+    const inputRef = useRef();
 
     useEffect(() => {
         const search = data.searchParams.get('search')
@@ -25,6 +27,20 @@ export default function SearchBar(data) {
             searchData(search)
         }
     }, [data.searchParams])
+
+    useEffect(() => {
+        const shortcuts = [
+            {
+                codes: ['KeyV'],
+                isActive: (activeElement) => activeElement !== inputRef.current.input,
+                action: (activeElement) => {
+                    inputRef.current.focus();
+                    searchModeSelectorRef.current.setSelectedCategories(['vlan'])
+                },
+            },
+        ];
+        return setupShortcuts(shortcuts);
+    }, []);
 
     const highlightText = (text, searchText) => {
         return (
@@ -918,6 +934,7 @@ export default function SearchBar(data) {
                         allowClear
                         loading={isLoading}
                         enterButton
+                        ref={inputRef}
                     />
                 </AutoComplete>
             </Col>

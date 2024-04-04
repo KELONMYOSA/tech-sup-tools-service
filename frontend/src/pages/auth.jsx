@@ -1,9 +1,7 @@
-import {Button, Form, Input, notification, Space, Typography} from 'antd';
-import {useNavigate} from "react-router-dom";
+import {Button, Form, Input, Layout, notification, Space, Typography} from 'antd';
 
 export default function Auth() {
     const apiUrl = import.meta.env.VITE_API_URL;
-    const navigate = useNavigate();
 
     const [api, contextHolder] = notification.useNotification();
     const showAlert = (msg) => {
@@ -47,62 +45,63 @@ export default function Auth() {
     }
 
     return (
-        <Space style={pageStyle} direction="vertical" align="center" size="small">
-            {contextHolder}
-            <Typography.Title>LDAP Authentication</Typography.Title>
-            <Form
-                name="auth"
-                labelCol={{
-                    span: 6,
-                }}
-                style={{
-                    paddingTop: 20,
-                    paddingLeft: 30,
-                    paddingRight: 30,
-                    borderRadius: 6,
-                    border: "1px solid",
-                    borderColor: "lightgray"
-                }}
-                initialValues={{
-                    remember: true,
-                }}
-                onFinish={onFinish}
-                onFinishFailed={onFinishFailed}
-                autoComplete="off"
-            >
-                <Form.Item
-                    label="Логин"
-                    name="username"
-                    rules={[
-                        {
-                            required: true,
-                            message: 'Пожалуйста, введите логин!',
-                        },
-                    ]}
+        <Layout>
+            <Space style={pageStyle} direction="vertical" align="center" size="small">
+                {contextHolder}
+                <Typography.Title>LDAP Authentication</Typography.Title>
+                <Form
+                    name="auth"
+                    labelCol={{
+                        span: 6,
+                    }}
+                    style={{
+                        paddingTop: 20,
+                        paddingLeft: 30,
+                        paddingRight: 30,
+                        borderRadius: 6,
+                        border: "1px solid",
+                        borderColor: "lightgray"
+                    }}
+                    initialValues={{
+                        remember: true,
+                    }}
+                    onFinish={onFinish}
+                    onFinishFailed={onFinishFailed}
+                    autoComplete="off"
                 >
-                    <Input/>
-                </Form.Item>
+                    <Form.Item
+                        label="Логин"
+                        name="username"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Пожалуйста, введите логин!',
+                            },
+                        ]}
+                    >
+                        <Input/>
+                    </Form.Item>
 
-                <Form.Item
-                    label="Пароль"
-                    name="password"
-                    rules={[
-                        {
-                            required: true,
-                            message: 'Пожалуйста, введите пароль!',
-                        },
-                    ]}
-                >
-                    <Input.Password/>
-                </Form.Item>
+                    <Form.Item
+                        label="Пароль"
+                        name="password"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Пожалуйста, введите пароль!',
+                            },
+                        ]}
+                    >
+                        <Input.Password/>
+                    </Form.Item>
 
-                <Form.Item>
-                    <Button type="primary" htmlType="submit">
-                        Войти
-                    </Button>
-                </Form.Item>
-            </Form>
-        </Space>
-
+                    <Form.Item>
+                        <Button type="primary" htmlType="submit">
+                            Войти
+                        </Button>
+                    </Form.Item>
+                </Form>
+            </Space>
+        </Layout>
     )
 }

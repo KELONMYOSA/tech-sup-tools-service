@@ -1,4 +1,4 @@
-import {Button, Card, Col, Descriptions, List, Row, Table, Tabs, Typography} from "antd";
+import {Button, Card, Col, Descriptions, List, Radio, Row, Table, Tabs, Typography} from "antd";
 import React from "react";
 import axios from "axios";
 import {Document, Page, pdfjs} from "react-pdf";
@@ -477,26 +477,22 @@ export default async function ServiceInfo(data) {
                             ))}
                         </ul>
                     </Card>
-                    <Card key={3} title="Примечания" style={{marginTop: 20}}>
-                        <Tabs
-                            defaultActiveKey="1"
+                    <Card key={3} title="Примечания" style={{marginTop: 20, overflow: 'hidden'}}>
+                        <Descriptions
+                            column={1}
+                            layout='vertical'
+                            style={{overflowX: 'auto'}}
                             items={[
                                 {
-                                    key: '1',
                                     label: 'Менеджерское',
                                     children: (
-                                        <pre style={{overflowX: 'scroll', paddingBottom: 10}}>
-                                                {service.description || '---'}
-                                            </pre>
+                                        <pre style={{paddingBottom: 10}}>{service.description || '---'}</pre>
                                     ),
                                 },
                                 {
-                                    key: '2',
                                     label: 'Техническое',
                                     children: (
-                                        <pre style={{overflowX: 'scroll', paddingBottom: 10}}>
-                                                {service.supportDescription || '---'}
-                                            </pre>
+                                        <pre style={{paddingBottom: 10}}>{service.supportDescription || '---'}</pre>
                                     ),
                                 },
                             ]}
