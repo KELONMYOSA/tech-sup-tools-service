@@ -319,17 +319,17 @@ class Service(OracleBase):
     def speed(self):
         _speed = 0
         if self.fiz_id != 0 and self.fiz_inet_tarif_id:
-            return self.tariff.speed_descr.description if self.tariff.id_speed else 0
+            return self.tariff.speed_descr.name if self.tariff.id_speed else 0
         if int(self.id_type_service) == 297:  # noqa: PLR2004
-            _speed = self.speed_inet.description if self.speed_inet else 0
+            _speed = self.speed_inet.name if self.speed_inet else 0
         elif int(self.id_type_service) == 303:  # noqa: PLR2004
             _speed = "; ".join([str(y) for y in set([str(x.speed) for x in self.vpns])])  # noqa: C403
         elif int(self.id_type_service) == 4179:  # noqa: PLR2004
-            _speed = self.speed_inet.description if self.speed_inet else 0
+            _speed = self.iptransit.speed.name if self.iptransit else 0
         elif int(self.id_type_service) == 4180:  # noqa: PLR2004
-            _speed = self.peering.speed.description if self.peering and self.peering.id_speed else 0
+            _speed = self.peering.speed.name if self.peering and self.peering.id_speed else 0
         elif int(self.id_type_service) == 4534:  # noqa: PLR2004
-            _speed = self.speed_inet.description if self.speed_inet else 0
+            _speed = self.speed_inet.name if self.speed_inet else 0
 
         return _speed
 

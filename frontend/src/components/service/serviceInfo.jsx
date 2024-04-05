@@ -1,10 +1,11 @@
-import {Button, Card, Col, Descriptions, List, Radio, Row, Table, Tabs, Typography} from "antd";
+import {Button, Card, Col, Descriptions, Flex, List, Row, Table, Typography} from "antd";
 import React from "react";
 import axios from "axios";
 import {Document, Page, pdfjs} from "react-pdf";
 import 'react-pdf/dist/Page/TextLayer.css'
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import CopyToClipboardButton from "../../utils/components.jsx";
+import {CopyOutlined} from "@ant-design/icons";
 
 export default async function ServiceInfo(data) {
     const apiUrl = import.meta.env.VITE_API_URL
@@ -418,9 +419,19 @@ export default async function ServiceInfo(data) {
                             items={[
                                 {
                                     label: 'Компания',
-                                    children: (<a href={`/company/${service.companyId}`}>
-                                        (ID: {service.companyId}) {service.company} ({service.companyTypeDesc.name})
-                                    </a>),
+                                    children: (
+                                        <Flex justify='flex-start' align='center'>
+                                            <a href={`/company/${service.companyId}`}>
+                                                (ID: {service.companyId}) {service.company} ({service.companyTypeDesc.name})
+                                            </a>
+                                            <CopyToClipboardButton
+                                                text={service.companyId}
+                                                type='text'
+                                                style={{height: '100%', padding: 2, marginLeft: 10}}
+                                                item={<CopyOutlined />}
+                                            />
+                                        </Flex>
+                                    ),
                                 },
                                 {
                                     label: 'Провайдер',

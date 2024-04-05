@@ -90,14 +90,16 @@ export default function App() {
                     {
                         components: {
                             Layout: {headerBg: 'white'},
-                            Table: {rowExpandedBg: '#f7fcff'}
+                            Table: {rowExpandedBg: '#f7fcff'},
+                            Message: {contentBg: 'white'}
                         }
                     }
                     :
                     {
                         components: {
                             Layout: {headerBg: '#141414'},
-                            Table: {rowExpandedBg: '#000c14'}
+                            Table: {rowExpandedBg: '#000c14'},
+                            Message: {contentBg: '#000'}
                         }
                     }
             }
