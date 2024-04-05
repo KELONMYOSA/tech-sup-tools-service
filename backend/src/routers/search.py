@@ -62,10 +62,12 @@ async def search_by_company_name(name: str, max_results: int = 10, _: User = Dep
         "query": {
             "bool": {
                 "should": [
-                    {"match": {"company_name.keyword": {"query": name, "fuzziness": "AUTO"}}},
-                    {"wildcard": {"company_name.keyword": f"*{name}*"}},
+                    {"match": {"company_name.keyword": {"query": name, "fuzziness": "AUTO", "boost": "3"}}},
+                    {"wildcard": {"company_name.keyword": {"value": f"*{name}*", "boost": "3"}}},
+                    {"match": {"company_name": {"query": name, "fuzziness": "0", "boost": "2"}}},
                     {"match": {"company_brand_name.keyword": {"query": name, "fuzziness": "AUTO"}}},
                     {"wildcard": {"company_brand_name.keyword": f"*{name}*"}},
+                    {"match": {"company_brand_name": {"query": name, "fuzziness": "0"}}},
                 ],
                 "minimum_should_match": 1,
             }
