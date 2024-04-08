@@ -32,7 +32,7 @@ export default function SearchBar(data) {
         const shortcuts = [
             {
                 codes: ['KeyV'],
-                isActive: (activeElement) => activeElement !== inputRef.current.input,
+                isActive: (activeElement) => ['input', 'textarea', 'select'].indexOf(activeElement.tagName.toLowerCase()) === -1,
                 action: (activeElement) => {
                     setSearchText(null)
                     setIsOpen(false)
