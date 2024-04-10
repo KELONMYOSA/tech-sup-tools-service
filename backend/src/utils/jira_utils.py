@@ -4,8 +4,11 @@ from pydantic import BaseModel
 
 
 def get_issues_by_service_id(jira: JIRA, service_id: int) -> list[dict]:
-    issues = jira.search_issues(f'"ID Услуги" ~ "{service_id}"')
-    return _result_list_to_dict_list(issues)
+    query1 = f'"ID Услуги" ~ "{service_id}"'
+    query2 = f'project = CLIENTS AND description ~ "\\"(id = {service_id})\\""'
+    issues = jira.search_issues(f"{query1} OR {query2}")
+    sorted_issues = sorted(issues, key=lambda x: x.fields.created, reverse=True)
+    return _result_list_to_dict_list(sorted_issues)
 
 
 class JIRAIssueCreateData(BaseModel):
