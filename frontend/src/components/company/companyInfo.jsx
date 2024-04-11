@@ -55,7 +55,7 @@ export default async function CompanyInfo(data) {
                     },
                     {
                         label: 'Тип',
-                        children: company.type.name,
+                        children: company.type ? company.type.name : null,
                     },
                     {
                         label: 'Статус',

@@ -103,7 +103,7 @@ export default function CompanyServicesTable(data) {
     useEffect(() => {
         (async () => {
             const services = await getServices();
-            if (services.length === 0) {
+            if (services === undefined || services.length === 0) {
                 setIsGettingData(true)
                 if (Object.keys(expandedData).length !== 0) {
                     setExpandedData({})
