@@ -112,6 +112,15 @@ export default function ServiceCard(data) {
                 if (key === 'Действует') {
                     defaultStatusFilters.push('Действует')
                 }
+                if (key === 'null') {
+                    statusFilters.push(
+                        {
+                            text: null,
+                            value: null,
+                        }
+                    )
+                    continue
+                }
                 statusFilters.push(
                     {
                         text: key,
@@ -216,7 +225,7 @@ export default function ServiceCard(data) {
                             width: 120,
                             filters: typeFilters,
                             className: styles.column_header_filter_button,
-                            onFilter: (value, record) => record.type.startsWith(value),
+                            onFilter: (value, record) => record.type === value,
                         },
                         {
                             title: 'Статус',
@@ -225,7 +234,7 @@ export default function ServiceCard(data) {
                             filters: statusFilters,
                             defaultFilteredValue: defaultStatusFilters,
                             className: styles.column_header_filter_button,
-                            onFilter: (value, record) => record.status.startsWith(value),
+                            onFilter: (value, record) => record.status === value,
                         },
                         {
                             title: 'Адреса',

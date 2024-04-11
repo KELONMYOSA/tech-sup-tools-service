@@ -15,14 +15,13 @@ export default async function ServiceBriefInfo(data) {
 
             return response.data
         } catch (error) {
-            console.error(error)
             return null
         }
     };
 
     const service = await getServiceInfo(serviceId)
     if (!service) {
-        return [false, null]
+        return [false, <div></div>]
     }
 
     let interfacesTable
