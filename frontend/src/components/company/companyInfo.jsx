@@ -81,7 +81,6 @@ export default async function CompanyInfo(data) {
         }
     };
 
-
     const contacts = await getContacts(companyId)
     let companyContactsItem = null
     if (contacts) {

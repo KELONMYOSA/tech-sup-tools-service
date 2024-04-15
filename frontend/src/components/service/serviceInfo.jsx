@@ -1,4 +1,4 @@
-import {Button, Card, Col, Descriptions, Flex, List, Row, Table, Typography} from "antd";
+import {Button, Card, Col, Collapse, Descriptions, Flex, List, Row, Table, Typography} from "antd";
 import React from "react";
 import axios from "axios";
 import {Document, Page, pdfjs} from "react-pdf";
@@ -28,6 +28,72 @@ export default async function ServiceInfo(data) {
     const service = await getServiceInfo(serviceId)
     if (!service) {
         return [false, null]
+    }
+
+    const getContacts = async (companyId) => {
+        try {
+            const response = await axios.get(
+                `${apiUrl}/contact/byCompany/${companyId}`
+            );
+
+            return response.data
+        } catch (error) {
+        }
+    };
+
+    const contacts = await getContacts(service.companyId)
+    let companyContactsItem = null
+    if (contacts) {
+        companyContactsItem = (
+            <Collapse
+                style={{marginBottom: 10}}
+                items={[
+                    {
+                        label: 'Контакты',
+                        children: contacts.map((contact, i) => (
+                                <div key={i}>
+                                    <Descriptions
+                                        key={i}
+                                        bordered
+                                        size='small'
+                                        title={`${contact.name.lName} ${contact.name.fName ? contact.name.fName : ''} ${contact.name.mName ? contact.name.mName : ''}`}
+                                        items={[
+                                            {
+                                                label: 'Телефон',
+                                                children: contact.phones ?
+                                                    <ul style={{marginLeft: 10}}>{contact.phones.map((phone, i) => (
+                                                        <li key={i}>{phone.ext ? `7${phone.phone} (доб. ${phone.ext})` : `7${phone.phone}`}</li>))}</ul> : "-",
+                                            },
+                                            {
+                                                label: 'email',
+                                                children: contact.email ? contact.email : '-',
+                                            },
+                                            {
+                                                label: 'Тип',
+                                                children: contact.type ? contact.type : '-',
+                                            },
+                                            {
+                                                label: 'Должность',
+                                                children: contact.position ? contact.position : '-',
+                                            },
+                                            {
+                                                label: 'Оповещать',
+                                                children: contact.send_alarm ? 'Да' : 'Нет',
+                                            },
+                                            {
+                                                label: 'Комментарии',
+                                                children: contact.comments ? contact.comments : '-',
+                                            },
+                                        ]}
+                                    />
+                                    <br/>
+                                </div>
+                            )
+                        )
+                    }
+                ]}
+            />
+        )
     }
 
     const getJiraIssues = async (serviceId) => {
@@ -529,6 +595,7 @@ export default async function ServiceInfo(data) {
                     </Card>
                 </Col>
                 <Col key={2} xs={24} md={14} lg={17} style={{padding: 20}}>
+                    {companyContactsItem}
                     <Card title="Технические параметры">
                         {jiraOpenIssues}
                         {rentServices}

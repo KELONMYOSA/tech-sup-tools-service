@@ -325,7 +325,7 @@ class Service(OracleBase):
         elif int(self.id_type_service) == 303:  # noqa: PLR2004
             _speed = "; ".join([str(y) for y in set([str(x.speed) for x in self.vpns])])  # noqa: C403
         elif int(self.id_type_service) == 4179:  # noqa: PLR2004
-            _speed = self.iptransit.speed.name if self.iptransit else 0
+            _speed = self.iptransit.speed.name if (self.iptransit and self.iptransit.speed) else 0
         elif int(self.id_type_service) == 4180:  # noqa: PLR2004
             _speed = self.peering.speed.name if self.peering and self.peering.id_speed else 0
         elif int(self.id_type_service) == 4534:  # noqa: PLR2004
