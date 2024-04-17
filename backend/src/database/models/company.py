@@ -16,6 +16,8 @@ class CompanyModel(Company):
             "type": self.client_type_descr,
             "status": self.status_descr,
             "provider": self.provider_company.name,
+            "manager": self.manager,
+            "managerService": self.manager_service,
         }
 
     def get_contacts(self):

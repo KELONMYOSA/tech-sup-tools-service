@@ -50,46 +50,56 @@ export default async function ServiceInfo(data) {
                 items={[
                     {
                         label: 'Контакты',
-                        children: contacts.map((contact, i) => (
-                                <div key={i}>
-                                    <Descriptions
-                                        key={i}
-                                        bordered
-                                        size='small'
-                                        title={`${contact.name.lName} ${contact.name.fName ? contact.name.fName : ''} ${contact.name.mName ? contact.name.mName : ''}`}
-                                        items={[
-                                            {
-                                                label: 'Телефон',
-                                                children: contact.phones ?
-                                                    <ul style={{marginLeft: 10}}>{contact.phones.map((phone, i) => (
-                                                        <li key={i}>{phone.ext ? `7${phone.phone} (доб. ${phone.ext})` : `7${phone.phone}`}</li>))}</ul> : "-",
-                                            },
-                                            {
-                                                label: 'email',
-                                                children: contact.email ? contact.email : '-',
-                                            },
-                                            {
-                                                label: 'Тип',
-                                                children: contact.type ? contact.type : '-',
-                                            },
-                                            {
-                                                label: 'Должность',
-                                                children: contact.position ? contact.position : '-',
-                                            },
-                                            {
-                                                label: 'Оповещать',
-                                                children: contact.send_alarm ? 'Да' : 'Нет',
-                                            },
-                                            {
-                                                label: 'Комментарии',
-                                                children: contact.comments ? contact.comments : '-',
-                                            },
-                                        ]}
-                                    />
-                                    <br/>
-                                </div>
-                            )
-                        )
+                        children:
+                            <Table
+                                size='small'
+                                pagination={false}
+                                scroll={{x: 600}}
+                                columns={[
+                                    {
+                                        title: 'ФИО',
+                                        dataIndex: 'name',
+                                    },
+                                    {
+                                        title: 'Телефон',
+                                        dataIndex: 'phone',
+                                    },
+                                    {
+                                        title: 'Email',
+                                        dataIndex: 'email',
+                                    },
+                                    {
+                                        title: 'Тип',
+                                        dataIndex: 'type',
+                                    },
+                                    {
+                                        title: 'Должность',
+                                        dataIndex: 'position',
+                                    },
+                                    {
+                                        title: 'Оповещать',
+                                        dataIndex: 'sendAlarm',
+                                    },
+                                    {
+                                        title: 'Комментарии',
+                                        dataIndex: 'comments',
+                                    },
+                                ]}
+                                dataSource={
+                                    contacts.map(contact => ({
+                                        name: `${contact.name.lName} ${contact.name.fName ? contact.name.fName : ''} ${contact.name.mName ? contact.name.mName : ''}`,
+                                        phone: contact.phones ?
+                                            <ul style={{marginLeft: 10}}>{contact.phones.map((phone, i) => (
+                                                <li key={i}>{phone.ext ? `7${phone.phone} (доб. ${phone.ext})` : `7${phone.phone}`}</li>))}</ul>
+                                            : "-",
+                                        email: contact.email ? contact.email : '-',
+                                        type: contact.type ? contact.type : '-',
+                                        position: contact.position ? contact.position : '-',
+                                        sendAlarm: contact.send_alarm ? 'Да' : 'Нет',
+                                        comments: contact.comments ? contact.comments : '-',
+                                    }))
+                                }
+                            />
                     }
                 ]}
             />
@@ -494,7 +504,7 @@ export default async function ServiceInfo(data) {
                                                 text={service.companyId}
                                                 type='text'
                                                 style={{height: '100%', padding: 2, marginLeft: 10}}
-                                                item={<CopyOutlined />}
+                                                item={<CopyOutlined/>}
                                             />
                                         </Flex>
                                     ),
