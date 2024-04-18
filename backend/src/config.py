@@ -14,6 +14,8 @@ class Settings(BaseSettings):
 
     ORACLE_DB_URL: str
 
+    MARIA_DB_URL: str
+
     ES_URL: str
 
     JIRA_URL: str

@@ -279,8 +279,8 @@ export default async function ServiceInfo(data) {
                                 portType: i.type,
                                 unitAddress: i.uAddress ? `${i.uAddress.city}${!['', ' ', null].includes(i.uAddress.street) ? `, ${i.uAddress.street}` : ''}${!['', ' ', null].includes(i.uAddress.house) ? `, ${i.uAddress.house}` : ''}${!['', ' ', null].includes(i.uAddress.building) ? `, ${i.uAddress.building}` : ''}${!['', ' ', null].includes(i.uAddress.letter) ? ` ${i.uAddress.letter}` : ''}${!['', ' ', null].includes(i.uAddress.flat) ? `, ${i.uAddress.flat}` : ''}` : null,
                                 equipmentDomain: i.eDomain,
-                                portHost: i.host,
-                                iName: i.name,
+                                portHost: <a target='_blank' href={`https://zbxweb.comfortel.pro/zabbix.php?action=search&search=${i.host}`}>{i.host}</a>,
+                                iName: <a target='_blank' href={`${apiUrl}/zabbix/traffic?host=${i.eDomain}&interface=${i.name}`}>{i.name}</a>,
                             }
                         ))}
                     columns={[
