@@ -16,7 +16,7 @@ WHERE h.host = '{host}'
   AND h.hostid = i.hostid
   AND h.status <> 3
   AND g.flags IN (0, 4)
-  AND g.name like 'Traffic%{interface}%'
+  AND i.key_ = 'ifOutOctets[{interface}]'
 """)
     with maria_db() as db:
         results = db.execute(statement).first()
