@@ -11,7 +11,10 @@ router = APIRouter(
 
 @router.get("/traffic")
 async def get_traffic_link(host: str, interface: str):
-    link = create_traffic_link(host, interface)
-    if not link:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Graph not found")
-    return RedirectResponse(link, status_code=302)
+    if link := create_traffic_link(host, interface):
+        return RedirectResponse(link, status_code=302)
+
+    if "/" in interface and (link := create_traffic_link(host, interface.split("/")[-1])):
+        return RedirectResponse(link, status_code=302)
+
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Graph not found")
