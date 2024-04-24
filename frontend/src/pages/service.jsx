@@ -1,7 +1,7 @@
 import {useParams} from "react-router-dom";
 import ServiceInfo from "../components/service/serviceInfo.jsx";
 import React, {useEffect, useRef, useState} from "react";
-import {Button, Flex, Form, Layout, Modal, notification, Select, Space, Spin, Typography} from "antd";
+import {Button, Checkbox, Flex, Form, Layout, Modal, notification, Select, Space, Spin, Typography} from "antd";
 import PageNotFound from "./404page.jsx";
 import TextArea from "antd/es/input/TextArea.js";
 import {
@@ -82,7 +82,7 @@ export default function Service(data) {
                 extraFields["customfield_11258"] = values.complainer
                 const body = {
                     summary: values.summary,
-                    description: values.description,
+                    description: values.formatting ? `{noformat}${values.description}{noformat}` : values.description,
                     service_id: serviceId,
                     assignee: data.userData.uid,
                     extra_fields: extraFields
@@ -107,7 +107,7 @@ export default function Service(data) {
         }
 
         const onReset = () => {
-            formIssueCreate.setFieldsValue({components: null, summary: null, description: null, complainer: null})
+            formIssueCreate.setFieldsValue({components: null, summary: null, description: null, complainer: null, formatting: false})
             setIsVisibleAddressAdd(true)
         }
 
@@ -237,6 +237,9 @@ export default function Service(data) {
                     </Form.Item>
                     <Form.Item name="description" label="Описание" rules={[{required: true}]}>
                         <TextArea allowClear/>
+                    </Form.Item>
+                    <Form.Item name="formatting" label="Форматирование" valuePropName="checked">
+                        <Checkbox/>
                     </Form.Item>
                     <Form.Item {...tailLayout}>
                         <Space>

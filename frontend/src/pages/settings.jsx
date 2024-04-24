@@ -43,6 +43,18 @@ export default function Settings(data) {
                             label: 'V',
                             children: 'Поиск по "Vlan", фокус на строке поиска'
                         },
+                        {
+                            label: 'Tab',
+                            children: 'Фокус на следующей категории поиска'
+                        },
+                        {
+                            label: 'Shift + Tab',
+                            children: 'Фокус на предыдущей категории поиска'
+                        },
+                        {
+                            label: 'Space',
+                            children: 'Выбор категории, на которой фокус'
+                        },
                     ]}
                 />
             </Col>

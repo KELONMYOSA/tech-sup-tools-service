@@ -40,6 +40,27 @@ export default function SearchBar(data) {
                     searchModeSelectorRef.current.setSelectedCategories(['vlan'])
                 },
             },
+            {
+                codes: ['Tab'],
+                isActive: (activeElement) => ['input', 'textarea', 'select'].indexOf(activeElement.tagName.toLowerCase()) === -1,
+                action: (activeElement) => {
+                    searchModeSelectorRef.current.focusNextCategory();
+                },
+            },
+            {
+                codes: ['Shift+Tab'],
+                isActive: (activeElement) => ['input', 'textarea', 'select'].indexOf(activeElement.tagName.toLowerCase()) === -1,
+                action: (activeElement) => {
+                    searchModeSelectorRef.current.focusPrevCategory();
+                },
+            },
+            {
+                codes: ['Space'],
+                isActive: (activeElement) => ['input', 'textarea', 'select'].indexOf(activeElement.tagName.toLowerCase()) === -1,
+                action: (activeElement) => {
+                    searchModeSelectorRef.current.toggleSelectedCategory();
+                },
+            }
         ];
         return setupShortcuts(shortcuts);
     }, []);

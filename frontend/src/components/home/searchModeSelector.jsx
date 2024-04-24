@@ -1,12 +1,20 @@
-import React, {forwardRef, useImperativeHandle, useState} from 'react';
+import React, {forwardRef, useEffect, useImperativeHandle, useRef, useState} from 'react';
 import {Tag} from 'antd';
 
-const Category = ({category, onToggle}) => {
+const Category = ({category, onToggle, focused}) => {
+    const ref = useRef(null);
+
+    // Сфокусироваться на элементе, если он должен быть в фокусе
+    useEffect(() => {
+        if (focused) ref.current.focus();
+    }, [focused]);
+
     return (
         <Tag
+            ref={ref}
             color={category.selected ? 'blue' : 'default'}
             onClick={() => onToggle(category.key)}
-            style={{cursor: 'pointer', margin: 5}}
+            style={{cursor: 'pointer', margin: 5, outline: focused ? '2px solid #1890ff' : 'none'}}
         >
             {category.label}
         </Tag>
@@ -15,6 +23,7 @@ const Category = ({category, onToggle}) => {
 
 const SearchModeSelector = forwardRef(({ initialCategories, onChange }, ref) => {
     const [categories, setCategories] = useState(initialCategories);
+    const [focusedIndex, setFocusedIndex] = useState(-1);
 
     useImperativeHandle(ref, () => ({
         setSelectedCategories: (selectedKeys) => {
@@ -24,6 +33,23 @@ const SearchModeSelector = forwardRef(({ initialCategories, onChange }, ref) => 
             }));
             setCategories(newCategories);
             onChange(selectedKeys);
+        },
+        focusNextCategory: () => {
+            const nextIndex = (focusedIndex + 1) % categories.length;
+            setFocusedIndex(nextIndex);
+        },
+        focusPrevCategory: () => {
+            let nextIndex
+            if (focusedIndex === -1) {
+                nextIndex = (-1 + categories.length) % categories.length;
+            } else {
+                nextIndex = (focusedIndex - 1 + categories.length) % categories.length;
+            }
+            setFocusedIndex(nextIndex);
+        },
+        toggleSelectedCategory: () => {
+            const key = categories[focusedIndex].key;
+            handleToggle(key);
         },
     }));
 
@@ -72,8 +98,8 @@ const SearchModeSelector = forwardRef(({ initialCategories, onChange }, ref) => 
 
     return (
         <div style={{display: 'flex', flexWrap: 'wrap', padding: '10px'}}>
-            {categories.map(category => (
-                <Category key={category.key} category={category} onToggle={handleToggle}/>
+            {categories.map((category, index) => (
+                <Category key={category.key} category={category} onToggle={handleToggle} focused={index === focusedIndex}/>
             ))}
         </div>
     );

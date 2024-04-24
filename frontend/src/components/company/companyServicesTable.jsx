@@ -131,6 +131,7 @@ export default function CompanyServicesTable(data) {
                 type: service.type,
                 status: service.status.name,
                 date: service.statusDate,
+                direction: service.isProvider ? 'Покупка' : 'Продажа',
                 addresses: (
                     <ul>
                         {service.addresses.map((address, i) => (
@@ -176,6 +177,14 @@ export default function CompanyServicesTable(data) {
                             title: 'Дата',
                             width: 120,
                             dataIndex: 'date'
+                        },
+                        {
+                            title: 'Направление',
+                            width: 130,
+                            dataIndex: 'direction',
+                            filters: [{text: 'Продажа', value: 'Продажа'}, {text: 'Покупка', value: 'Покупка'}],
+                            className: styles.column_header_filter_button,
+                            onFilter: (value, record) => record.direction.startsWith(value),
                         },
                         {
                             title: 'Адреса',
