@@ -442,6 +442,7 @@ class ServiceDocument(OracleBase):
     is_delete = Column(oracle.VARCHAR2(1), server_default=text("N"))  # "IS_DELETE" VARCHAR2(1) DEFAULT 'N',
     delete_date = Column(oracle.DATE())  # "DELETE_DATE" DATE,
     delete_user = Column(oracle.NUMBER(9, 0), ForeignKey("IFS_KERNEL.CLIENT.id"))  # "DELETE_USER" NUMBER,
+    link = Column(oracle.VARCHAR2(102))
 
     service = relationship("Service", foreign_keys=[service_id], backref=backref("service_documents"))
 

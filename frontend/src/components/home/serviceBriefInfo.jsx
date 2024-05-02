@@ -204,14 +204,20 @@ export default async function ServiceBriefInfo(data) {
                             span: {xs: 2},
                             children: (
                                 <ul style={{listStyle: "none"}}>
-                                    {service.serviceDocs.map((doc, i) => (
+                                    {service.serviceDocs.files.map((doc, i) => (
                                         <li key={i}>
                                             <a target='_blank'
                                                href={`https://boss.comfortel.pro/service_docs/${serviceId}/${doc}`}>
                                                 {doc}
                                             </a>
                                         </li>
-                                    ))}
+                                    )).concat(
+                                        service.serviceDocs.links.map((link, i) => (
+                                            <li key={i + 1000}>
+                                                <a target='_blank' href={link}>{link}</a>
+                                            </li>
+                                        ))
+                                    )}
                                 </ul>
                             ),
                         },

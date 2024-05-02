@@ -6,6 +6,7 @@ import 'react-pdf/dist/Page/TextLayer.css'
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import CopyToClipboardButton from "../../utils/components.jsx";
 import {CopyOutlined} from "@ant-design/icons";
+import CommentCard from "./commentCard.jsx";
 
 export default async function ServiceInfo(data) {
     const apiUrl = import.meta.env.VITE_API_URL
@@ -452,11 +453,11 @@ export default async function ServiceInfo(data) {
     ).toString();
 
     let serviceDocs
-    if (service.serviceDocs.length > 0) {
+    if (service.serviceDocs.files.length > 0) {
         serviceDocs = (
             <Card title='Схема' size='small'>
                 {
-                    service.serviceDocs.map((doc, i) => {
+                    service.serviceDocs.files.map((doc, i) => {
                         if (doc.indexOf(".pdf", doc.length - 4) !== -1) {
                             return (
                                 <Document key={i} file={`${apiUrl}/service_docs/${serviceId}/${doc}`}>
@@ -564,34 +565,7 @@ export default async function ServiceInfo(data) {
                             ))}
                         </ul>
                     </Card>
-                    <Card key={3} title="Примечания" style={{marginTop: 20, overflow: 'hidden'}}>
-                        <Descriptions
-                            column={1}
-                            layout='vertical'
-                            items={[
-                                {
-                                    label: 'Менеджерское',
-                                    children: (
-                                        <pre style={{
-                                            paddingBottom: 10,
-                                            whiteSpace: 'pre-wrap',
-                                            wordWrap: 'break-word'
-                                        }}>{service.description || '---'}</pre>
-                                    ),
-                                },
-                                {
-                                    label: 'Техническое',
-                                    children: (
-                                        <pre style={{
-                                            paddingBottom: 10,
-                                            whiteSpace: 'pre-wrap',
-                                            wordWrap: 'break-word'
-                                        }}>{service.supportDescription || '---'}</pre>
-                                    ),
-                                },
-                            ]}
-                        />
-                    </Card>
+                    <CommentCard service={service}/>
                     <Card key={4} title="Jira" style={{marginTop: 20}}
                           extra={<Button onClick={data.showIssueCreation}>Создать задачу</Button>}>
                         <ul style={{marginLeft: 10}}>
@@ -639,14 +613,20 @@ export default async function ServiceInfo(data) {
                                     span: {xs: 2},
                                     children: (
                                         <ul style={{listStyle: "none"}}>
-                                            {service.serviceDocs.map((doc, i) => (
+                                            {service.serviceDocs.files.map((doc, i) => (
                                                 <li key={i}>
                                                     <a target='_blank'
                                                        href={`https://boss.comfortel.pro/service_docs/${serviceId}/${doc}`}>
                                                         {doc}
                                                     </a>
                                                 </li>
-                                            ))}
+                                            )).concat(
+                                                service.serviceDocs.links.map((link, i) => (
+                                                    <li key={i + 1000}>
+                                                        <a target='_blank' href={link}>{link}</a>
+                                                    </li>
+                                                ))
+                                            )}
                                         </ul>
                                     ),
                                 },

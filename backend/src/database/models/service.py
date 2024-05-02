@@ -22,6 +22,13 @@ class ServiceModel(Service):
             .all()
         )
 
+    def set_descriptions(self, id, desc, support_desc):
+        service = self.db.query(ServiceModel).filter(ServiceModel.id == id, ServiceModel.is_delete == "N").first()
+        if service:
+            service.description = desc
+            service.support_desc = support_desc
+            self.db.commit()
+
     def __get_addresses(self):
         addresses = []
         for a in self.addresses:
@@ -89,6 +96,12 @@ class ServiceModel(Service):
             return f"{self.status_descr} (с неопределённой даты)"
 
     def get_tech_info(self):
+        service_docs = {"files": [], "links": []}
+        for doc in self.service_documents:
+            if doc.is_delete == "N" and (doc.document and not doc.document.endswith((".vsd", ".vsdx"))):
+                service_docs["files"].append(doc.document)
+                if doc.link:
+                    service_docs["links"].append(doc.link)
         return {
             "id": int(self.id),
             "typeId": int(self.id_type_service),
@@ -175,11 +188,7 @@ class ServiceModel(Service):
                 }
                 for line in self.phone_lines
             ],
-            "serviceDocs": [
-                doc.document
-                for doc in self.service_documents
-                if doc.is_delete == "N" and (doc.document and not doc.document.endswith((".vsd", ".vsdx")))
-            ],
+            "serviceDocs": service_docs,
         }
 
     def get_brief_info(self):
