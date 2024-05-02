@@ -53,6 +53,8 @@ const CommentCard = ({service}) => {
                             value={managerComment}
                             onChange={e => setManagerComment(e.target.value)}
                             autoSize={true}
+                            showCount
+                            maxLength={999}
                         />
                     ) : (
                         <pre style={{paddingBottom: 10, whiteSpace: 'pre-wrap', wordWrap: 'break-word'}}>
@@ -66,6 +68,8 @@ const CommentCard = ({service}) => {
                             value={techComment}
                             onChange={e => setTechComment(e.target.value)}
                             autoSize={true}
+                            showCount
+                            maxLength={999}
                         />
                     ) : (
                         <pre style={{paddingBottom: 10, whiteSpace: 'pre-wrap', wordWrap: 'break-word'}}>
