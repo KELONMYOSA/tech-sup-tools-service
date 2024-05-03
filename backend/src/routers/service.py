@@ -34,13 +34,12 @@ async def services_by_company_id(company_id: int, _: User = Depends(get_current_
 
 # Изменить комментарии к услуге по id
 class ChangeDescData(BaseModel):
-    desc: str
     support_desc: str
 
 
 @router.put("/description/{service_id}")
 async def update_service_desc_by_id(service_id: int, desc_data: ChangeDescData, _: User = Depends(get_current_user)):  # noqa: B008
-    if len(desc_data.desc) > 999 or len(desc_data.support_desc) > 999:  # noqa: PLR2004
+    if len(desc_data.support_desc) > 999:  # noqa: PLR2004
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Description too long")
-    set_service_desc_by_id(service_id, desc_data.desc, desc_data.support_desc)
+    set_service_desc_by_id(service_id, desc_data.support_desc)
     return {"detail": "Success"}

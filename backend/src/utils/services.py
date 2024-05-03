@@ -47,6 +47,6 @@ def get_services_by_ip(ip: int) -> list | None:
         return data
 
 
-def set_service_desc_by_id(service_id: int, desc: str, support_desc: str):
+def set_service_desc_by_id(service_id: int, support_desc: str):
     with oracle_db() as db:
-        ServiceModel(db).set_descriptions(service_id, desc, support_desc)
+        ServiceModel(db).set_descriptions(service_id, support_desc)

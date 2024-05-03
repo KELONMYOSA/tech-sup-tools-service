@@ -22,10 +22,9 @@ class ServiceModel(Service):
             .all()
         )
 
-    def set_descriptions(self, id, desc, support_desc):
+    def set_descriptions(self, id, support_desc):
         service = self.db.query(ServiceModel).filter(ServiceModel.id == id, ServiceModel.is_delete == "N").first()
         if service:
-            service.description = desc
             service.support_desc = support_desc
             self.db.commit()
 
