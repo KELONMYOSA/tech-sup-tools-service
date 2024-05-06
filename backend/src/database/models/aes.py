@@ -437,12 +437,13 @@ class ServiceDocument(OracleBase):
     service_id = Column(oracle.NUMBER(), ForeignKey("SERVICE.id"))  # "SERVICE_ID" NUMBER NOT NULL ENABLE,
     document = Column(oracle.VARCHAR2(250))  # "DOCUMENT" VARCHAR2(250),
     description = Column(oracle.VARCHAR2(250))  # "DESCRIPTION" VARCHAR2(255),
-    created_date = Column(oracle.DATE())  # "CREATED_DATE" DATE DEFAULT sysdate,
+    created_date = Column(oracle.DATE(), server_default=func.now())  # "CREATED_DATE" DATE DEFAULT sysdate,
     created_user = Column(oracle.NUMBER(9, 0), ForeignKey("IFS_KERNEL.CLIENT.id"))  # "CREATED_USER" NUMBER,
     is_delete = Column(oracle.VARCHAR2(1), server_default=text("N"))  # "IS_DELETE" VARCHAR2(1) DEFAULT 'N',
     delete_date = Column(oracle.DATE())  # "DELETE_DATE" DATE,
     delete_user = Column(oracle.NUMBER(9, 0), ForeignKey("IFS_KERNEL.CLIENT.id"))  # "DELETE_USER" NUMBER,
     link = Column(oracle.VARCHAR2(102))
+    type_id = Column(oracle.NUMBER(9))
 
     service = relationship("Service", foreign_keys=[service_id], backref=backref("service_documents"))
 

@@ -211,13 +211,7 @@ export default async function ServiceBriefInfo(data) {
                                                 {doc}
                                             </a>
                                         </li>
-                                    )).concat(
-                                        service.serviceDocs.links.map((link, i) => (
-                                            <li key={i + 1000}>
-                                                <a target='_blank' href={link}>{link}</a>
-                                            </li>
-                                        ))
-                                    )}
+                                    ))}
                                 </ul>
                             ),
                         },

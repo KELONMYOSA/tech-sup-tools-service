@@ -2,7 +2,7 @@ import ipaddress
 
 from sqlalchemy import func
 
-from src.database.models.aes import NetworkCompany, Service
+from src.database.models.aes import NetworkCompany, Service, ServiceDocument
 
 
 class ServiceModel(Service):
@@ -27,6 +27,35 @@ class ServiceModel(Service):
         if service:
             service.support_desc = support_desc
             self.db.commit()
+
+    def update_document_link(self, id, type_id, link):
+        service = self.db.query(ServiceModel).filter(ServiceModel.id == id, ServiceModel.is_delete == "N").first()
+
+        if not service or type_id not in [11736, 11737]:
+            return
+
+        exists = False
+        for doc in service.service_documents:
+            if doc.is_delete == "N" and doc.type_id == type_id:
+                exists = True
+                break
+
+        if exists:
+            document = (
+                self.db.query(ServiceDocument)
+                .filter(
+                    ServiceDocument.service_id == id,
+                    ServiceDocument.is_delete == "N",
+                    ServiceDocument.type_id == type_id,
+                )
+                .first()
+            )
+            document.link = link
+        else:
+            document = ServiceDocument(service_id=id, type_id=type_id, link=link)
+            self.db.add(document)
+        self.db.commit()
+        return document.id
 
     def __get_addresses(self):
         addresses = []
@@ -95,12 +124,16 @@ class ServiceModel(Service):
             return f"{self.status_descr} (с неопределённой даты)"
 
     def get_tech_info(self):
-        service_docs = {"files": [], "links": []}
+        service_docs = {"files": [], "links": {"wiki": None, "cloud": None}}
         for doc in self.service_documents:
-            if doc.is_delete == "N" and (doc.document and not doc.document.endswith((".vsd", ".vsdx"))):
-                service_docs["files"].append(doc.document)
+            if doc.is_delete == "N":
+                if doc.document and not doc.document.endswith((".vsd", ".vsdx")):
+                    service_docs["files"].append(doc.document)
                 if doc.link:
-                    service_docs["links"].append(doc.link)
+                    if doc.type_id == 11736:  # noqa: PLR2004
+                        service_docs["links"]["wiki"] = doc.link
+                    elif doc.type_id == 11737:  # noqa: PLR2004
+                        service_docs["links"]["cloud"] = doc.link
         return {
             "id": int(self.id),
             "typeId": int(self.id_type_service),

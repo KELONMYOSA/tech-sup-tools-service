@@ -7,6 +7,7 @@ import 'react-pdf/dist/Page/AnnotationLayer.css';
 import CopyToClipboardButton from "../../utils/components.jsx";
 import {CopyOutlined} from "@ant-design/icons";
 import CommentCard from "./commentCard.jsx";
+import ServiceLinksCard from "./serviceLinksCard.jsx";
 
 export default async function ServiceInfo(data) {
     const apiUrl = import.meta.env.VITE_API_URL
@@ -87,7 +88,8 @@ export default async function ServiceInfo(data) {
                                     },
                                 ]}
                                 dataSource={
-                                    contacts.map(contact => ({
+                                    contacts.map((contact, key) => ({
+                                        key: key,
                                         name: `${contact.name.lName} ${contact.name.fName ? contact.name.fName : ''} ${contact.name.mName ? contact.name.mName : ''}`,
                                         phone: contact.phones ?
                                             <ul style={{marginLeft: 10}}>{contact.phones.map((phone, i) => (
@@ -137,7 +139,6 @@ export default async function ServiceInfo(data) {
             </Card>
         )
     }
-
 
     let rentServices
     if (service.rentServices.length > 0) {
@@ -582,6 +583,7 @@ export default async function ServiceInfo(data) {
                     {companyContactsItem}
                     <Card title="Технические параметры">
                         {jiraOpenIssues}
+                        <ServiceLinksCard service={service}/>
                         {rentServices}
                         {rentedFor}
                         {pack}
@@ -620,13 +622,7 @@ export default async function ServiceInfo(data) {
                                                         {doc}
                                                     </a>
                                                 </li>
-                                            )).concat(
-                                                service.serviceDocs.links.map((link, i) => (
-                                                    <li key={i + 1000}>
-                                                        <a target='_blank' href={link}>{link}</a>
-                                                    </li>
-                                                ))
-                                            )}
+                                            ))}
                                         </ul>
                                     ),
                                 },

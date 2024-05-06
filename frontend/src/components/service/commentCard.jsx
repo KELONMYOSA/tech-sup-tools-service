@@ -12,7 +12,7 @@ const CommentCard = ({service}) => {
 
     const updateService = async (serviceId, descData) => {
         try {
-            await axios.put(`${apiUrl}/service/description/${serviceId}`, {
+            await axios.patch(`${apiUrl}/service/description/${serviceId}`, {
                 support_desc: descData.supportDescription
             })
         } catch (error) {

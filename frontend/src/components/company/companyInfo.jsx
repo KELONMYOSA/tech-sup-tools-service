@@ -140,7 +140,8 @@ export default async function CompanyInfo(data) {
                                     },
                                 ]}
                                 dataSource={
-                                    contacts.map(contact => ({
+                                    contacts.map((contact, key) => ({
+                                        key: key,
                                         name: `${contact.name.lName} ${contact.name.fName ? contact.name.fName : ''} ${contact.name.mName ? contact.name.mName : ''}`,
                                         phone: contact.phones ?
                                             <ul style={{marginLeft: 10}}>{contact.phones.map((phone, i) => (

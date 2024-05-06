@@ -50,3 +50,8 @@ def get_services_by_ip(ip: int) -> list | None:
 def set_service_desc_by_id(service_id: int, support_desc: str):
     with oracle_db() as db:
         ServiceModel(db).set_descriptions(service_id, support_desc)
+
+
+def set_service_doc_link_by_id(service_id: int, doc_type_id: int, link: str):
+    with oracle_db() as db:
+        return ServiceModel(db).update_document_link(service_id, doc_type_id, link)
