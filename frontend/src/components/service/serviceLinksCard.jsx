@@ -68,6 +68,8 @@ const ServiceLinksCard = ({service}) => {
                                     <Input
                                         value={wikiLink}
                                         onChange={e => setWikiLink(e.target.value)}
+                                        showCount
+                                        maxLength={102}
                                     />
                                 ) : (
                                     <a href={wikiLink} target={'_blank'}>{wikiLink}</a>
@@ -102,6 +104,8 @@ const ServiceLinksCard = ({service}) => {
                                     <Input
                                         value={cloudLink}
                                         onChange={e => setCloudLink(e.target.value)}
+                                        showCount
+                                        maxLength={102}
                                     />
                                 ) : (
                                     <a href={cloudLink} target={'_blank'}>{cloudLink}</a>

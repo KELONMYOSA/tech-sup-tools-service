@@ -62,6 +62,8 @@ async def update_service_doc_link_by_id(
     link_data: ChangeDocLinkData,
     _: User = Depends(get_current_user),  # noqa: B008
 ):
+    if len(link_data.link) > 102:  # noqa: PLR2004
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Link too long")
     result = set_service_doc_link_by_id(service_id, link_data.doc_type_id, link_data.link)
     if not result:
         raise HTTPException(
