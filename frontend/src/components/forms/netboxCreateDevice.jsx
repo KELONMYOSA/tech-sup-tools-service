@@ -112,10 +112,10 @@ const NetboxCreateDeviceForm = ({handleCancel}) => {
                     marginTop: 20
                 }}
             >
-                <Form.Item name="name" label="Name" rules={[{required: true}]} tooltip='Доменка (заполняется вручную)'>
+                <Form.Item name="name" label="Name - доменное имя" rules={[{required: true}]} tooltip='Доменка (заполняется вручную)'>
                     <Input/>
                 </Form.Item>
-                <Form.Item name="deviceRole" label="Device role" rules={[{required: true}]} tooltip='Роль оборудования (из всплывающего, если нет, то создается новая роль вручную в нетбоксе)'>
+                <Form.Item name="deviceRole" label="Device role - тип оборудования" rules={[{required: true}]} tooltip='Роль оборудования (из всплывающего, если нет, то создается новая роль вручную в нетбоксе)'>
                     <Select
                         showSearch
                         filterOption={(input, option) =>
@@ -123,7 +123,7 @@ const NetboxCreateDeviceForm = ({handleCancel}) => {
                         options={netboxChoices.deviceRoles.map(role => ({value: role.id, label: role.name}))}
                     />
                 </Form.Item>
-                <Form.Item name="deviceType" label="Device type" rules={[{required: true}]} tooltip='Модель оборудования'>
+                <Form.Item name="deviceType" label="Device type - модель оборудования" rules={[{required: true}]} tooltip='Модель оборудования'>
                     <Select
                         showSearch
                         filterOption={(input, option) =>
@@ -131,13 +131,13 @@ const NetboxCreateDeviceForm = ({handleCancel}) => {
                         options={netboxChoices.deviceTypes.map(t => ({value: t.id, label: t.name}))}
                     />
                 </Form.Item>
-                <Form.Item name="serialNumber" label="Serial number" rules={[{required: true}]} tooltip='Серийный номер (заполняется вручную)'>
+                <Form.Item name="serialNumber" label="S/N - серийный номер" rules={[{required: true}]} tooltip='Серийный номер (заполняется вручную)'>
                     <Input/>
                 </Form.Item>
-                <Form.Item name="assetTag" label="Asset tag" rules={[{required: true}]} tooltip='Инвентарный номер по физическому складу (заполняется вручную)'>
+                <Form.Item name="assetTag" label="Asset tag - инвентарный номер" rules={[{required: true}]} tooltip='Инвентарный номер по физическому складу (заполняется вручную)'>
                     <Input/>
                 </Form.Item>
-                <Form.Item name="site" label="Site" rules={[{required: true}]} tooltip='Выбрать из всплывающего, если существующий. Если новый, то заполнить новую форму'>
+                <Form.Item name="site" label="Site - название узла" rules={[{required: true}]} tooltip='Выбрать из всплывающего, если существующий. Если новый, то заполнить новую форму'>
                     <Select
                         showSearch
                         filterOption={(input, option) =>
@@ -145,7 +145,7 @@ const NetboxCreateDeviceForm = ({handleCancel}) => {
                         options={netboxChoices.sites.map(s => ({value: s.id, label: s.name}))}
                     />
                 </Form.Item>
-                <Form.Item name="status" label="Status" rules={[{required: true}]} tooltip='Выбрать из всплывающего'>
+                <Form.Item name="status" label="Status - статус" rules={[{required: true}]} tooltip='Выбрать из всплывающего'>
                     <Select
                         options={netboxChoices.statuses.map(s => ({value: s.value, label: s.display_name}))}
                     />

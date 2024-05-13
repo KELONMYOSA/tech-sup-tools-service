@@ -113,18 +113,18 @@ const NetboxCreateSiteForm = ({handleCancel}) => {
                     marginTop: 20
                 }}
             >
-                <Form.Item name="name" label="Name" rules={[{required: true}]} tooltip='Название узла'>
+                <Form.Item name="name" label="Name - название узла" rules={[{required: true}]} tooltip='Название узла'>
                     <Input/>
                 </Form.Item>
-                <Form.Item name="slug" label="Slug" rules={[{required: true}]} tooltip='Название узла на англ. (как вариант)'>
+                <Form.Item name="slug" label="Slug - краткое обозначение (eng)" rules={[{required: true}]} tooltip='Название узла на англ. (как вариант)'>
                     <Input/>
                 </Form.Item>
-                <Form.Item name="status" label="Status" rules={[{required: true}]} tooltip='Выбрать из всплывающего'>
+                <Form.Item name="status" label="Status - статус" rules={[{required: true}]} tooltip='Выбрать из всплывающего'>
                     <Select
                         options={netboxChoices.statuses.map(s => ({value: s.value, label: s.display_name}))}
                     />
                 </Form.Item>
-                <Form.Item name="region" label="Region" rules={[{required: true}]} tooltip='Выбрать из всплывающего, если нет, то создается новая роль вручную в нетбоксе'>
+                <Form.Item name="region" label="Region - регион" rules={[{required: true}]} tooltip='Выбрать из всплывающего, если нет, то создается новая роль вручную в нетбоксе'>
                     <Select
                         showSearch
                         filterOption={(input, option) =>
@@ -132,13 +132,13 @@ const NetboxCreateSiteForm = ({handleCancel}) => {
                         options={netboxChoices.regions.map(role => ({value: role.id, label: role.name}))}
                     />
                 </Form.Item>
-                <Form.Item name="address" label="Physical address" rules={[{required: true}]} tooltip='Адрес – заполняется полностью'>
+                <Form.Item name="address" label="Physical address - физический адрес" rules={[{required: true}]} tooltip='Адрес – заполняется полностью'>
                     <TextArea/>
                 </Form.Item>
-                <Form.Item name="aes" label="AES Unit ID" rules={[{required: true}]} tooltip='Биллинг -> Тех.Ресурсы -> Узлы -> Общая информация -> ID UNIT'>
+                <Form.Item name="aes" label="AES Unit ID - ID узла в биллинг" rules={[{required: true}]} tooltip='Биллинг -> Тех.Ресурсы -> Узлы -> Общая информация -> ID UNIT'>
                     <Input/>
                 </Form.Item>
-                <Form.Item name="comments" label="Comments" tooltip='Комментарий – для ссылки на задачу, добавления подробности и в дальнейшем ссылки на некстклауд, где будет храниться СоС, файлы и фотграфии'>
+                <Form.Item name="comments" label="Comments - комментарии" tooltip='Комментарий – для ссылки на задачу, добавления подробности и в дальнейшем ссылки на некстклауд, где будет храниться СоС, файлы и фотграфии'>
                     <TextArea/>
                 </Form.Item>
                 <Form.Item {...tailLayout}>
