@@ -11,6 +11,7 @@ import useWindowSize from "./utils/useWindowSize.js";
 import Company from "./pages/company.jsx";
 import {ThemeProvider, useThemeMode} from "antd-style";
 import Settings from "./pages/settings.jsx";
+import Forms from "./pages/forms.jsx";
 
 export default function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -109,6 +110,8 @@ export default function App() {
                     <Route path="/" element={isAuthenticated ? <Home userData={userData}/> : <Navigate to="/auth"/>}/>
                     <Route path="/settings"
                            element={isAuthenticated ? <Settings userData={userData}/> : <Navigate to="/auth"/>}/>
+                    <Route path="/forms"
+                           element={isAuthenticated ? <Forms userData={userData}/> : <Navigate to="/auth"/>}/>
                     <Route path="/service/:serviceId" element={isAuthenticated ?
                         <Service userData={userData} isMobile={isMobile} windowWidth={windowWidth}/> :
                         <Navigate to="/auth"/>}/>

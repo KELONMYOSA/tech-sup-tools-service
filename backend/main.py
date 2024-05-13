@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import exc as sa_exc
 
 from src.database.db import init_db
-from src.routers import auth, company, contact, jira_actions, search, service, service_docs, zabbix
+from src.routers import auth, company, contact, jira_actions, netbox, search, service, service_docs, zabbix
 
 app = FastAPI(
     title="Comfortel Technical Support API",
@@ -38,6 +38,7 @@ app.include_router(company.router)
 app.include_router(service_docs.router)
 app.include_router(jira_actions.router)
 app.include_router(zabbix.router)
+app.include_router(netbox.router)
 
 if __name__ == "__main__":
     host = "0.0.0.0"

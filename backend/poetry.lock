@@ -740,13 +740,13 @@ signedtoken = ["cryptography (>=3.0.0)", "pyjwt (>=2.0.0,<3)"]
 
 [[package]]
 name = "packaging"
-version = "24.0"
+version = "23.2"
 description = "Core utilities for Python packages"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "packaging-24.0-py3-none-any.whl", hash = "sha256:2ddfb553fdf02fb784c234c7ba6ccc288296ceabec964ad2eae3777778130bc5"},
-    {file = "packaging-24.0.tar.gz", hash = "sha256:eb82c5e3e56209074766e6885bb04b8c38a0c015d0a30036ebe7ece34c9989e9"},
+    {file = "packaging-23.2-py3-none-any.whl", hash = "sha256:8c491190033a9af7e1d931d0b5dacc2ef47509b34dd0de67ed209b5203fc88c7"},
+    {file = "packaging-23.2.tar.gz", hash = "sha256:048fb0e9405036518eaaf48a55953c750c11e1a1b68e0dd1a9d62ed0c092cfc5"},
 ]
 
 [[package]]
@@ -988,6 +988,21 @@ files = [
 [package.extras]
 ed25519 = ["PyNaCl (>=1.4.0)"]
 rsa = ["cryptography"]
+
+[[package]]
+name = "pynetbox"
+version = "7.3.3"
+description = "NetBox API client library"
+optional = false
+python-versions = "*"
+files = [
+    {file = "pynetbox-7.3.3-py3-none-any.whl", hash = "sha256:9bc25f83ff126f12d26976e544a2f0f6c7c898c261e6d47f8a4144ab47686d81"},
+    {file = "pynetbox-7.3.3.tar.gz", hash = "sha256:b0bcef4c3a019516d2425ae0ce5509eae7f4f11ad4510c9fe9527d468f22529b"},
+]
+
+[package.dependencies]
+packaging = "<24.0"
+requests = ">=2.20.0,<3.0"
 
 [[package]]
 name = "python-dotenv"
@@ -1409,4 +1424,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "09c0bfde735a1090547bfd041cde88c4790667ce4254171138120b9809273555"
+content-hash = "d3fb0c3da7cacdc330a5b373851e1d9e48fb0cb4054ea4031849fb96a6f257e4"

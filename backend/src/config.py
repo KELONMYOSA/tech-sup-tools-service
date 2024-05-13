@@ -22,5 +22,8 @@ class Settings(BaseSettings):
     JIRA_USER: str
     JIRA_PASSWORD: str
 
+    NETBOX_URL: str
+    NETBOX_TOKEN: str
+
 
 settings = Settings()
