@@ -46,6 +46,7 @@ def ldap_login(username: str, password: str) -> User | None:
             telephoneNumber=attr["telephoneNumber"][0] if "telephoneNumber" in attr else None,
             title=attr["title"][0] if "title" in attr else None,
             uid=attr["uid"][0] if "uid" in attr else None,
+            gidNumber=attr.get("gidNumber", None),
         )
     else:
         conn.unbind()
@@ -66,6 +67,7 @@ def __get_user_by_uid(username: str) -> User | None:
             telephoneNumber=attr["telephoneNumber"][0] if "telephoneNumber" in attr else None,
             title=attr["title"][0] if "title" in attr else None,
             uid=attr["uid"][0] if "uid" in attr else None,
+            gidNumber=attr.get("gidNumber", None),
         )
     else:
         conn.unbind()

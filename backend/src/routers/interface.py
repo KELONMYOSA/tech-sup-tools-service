@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 
 from src.models.user import User
@@ -35,6 +35,9 @@ class CreateInterfaceData(BaseModel):
 
 
 @router.post("/")
-async def new_interface(data: CreateInterfaceData, _: User = Depends(get_current_user)):  # noqa: B008
-    create_new_interface(data.id_service, data.id_unit, data.id_equip, data.id_port, data.port_type)
-    return {"detail": "Success"}
+async def new_interface(data: CreateInterfaceData, user: User = Depends(get_current_user)):  # noqa: B008
+    if user.gidNumber in [10001, 10025]:
+        create_new_interface(data.id_service, data.id_unit, data.id_equip, data.id_port, data.port_type)
+        return {"detail": "Success"}
+    else:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient rights")

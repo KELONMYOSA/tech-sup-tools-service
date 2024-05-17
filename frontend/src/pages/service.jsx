@@ -261,7 +261,8 @@ export default function Service(data) {
             const serviceItems = await ServiceInfo({
                 serviceId: serviceId,
                 pdfWidth: data.windowWidth * 0.6,
-                showIssueCreation: showIssueCreation
+                showIssueCreation: showIssueCreation,
+                userData: data.userData,
             })
             serviceFormData.current = serviceItems[1]
             if (serviceItems[0]) {

@@ -3,7 +3,7 @@ import React, {useEffect, useState} from "react";
 import {PlusOutlined} from "@ant-design/icons";
 import axios from "axios";
 
-const InterfacesTable = ({service}) => {
+const InterfacesTable = ({service, userData}) => {
     const apiUrl = import.meta.env.VITE_API_URL
     const [api, contextHolder] = notification.useNotification();
     const [interfaces, setInterfaces] = useState(null);
@@ -45,9 +45,17 @@ const InterfacesTable = ({service}) => {
                     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
                 options={addressChoices} disabled={!addressChoices}
             />,
-            'equipmentDomain': <Select options={domainChoices} disabled={!domainChoices}/>,
+            'equipmentDomain': <Select
+                showSearch
+                filterOption={(input, option) =>
+                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+                options={domainChoices} disabled={!domainChoices}/>,
             'portHost': <p>{currIP}</p>,
-            'iName': <Select options={portChoices} disabled={!portChoices}/>,
+            'iName': <Select
+                showSearch
+                filterOption={(input, option) =>
+                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+                options={portChoices} disabled={!portChoices}/>,
         }
         return (
             <td {...restProps}>
@@ -238,9 +246,11 @@ const InterfacesTable = ({service}) => {
                 }
             ))
         )
-        initInterfaces.push({
-            key: 'addButton'
-        })
+        if ([10001, 10025].indexOf(userData.gidNumber) !== -1) {
+            initInterfaces.push({
+                key: 'addButton'
+            })
+        }
         setInterfaces(initInterfaces)
     }, []);
 
@@ -248,91 +258,128 @@ const InterfacesTable = ({service}) => {
         return null
     }
 
-    return (
-        <Card title='Интерфейсы' size='small'>
-            {contextHolder}
-            <Form form={form} component={false} onFieldsChange={onFieldsChange}>
+    if ([10001, 10025].indexOf(userData.gidNumber) === -1) {
+        return (
+            <Card title='Интерфейсы' size='small'>
                 <Table
                     pagination={false}
                     size='small'
                     scroll={{
                         x: 500
                     }}
-                    summary={() => {
-                        return (
-                            isAddingNew ?
-                                <Table.Summary fixed>
-                                    <Table.Summary.Row>
-                                        <Table.Summary.Cell colSpan={5} index={0}>
-                                            <>
-                                                <Button size='small' style={{marginRight: 8}} onClick={toggleAdd}>
-                                                    Отмена
-                                                </Button>
-                                                <Button type='primary' size='small' onClick={saveInterface}>
-                                                    Сохранить
-                                                </Button>
-                                            </>
-                                        </Table.Summary.Cell>
-                                    </Table.Summary.Row>
-                                </Table.Summary>
-                                :
-                                null
-                        )
-                    }}
                     dataSource={interfaces}
-                    components={{
-                        body: {
-                            cell: EditableCell,
-                        },
-                    }}
                     columns={[
                         {
                             title: 'Тип',
                             dataIndex: 'portType',
-                            onCell: (record, _) => ({
-                                colSpan: record.key === 'addButton' ? 5 : 1,
-                                editing: isAddingNew && record.key === rowsCount - 1,
-                                dataIndex: 'portType',
-                            }),
-                            render: (content, record) => {
-                                if (record.key !== 'addButton') {
-                                    return content
-                                }
-                                return isAddingNew ? (
-                                    content
-                                ) : (
-                                    <Button size={'small'} type={'text'} style={{width: '100%'}}
-                                            onClick={() => toggleAdd(record)}>
-                                        <PlusOutlined/>
-                                    </Button>
-                                )
-                            },
                         },
                         {
                             title: 'Адрес узла',
                             dataIndex: 'unitAddress',
-                            onCell: (record, _) => sharedOnCell(record, 'unitAddress'),
                         },
                         {
                             title: 'Оборудование',
                             dataIndex: 'equipmentDomain',
-                            onCell: (record, _) => sharedOnCell(record, 'equipmentDomain'),
                         },
                         {
                             title: 'IP',
                             dataIndex: 'portHost',
-                            onCell: (record, _) => sharedOnCell(record, 'portHost'),
                         },
                         {
                             title: 'Интерфейс',
                             dataIndex: 'iName',
-                            onCell: (record, _) => sharedOnCell(record, 'iName'),
                         },
                     ]}
                 />
-            </Form>
-        </Card>
-    );
+            </Card>
+        )
+    } else {
+        return (
+            <Card title='Интерфейсы' size='small'>
+                {contextHolder}
+                <Form form={form} component={false} onFieldsChange={onFieldsChange}>
+                    <Table
+                        pagination={false}
+                        size='small'
+                        scroll={{
+                            x: 500
+                        }}
+                        summary={() => {
+                            return (
+                                isAddingNew ?
+                                    <Table.Summary fixed>
+                                        <Table.Summary.Row>
+                                            <Table.Summary.Cell colSpan={5} index={0}>
+                                                <>
+                                                    <Button size='small' style={{marginRight: 8}} onClick={toggleAdd}>
+                                                        Отмена
+                                                    </Button>
+                                                    <Button type='primary' size='small' onClick={saveInterface}>
+                                                        Сохранить
+                                                    </Button>
+                                                </>
+                                            </Table.Summary.Cell>
+                                        </Table.Summary.Row>
+                                    </Table.Summary>
+                                    :
+                                    null
+                            )
+                        }}
+                        dataSource={interfaces}
+                        components={{
+                            body: {
+                                cell: EditableCell,
+                            },
+                        }}
+                        columns={[
+                            {
+                                title: 'Тип',
+                                dataIndex: 'portType',
+                                onCell: (record, _) => ({
+                                    colSpan: record.key === 'addButton' ? 5 : 1,
+                                    editing: isAddingNew && record.key === rowsCount - 1,
+                                    dataIndex: 'portType',
+                                }),
+                                render: (content, record) => {
+                                    if (record.key !== 'addButton') {
+                                        return content
+                                    }
+                                    return isAddingNew ? (
+                                        content
+                                    ) : (
+                                        <Button size={'small'} type={'text'} style={{width: '100%'}}
+                                                onClick={() => toggleAdd(record)}>
+                                            <PlusOutlined/>
+                                        </Button>
+                                    )
+                                },
+                            },
+                            {
+                                title: 'Адрес узла',
+                                dataIndex: 'unitAddress',
+                                onCell: (record, _) => sharedOnCell(record, 'unitAddress'),
+                            },
+                            {
+                                title: 'Оборудование',
+                                dataIndex: 'equipmentDomain',
+                                onCell: (record, _) => sharedOnCell(record, 'equipmentDomain'),
+                            },
+                            {
+                                title: 'IP',
+                                dataIndex: 'portHost',
+                                onCell: (record, _) => sharedOnCell(record, 'portHost'),
+                            },
+                            {
+                                title: 'Интерфейс',
+                                dataIndex: 'iName',
+                                onCell: (record, _) => sharedOnCell(record, 'iName'),
+                            },
+                        ]}
+                    />
+                </Form>
+            </Card>
+        );
+    }
 };
 
 export default InterfacesTable;

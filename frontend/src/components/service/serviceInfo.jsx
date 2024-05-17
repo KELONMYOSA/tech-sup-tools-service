@@ -581,7 +581,7 @@ export default async function ServiceInfo(data) {
                                 },
                             ]}
                         />
-                        <InterfacesTable service={service}/>
+                        <InterfacesTable service={service} userData={data.userData}/>
                         {ipList}
                         {telData}
                         {serviceDocs}

@@ -8,3 +8,4 @@ class User(BaseModel):
     telephoneNumber: str | None
     title: str | None
     uid: str | None
+    gidNumber: int | None
