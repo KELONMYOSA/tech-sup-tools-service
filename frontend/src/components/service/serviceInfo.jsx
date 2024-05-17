@@ -8,6 +8,7 @@ import CopyToClipboardButton from "../../utils/components.jsx";
 import {CopyOutlined} from "@ant-design/icons";
 import CommentCard from "./commentCard.jsx";
 import ServiceLinksCard from "./serviceLinksCard.jsx";
+import InterfacesTable from "./interfacesTable.jsx";
 
 export default async function ServiceInfo(data) {
     const apiUrl = import.meta.env.VITE_API_URL
@@ -257,54 +258,6 @@ export default async function ServiceInfo(data) {
                         {
                             title: 'Статус',
                             dataIndex: 'status',
-                        },
-                    ]}
-                />
-            </Card>
-        )
-    }
-
-    let interfacesTable
-    if (service.interfaces.length > 0) {
-        interfacesTable = (
-            <Card title='Интерфейсы' size='small'>
-                <Table
-                    pagination={false}
-                    size='small'
-                    scroll={{
-                        x: 500
-                    }}
-                    dataSource={
-                        service.interfaces.map((i, n) => (
-                            {
-                                key: n,
-                                portType: i.type,
-                                unitAddress: i.uAddress ? `${i.uAddress.city}${!['', ' ', null].includes(i.uAddress.street) ? `, ${i.uAddress.street}` : ''}${!['', ' ', null].includes(i.uAddress.house) ? `, ${i.uAddress.house}` : ''}${!['', ' ', null].includes(i.uAddress.building) ? `, ${i.uAddress.building}` : ''}${!['', ' ', null].includes(i.uAddress.letter) ? ` ${i.uAddress.letter}` : ''}${!['', ' ', null].includes(i.uAddress.flat) ? `, ${i.uAddress.flat}` : ''}` : null,
-                                equipmentDomain: i.eDomain,
-                                portHost: <a target='_blank' href={`https://zbxweb.comfortel.pro/zabbix.php?action=search&search=${i.host}`}>{i.host}</a>,
-                                iName: <a target='_blank' href={`${apiUrl}/zabbix/traffic?host=${i.eDomain}&interface=${i.name}`}>{i.name}</a>,
-                            }
-                        ))}
-                    columns={[
-                        {
-                            title: 'Тип',
-                            dataIndex: 'portType',
-                        },
-                        {
-                            title: 'Адрес узла',
-                            dataIndex: 'unitAddress',
-                        },
-                        {
-                            title: 'Оборудование',
-                            dataIndex: 'equipmentDomain',
-                        },
-                        {
-                            title: 'IP',
-                            dataIndex: 'portHost',
-                        },
-                        {
-                            title: 'Интерфейс',
-                            dataIndex: 'iName',
                         },
                     ]}
                 />
@@ -628,7 +581,7 @@ export default async function ServiceInfo(data) {
                                 },
                             ]}
                         />
-                        {interfacesTable}
+                        <InterfacesTable service={service}/>
                         {ipList}
                         {telData}
                         {serviceDocs}

@@ -41,6 +41,96 @@ export default function SearchBar(data) {
                 },
             },
             {
+                codes: ['KeyS'],
+                isActive: (activeElement) => ['input', 'textarea', 'select'].indexOf(activeElement.tagName.toLowerCase()) === -1,
+                action: (activeElement) => {
+                    setSearchText(null)
+                    setIsOpen(false)
+                    inputRef.current.focus();
+                    searchModeSelectorRef.current.setSelectedCategories(['serviceId'])
+                },
+            },
+            {
+                codes: ['KeyC'],
+                isActive: (activeElement) => ['input', 'textarea', 'select'].indexOf(activeElement.tagName.toLowerCase()) === -1,
+                action: (activeElement) => {
+                    setSearchText(null)
+                    setIsOpen(false)
+                    inputRef.current.focus();
+                    searchModeSelectorRef.current.setSelectedCategories(['companyId'])
+                },
+            },
+            {
+                codes: ['KeyO'],
+                isActive: (activeElement) => ['input', 'textarea', 'select'].indexOf(activeElement.tagName.toLowerCase()) === -1,
+                action: (activeElement) => {
+                    setSearchText(null)
+                    setIsOpen(false)
+                    inputRef.current.focus();
+                    searchModeSelectorRef.current.setSelectedCategories(['equipment'])
+                },
+            },
+            {
+                codes: ['KeyN'],
+                isActive: (activeElement) => ['input', 'textarea', 'select'].indexOf(activeElement.tagName.toLowerCase()) === -1,
+                action: (activeElement) => {
+                    setSearchText(null)
+                    setIsOpen(false)
+                    inputRef.current.focus();
+                    searchModeSelectorRef.current.setSelectedCategories(['companyName'])
+                },
+            },
+            {
+                codes: ['KeyA'],
+                isActive: (activeElement) => ['input', 'textarea', 'select'].indexOf(activeElement.tagName.toLowerCase()) === -1,
+                action: (activeElement) => {
+                    setSearchText(null)
+                    setIsOpen(false)
+                    inputRef.current.focus();
+                    searchModeSelectorRef.current.setSelectedCategories(['address'])
+                },
+            },
+            {
+                codes: ['KeyP'],
+                isActive: (activeElement) => ['input', 'textarea', 'select'].indexOf(activeElement.tagName.toLowerCase()) === -1,
+                action: (activeElement) => {
+                    setSearchText(null)
+                    setIsOpen(false)
+                    inputRef.current.focus();
+                    searchModeSelectorRef.current.setSelectedCategories(['phone'])
+                },
+            },
+            {
+                codes: ['KeyK'],
+                isActive: (activeElement) => ['input', 'textarea', 'select'].indexOf(activeElement.tagName.toLowerCase()) === -1,
+                action: (activeElement) => {
+                    setSearchText(null)
+                    setIsOpen(false)
+                    inputRef.current.focus();
+                    searchModeSelectorRef.current.setSelectedCategories(['contacts'])
+                },
+            },
+            {
+                codes: ['KeyD'],
+                isActive: (activeElement) => ['input', 'textarea', 'select'].indexOf(activeElement.tagName.toLowerCase()) === -1,
+                action: (activeElement) => {
+                    setSearchText(null)
+                    setIsOpen(false)
+                    inputRef.current.focus();
+                    searchModeSelectorRef.current.setSelectedCategories(['doc'])
+                },
+            },
+            {
+                codes: ['KeyI'],
+                isActive: (activeElement) => ['input', 'textarea', 'select'].indexOf(activeElement.tagName.toLowerCase()) === -1,
+                action: (activeElement) => {
+                    setSearchText(null)
+                    setIsOpen(false)
+                    inputRef.current.focus();
+                    searchModeSelectorRef.current.setSelectedCategories(['ip'])
+                },
+            },
+            {
                 codes: ['Tab'],
                 isActive: (activeElement) => ['input', 'textarea', 'select'].indexOf(activeElement.tagName.toLowerCase()) === -1,
                 action: (activeElement) => {
