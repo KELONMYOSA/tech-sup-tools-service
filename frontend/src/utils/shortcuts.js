@@ -1,6 +1,11 @@
 export const setupShortcuts = (shortcuts) => {
     const handleKeyDown = (event) => {
         const activeElement = document.activeElement;
+
+        if (event.ctrlKey || event.altKey || event.metaKey) {
+            return;
+        }
+
         const fullCode = `${event.shiftKey ? 'Shift+' : ''}${event.code}`;
         const shortcut = shortcuts.find(s => s.codes.includes(fullCode) && (s.isActive ? s.isActive(activeElement) : true));
 
