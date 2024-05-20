@@ -11,6 +11,13 @@ RUN apt-get update && apt-get install -y libaio1 wget unzip && apt-get install -
   && echo /opt/oracle/instantclient* > /etc/ld.so.conf.d/oracle-instantclient.conf \
   && ldconfig
 
+WORKDIR /opt/drawio-desktop
+
+RUN wget https://github.com/jgraph/drawio-desktop/releases/download/v24.4.0/drawio-amd64-24.4.0.deb \
+  && apt-get install -y libgtk-3-0 libatspi2.0-0 libsecret-1-0 libasound2 libgconf-2-4 libnotify4 libnss3 libxss1 libxtst6 xdg-utils xvfb \
+  && apt-get install -y /opt/drawio-desktop/drawio-amd64-24.4.0.deb \
+  && rm /opt/drawio-desktop/drawio-amd64-24.4.0.deb
+
 FROM builder as builder_wheels
 
 RUN pip install poetry
@@ -30,4 +37,6 @@ RUN pip install --no-cache /wheels/*
 COPY backend /app/backend
 COPY .env /app/.env
 
-ENTRYPOINT ["python", "main.py"]
+ENV DISPLAY ":99"
+
+ENTRYPOINT ["sh", "-c", "Xvfb :99 -screen 0 1024x768x16 & python main.py"]

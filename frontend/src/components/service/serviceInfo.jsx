@@ -4,11 +4,12 @@ import axios from "axios";
 import {Document, Page, pdfjs} from "react-pdf";
 import 'react-pdf/dist/Page/TextLayer.css'
 import 'react-pdf/dist/Page/AnnotationLayer.css';
-import CopyToClipboardButton from "../../utils/components.jsx";
+import CopyToClipboardButton from "../../utils/copyToClipboardButton.jsx";
 import {CopyOutlined} from "@ant-design/icons";
 import CommentCard from "./commentCard.jsx";
 import ServiceLinksCard from "./serviceLinksCard.jsx";
 import InterfacesTable from "./interfacesTable.jsx";
+import SvgRenderer from "../../utils/svgRenderer.jsx";
 
 export default async function ServiceInfo(data) {
     const apiUrl = import.meta.env.VITE_API_URL
@@ -406,10 +407,16 @@ export default async function ServiceInfo(data) {
         import.meta.url,
     ).toString();
 
+    const serviceDocsDrawio = service.serviceDocs.links.cloud ?
+        <Card title='Схема drawio' size='small'>
+            <SvgRenderer serviceDocUrl={service.serviceDocs.links.cloud}/>
+        </Card>
+        : null
+
     let serviceDocs
     if (service.serviceDocs.files.length > 0) {
         serviceDocs = (
-            <Card title='Схема' size='small'>
+            <Card title='Схема PDF' size='small'>
                 {
                     service.serviceDocs.files.map((doc, i) => {
                         if (doc.indexOf(".pdf", doc.length - 4) !== -1) {
@@ -584,6 +591,7 @@ export default async function ServiceInfo(data) {
                         <InterfacesTable service={service} userData={data.userData}/>
                         {ipList}
                         {telData}
+                        {serviceDocsDrawio}
                         {serviceDocs}
                     </Card>
                 </Col>

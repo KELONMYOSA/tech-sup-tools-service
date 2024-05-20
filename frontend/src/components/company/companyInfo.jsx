@@ -2,7 +2,7 @@ import axios from "axios";
 import {Card, Col, Collapse, Descriptions, Row, Table, Typography} from "antd";
 import React from "react";
 import CompanyServicesTable from "./companyServicesTable.jsx";
-import CopyToClipboardButton from "../../utils/components.jsx";
+import CopyToClipboardButton from "../../utils/copyToClipboardButton.jsx";
 
 export default async function CompanyInfo(data) {
     const apiUrl = import.meta.env.VITE_API_URL
