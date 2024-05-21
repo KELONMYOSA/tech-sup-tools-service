@@ -1,4 +1,4 @@
-from src.database.models.aes import AllAddress, EquipmentIntService, Port, Unit, UnitEquipment
+from src.database.models.aes import AllAddress, EquipmentIntService, Port, Unit, UnitEquipment, Router
 
 
 class InterfaceModel(EquipmentIntService):
@@ -11,15 +11,8 @@ class InterfaceModel(EquipmentIntService):
     def get_all_equip_by_unit_id(self, unit_id):
         return self.db.query(UnitEquipment).filter(UnitEquipment.id_unit == unit_id).all()
 
-    def get_all_ports_by_unit_and_equip(self, unit_id, equip_id):
-        subquery = (
-            self.db.query(Port.router_id)
-            .join(EquipmentIntService, EquipmentIntService.id_port == Port.id)
-            .filter(EquipmentIntService.unit_id == unit_id, EquipmentIntService.equip_id == equip_id)
-            .distinct()
-            .subquery()
-        )
-        ports = self.db.query(Port).filter(Port.router_id.in_(subquery)).all()
+    def get_all_ports_by_ip(self, ip):
+        ports = self.db.query(Port).join(Router, Router.id == Port.router_id).filter(Router.host == ip).all()
         return ports
 
     def set_new_interface(self, id_service, id_unit, id_equip, id_port, port_type):

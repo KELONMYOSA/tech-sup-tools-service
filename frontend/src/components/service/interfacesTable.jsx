@@ -109,10 +109,11 @@ const InterfacesTable = ({service, userData}) => {
         if (changedFields[0].validated && changedFields[0].name[0] === 'equipmentDomain') {
             (async () => {
                 try {
-                    const response = await axios.get(`${apiUrl}/interface/choices/port?unit_id=${allFields[1].value}&equip_id=${changedFields[0].value}`)
+                    const ipVal = domain2Ip[changedFields[0].value]
+                    const response = await axios.get(`${apiUrl}/interface/choices/port?ip=${ipVal}`)
                     setPortChoices(response.data.map(e => ({label: e.name, value: e.id})))
-                    setCurrIP(domain2Ip[changedFields[0].value])
-                    form.setFieldValue('portHost', domain2Ip[changedFields[0].value])
+                    setCurrIP(ipVal)
+                    form.setFieldValue('portHost', ipVal)
                     form.setFieldValue('iName', null)
                 } catch (error) {
                     console.error(error)

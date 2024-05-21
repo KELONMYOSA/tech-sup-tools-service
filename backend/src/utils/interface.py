@@ -42,10 +42,10 @@ def get_equip_choices(unit_id):
         return equip
 
 
-def get_port_choices(unit_id, equip_id):
+def get_port_choices(ip):
     with oracle_db() as db:
         inf = InterfaceModel(db)
-        port_rows = inf.get_all_ports_by_unit_and_equip(unit_id, equip_id)
+        port_rows = inf.get_all_ports_by_ip(ip)
         ports = []
         for row in port_rows:
             ports.append({"id": row.id, "name": f"{row.ifname}"})

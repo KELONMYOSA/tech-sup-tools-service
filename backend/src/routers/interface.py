@@ -22,8 +22,8 @@ async def equipment_choices(unit_id: int, _: User = Depends(get_current_user)): 
 
 
 @router.get("/choices/port")
-async def port_choices(unit_id: int, equip_id: int, _: User = Depends(get_current_user)):  # noqa: B008
-    return get_port_choices(unit_id, equip_id)
+async def port_choices(ip: str, _: User = Depends(get_current_user)):  # noqa: B008
+    return get_port_choices(ip)
 
 
 class CreateInterfaceData(BaseModel):
