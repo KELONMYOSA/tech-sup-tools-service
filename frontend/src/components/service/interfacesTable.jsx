@@ -254,11 +254,11 @@ const InterfacesTable = ({service, userData}) => {
         setInterfaces(initInterfaces)
     }, []);
 
-    if (service.interfaces.length === 0) {
-        return null
-    }
-
     if ([10001, 10025].indexOf(userData.gidNumber) === -1) {
+        if (service.interfaces.length === 0) {
+            return null
+        }
+
         return (
             <Card title='Интерфейсы' size='small'>
                 <Table
@@ -294,6 +294,10 @@ const InterfacesTable = ({service, userData}) => {
             </Card>
         )
     } else {
+        if (service.interfaces.length === 0 && [297, 303].indexOf(service.typeId) === -1) {
+            return null
+        }
+
         return (
             <Card title='Интерфейсы' size='small'>
                 {contextHolder}
