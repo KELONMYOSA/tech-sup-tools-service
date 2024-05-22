@@ -1,11 +1,12 @@
-import {Form, Button, Card, Table, Select, notification} from "antd";
-import React, {useEffect, useState} from "react";
-import {PlusOutlined} from "@ant-design/icons";
+import {Form, Button, Card, Table, Select, notification, Popconfirm} from "antd";
+import React, {useEffect, useRef, useState} from "react";
+import {DeleteOutlined, PlusOutlined} from "@ant-design/icons";
 import axios from "axios";
 
 const InterfacesTable = ({service, userData}) => {
     const apiUrl = import.meta.env.VITE_API_URL
     const [api, contextHolder] = notification.useNotification();
+    const interfacesRef = useRef(null);
     const [interfaces, setInterfaces] = useState(null);
     const [rowsCount, setRowsCount] = useState(service.interfaces.length);
     const [isAddingNew, setIsAddingNew] = useState(false);
@@ -56,6 +57,7 @@ const InterfacesTable = ({service, userData}) => {
                 filterOption={(input, option) =>
                     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
                 options={portChoices} disabled={!portChoices}/>,
+            'action': null,
         }
         return (
             <td {...restProps}>
@@ -126,8 +128,9 @@ const InterfacesTable = ({service, userData}) => {
     const toggleAdd = (record) => {
         if (isAddingNew) {
             setIsAddingNew(!isAddingNew);
-            setInterfaces(interfaces.splice(-1))
-            setInterfaces([...interfaces, {key: 'addButton'}])
+            interfacesRef.current = interfacesRef.current.splice(-1)
+            interfacesRef.current = [...interfacesRef.current, {key: 'addButton'}]
+            setInterfaces(interfacesRef.current)
             setRowsCount(rowsCount - 1)
         } else {
             if (addressChoices === null) {
@@ -149,6 +152,7 @@ const InterfacesTable = ({service, userData}) => {
                 equipmentDomain: '',
                 portHost: '',
                 iName: '',
+                action: ' ',
                 ...record,
             });
         }
@@ -172,7 +176,7 @@ const InterfacesTable = ({service, userData}) => {
                 );
 
                 setIsAddingNew(!isAddingNew);
-                const newInterfaces = interfaces
+                const newInterfaces = interfacesRef.current
                 const newInf = {}
                 Object.entries(formResults).forEach(([k, v]) => {
                     if (k === 'unitAddress') {
@@ -203,12 +207,25 @@ const InterfacesTable = ({service, userData}) => {
                     } else if (k === 'portHost') {
                         newInf['portHost'] = <a target='_blank'
                                                 href={`https://zbxweb.comfortel.pro/zabbix.php?action=search&search=${v}`}>{v}</a>
+                    } else if (k === 'action') {
+                        newInf['action'] = (
+                            <Popconfirm
+                                title="Удалить данный интерфейс?"
+                                okText="Удалить"
+                                cancelText="Отмена"
+                                onConfirm={() => removeInterface(newInterfaces[newInterfaces.length - 1].key)}
+                            >
+                                <Button size='small' type={'text'}>
+                                    <DeleteOutlined/>
+                                </Button>
+                            </Popconfirm>)
                     } else {
                         newInf[k] = v
                     }
                 })
                 newInterfaces[newInterfaces.length - 1] = {...newInterfaces[newInterfaces.length - 1], ...newInf}
-                setInterfaces([...newInterfaces, {key: 'addButton'}])
+                interfacesRef.current = [...newInterfaces, {key: 'addButton'}]
+                setInterfaces(interfacesRef.current)
                 showSuccess("Интерфейс создан!")
             } catch (error) {
                 showAlert("Ошибка создания интерфейса!")
@@ -217,6 +234,28 @@ const InterfacesTable = ({service, userData}) => {
             console.log('Validate Failed:', errInfo);
         }
 
+    }
+
+    const removeInterface = async (key) => {
+        const delInf = interfacesRef.current.filter((interfaceObj) => interfaceObj.key === key)[0]
+        const body = {
+            id_service: service.id,
+            equip: delInf.equipmentDomain,
+            port: delInf.iName.props.children,
+            port_type: delInf.portType,
+        }
+        try {
+            const response = await axios.delete(
+                `${apiUrl}/interface/`,
+                {data: body}
+            );
+            const updatedInterfaces = interfacesRef.current.filter((interfaceObj) => interfaceObj.key !== key)
+            interfacesRef.current = updatedInterfaces
+            setInterfaces(updatedInterfaces)
+            showSuccess("Интерфейс удален!")
+        } catch (error) {
+            showAlert("Ошибка удаления интерфейса!")
+        }
     }
 
     const sharedOnCell = (record, dataIndex) => {
@@ -244,6 +283,18 @@ const InterfacesTable = ({service, userData}) => {
                                  href={`https://zbxweb.comfortel.pro/zabbix.php?action=search&search=${i.host}`}>{i.host}</a>,
                     iName: <a target='_blank'
                               href={`${apiUrl}/zabbix/traffic?host=${i.eDomain}&interface=${i.name}`}>{i.name}</a>,
+                    action: (
+                        <Popconfirm
+                            title="Удалить данный интерфейс?"
+                            okText="Удалить"
+                            cancelText="Отмена"
+                            onConfirm={() => removeInterface(n)}
+                        >
+                            <Button size='small' type={'text'}>
+                                <DeleteOutlined/>
+                            </Button>
+                        </Popconfirm>
+                    )
                 }
             ))
         )
@@ -252,7 +303,8 @@ const InterfacesTable = ({service, userData}) => {
                 key: 'addButton'
             })
         }
-        setInterfaces(initInterfaces)
+        interfacesRef.current = initInterfaces
+        setInterfaces(interfacesRef.current)
     }, []);
 
     if ([10001, 10025].indexOf(userData.gidNumber) === -1) {
@@ -341,7 +393,7 @@ const InterfacesTable = ({service, userData}) => {
                                 title: 'Тип',
                                 dataIndex: 'portType',
                                 onCell: (record, _) => ({
-                                    colSpan: record.key === 'addButton' ? 5 : 1,
+                                    colSpan: record.key === 'addButton' ? 6 : 1,
                                     editing: isAddingNew && record.key === rowsCount - 1,
                                     dataIndex: 'portType',
                                 }),
@@ -378,6 +430,10 @@ const InterfacesTable = ({service, userData}) => {
                                 title: 'Интерфейс',
                                 dataIndex: 'iName',
                                 onCell: (record, _) => sharedOnCell(record, 'iName'),
+                            },
+                            {
+                                dataIndex: 'action',
+                                onCell: (record, _) => sharedOnCell(record, 'action'),
                             },
                         ]}
                     />

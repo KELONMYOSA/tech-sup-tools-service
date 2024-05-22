@@ -57,3 +57,8 @@ def get_port_choices(ip):
 def create_new_interface(id_service, id_unit, id_equip, id_port, port_type):
     with oracle_db() as db:
         InterfaceModel(db).set_new_interface(id_service, id_unit, id_equip, id_port, port_type)
+
+
+def delete_interface(id_service, equip, port, port_type):
+    with oracle_db() as db:
+        return InterfaceModel(db).delete_interface(id_service, equip, port, port_type)

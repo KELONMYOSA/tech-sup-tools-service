@@ -26,3 +26,23 @@ class InterfaceModel(EquipmentIntService):
         )
         self.db.add(inf)
         self.db.commit()
+
+    def delete_interface(self, id_service, equip, port, port_type):
+        record = (
+            self.db.query(EquipmentIntService)
+            .join(Port, Port.id == EquipmentIntService.id_port)
+            .join(UnitEquipment, UnitEquipment.id_equipment == EquipmentIntService.equip_id)
+            .filter(
+                EquipmentIntService.id_service == id_service,
+                EquipmentIntService.port_type == port_type,
+                Port.ifname == port,
+                UnitEquipment.domain == equip,
+            )
+            .first()
+        )
+        if record:
+            self.db.delete(record)
+            self.db.commit()
+            return True
+        else:
+            return False
