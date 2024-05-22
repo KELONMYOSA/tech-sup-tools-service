@@ -1,4 +1,4 @@
-from src.database.models.aes import AllAddress, EquipmentIntService, Port, Unit, UnitEquipment, Router
+from src.database.models.aes import AllAddress, EquipmentIntService, Port, Router, Unit, UnitEquipment
 
 
 class InterfaceModel(EquipmentIntService):
@@ -6,7 +6,12 @@ class InterfaceModel(EquipmentIntService):
         self.db = db
 
     def get_all_unit_addresses(self):
-        return self.db.query(Unit, AllAddress).join(AllAddress, AllAddress.id == Unit.id_address).all()
+        return (
+            self.db.query(Unit, AllAddress)
+            .join(AllAddress, AllAddress.id == Unit.id_address)
+            .filter(Unit.is_delete == "N")
+            .all()
+        )
 
     def get_all_equip_by_unit_id(self, unit_id):
         return self.db.query(UnitEquipment).filter(UnitEquipment.id_unit == unit_id).all()

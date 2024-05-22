@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Column, ForeignKey, Table, bindparam, outparam
+from sqlalchemy import Column, ForeignKey, Table, and_, bindparam, outparam
 from sqlalchemy.dialects import oracle
 from sqlalchemy.orm import backref, column_property, relationship
 from sqlalchemy.sql import func, text
@@ -34,6 +34,7 @@ service_pack_table = Table(
     OracleBase.metadata,
     Column("id_pack", oracle.NUMBER(), ForeignKey("SERVICE.id")),
     Column("id_service", oracle.NUMBER(), ForeignKey("SERVICE.id")),
+    Column("is_delete", oracle.VARCHAR2(1)),
 )
 
 
@@ -360,7 +361,7 @@ class Service(OracleBase):
     pack_services = relationship(
         "Service",
         secondary=service_pack_table,
-        primaryjoin=id == service_pack_table.c.id_pack,
+        primaryjoin=and_(id == service_pack_table.c.id_pack, service_pack_table.c.is_delete == "N"),
         secondaryjoin=id == service_pack_table.c.id_service,
         viewonly=True,
     )
