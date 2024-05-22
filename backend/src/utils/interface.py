@@ -18,7 +18,8 @@ def get_address_choices():
                     + ("" if row.AllAddress.house in [None, "", " "] else f", {row.AllAddress.house}")
                     + ("" if row.AllAddress.building in [None, "", " "] else f", {row.AllAddress.building}")
                     + ("" if row.AllAddress.letter in [None, "", " "] else f", {row.AllAddress.letter}")
-                    + ("" if row.AllAddress.flat in [None, "", " "] else f", {row.AllAddress.flat}"),
+                    + ("" if row.AllAddress.flat in [None, "", " "] else f", {row.AllAddress.flat}")
+                    + ("" if row.Unit.name is None else f" ({row.Unit.name})"),
                 }
             )
         addresses.sort(key=lambda a: a["address"])

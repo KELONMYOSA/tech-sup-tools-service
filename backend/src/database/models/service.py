@@ -2,7 +2,7 @@ import ipaddress
 
 from sqlalchemy import func
 
-from src.database.models.aes import NetworkCompany, Service, ServiceDocument
+from src.database.models.aes import NetworkCompany, Service, ServiceDocument, ServiceVlan
 
 
 class ServiceModel(Service):
@@ -260,3 +260,13 @@ class ServiceModel(Service):
             "cName": self.company.name,
             "brandName": self.company.brand_name,
         }
+
+
+class ServiceVlanModel(ServiceVlan):
+    def __init__(self, db):
+        self.db = db
+
+    def set_new_service_vlan(self, service_id, vlan_id):
+        vlan = ServiceVlan(vlan=vlan_id, id_service=service_id)
+        self.db.add(vlan)
+        self.db.commit()

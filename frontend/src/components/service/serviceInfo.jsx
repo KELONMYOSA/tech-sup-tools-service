@@ -10,6 +10,7 @@ import CommentCard from "./commentCard.jsx";
 import ServiceLinksCard from "./serviceLinksCard.jsx";
 import InterfacesTable from "./interfacesTable.jsx";
 import SvgRenderer from "../../utils/svgRenderer.jsx";
+import TechInfoTable from "./techInfoTable.jsx";
 
 export default async function ServiceInfo(data) {
     const apiUrl = import.meta.env.VITE_API_URL
@@ -548,46 +549,7 @@ export default async function ServiceInfo(data) {
                         {rentedFor}
                         {pack}
                         {packData}
-                        <Descriptions
-                            size='small'
-                            bordered
-                            style={{marginTop: 10, marginBottom: 10}}
-                            items={[
-                                {
-                                    label: 'Скорость',
-                                    children: service.speed === 0 ? '- ? -' : service.speed,
-                                },
-                                {
-                                    label: 'Vlan(s)',
-                                    children: (
-                                        <ul style={{listStyle: "none"}}>
-                                            {service.vlans.map((vlan, i) => (
-                                                <li key={i}>
-                                                    <a target='_blank'
-                                                       href={`http://10.3.1.8:13080/viz/${vlan.vlan}`}>{vlan.vlan} </a>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    ),
-                                },
-                                {
-                                    label: 'Сервисные документы',
-                                    span: {xs: 2},
-                                    children: (
-                                        <ul style={{listStyle: "none"}}>
-                                            {service.serviceDocs.files.map((doc, i) => (
-                                                <li key={i}>
-                                                    <a target='_blank'
-                                                       href={`https://boss.comfortel.pro/service_docs/${serviceId}/${doc}`}>
-                                                        {doc}
-                                                    </a>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    ),
-                                },
-                            ]}
-                        />
+                        <TechInfoTable service={service} userData={data.userData}/>
                         <InterfacesTable service={service} userData={data.userData}/>
                         {ipList}
                         {telData}

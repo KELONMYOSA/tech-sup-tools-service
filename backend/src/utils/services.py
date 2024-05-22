@@ -1,6 +1,6 @@
 from src.database.db import oracle_db
 from src.database.models.company import CompanyModel
-from src.database.models.service import ServiceModel
+from src.database.models.service import ServiceModel, ServiceVlanModel
 
 
 def get_service_by_id(service_id: int) -> tuple[bool, str] | tuple[bool, dict]:
@@ -55,3 +55,8 @@ def set_service_desc_by_id(service_id: int, support_desc: str):
 def set_service_doc_link_by_id(service_id: int, doc_type_id: int, link: str):
     with oracle_db() as db:
         return ServiceModel(db).update_document_link(service_id, doc_type_id, link)
+
+
+def set_new_service_vlan(service_id: int, vlan_id: int):
+    with oracle_db() as db:
+        ServiceVlanModel(db).set_new_service_vlan(service_id, vlan_id)

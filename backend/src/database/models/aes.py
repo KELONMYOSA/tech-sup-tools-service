@@ -708,7 +708,7 @@ class ServiceVlan(OracleBase):
     id = Column("id", oracle.NUMBER(), primary_key=True)
     vlan = Column(oracle.NUMBER())
     id_service = Column(oracle.NUMBER(), ForeignKey("SERVICE.id"))
-    ddate = Column(oracle.DATE())
+    ddate = Column(oracle.DATE(), server_default=func.now())
 
     service = relationship("Service", foreign_keys=[id_service])
 

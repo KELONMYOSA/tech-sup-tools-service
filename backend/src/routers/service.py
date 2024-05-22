@@ -6,6 +6,7 @@ from src.utils.auth import get_current_user
 from src.utils.services import (
     get_service_by_id,
     get_services_by_company_id,
+    set_new_service_vlan,
     set_service_desc_by_id,
     set_service_doc_link_by_id,
 )
@@ -70,3 +71,12 @@ async def update_service_doc_link_by_id(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Service not found or incorrect document type id"
         )
     return {"detail": "Success", "document_id": result}
+
+
+@router.post("/vlan")
+async def add_service_vlan(service_id: int, vlan_id: int, user: User = Depends(get_current_user)):  # noqa: B008
+    if user.gidNumber in [10001, 10025]:
+        set_new_service_vlan(service_id, vlan_id)
+        return {"detail": "Success"}
+    else:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient rights")
