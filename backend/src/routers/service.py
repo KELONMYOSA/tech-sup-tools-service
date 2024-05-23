@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from src.models.user import User
 from src.utils.auth import get_current_user
 from src.utils.services import (
+    delete_service_vlan,
     get_service_by_id,
     get_services_by_company_id,
     set_new_service_vlan,
@@ -78,5 +79,16 @@ async def add_service_vlan(service_id: int, vlan_id: int, user: User = Depends(g
     if user.gidNumber in [10001, 10025]:
         set_new_service_vlan(service_id, vlan_id)
         return {"detail": "Success"}
+    else:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient rights")
+
+
+@router.delete("/vlan")
+async def remove_vlan(service_id: int, vlan_id: int, user: User = Depends(get_current_user)):  # noqa: B008
+    if user.gidNumber in [10001, 10025]:
+        if delete_service_vlan(service_id, vlan_id):
+            return {"detail": "Success"}
+        else:
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Service vlan not found")
     else:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient rights")

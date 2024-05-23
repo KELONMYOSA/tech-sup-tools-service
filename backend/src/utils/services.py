@@ -60,3 +60,8 @@ def set_service_doc_link_by_id(service_id: int, doc_type_id: int, link: str):
 def set_new_service_vlan(service_id: int, vlan_id: int):
     with oracle_db() as db:
         ServiceVlanModel(db).set_new_service_vlan(service_id, vlan_id)
+
+
+def delete_service_vlan(service_id: int, vlan_id: int):
+    with oracle_db() as db:
+        return ServiceVlanModel(db).delete_service_vlan(service_id, vlan_id)

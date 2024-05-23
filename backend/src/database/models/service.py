@@ -270,3 +270,19 @@ class ServiceVlanModel(ServiceVlan):
         vlan = ServiceVlan(vlan=vlan_id, id_service=service_id)
         self.db.add(vlan)
         self.db.commit()
+
+    def delete_service_vlan(self, service_id, vlan_id):
+        record = (
+            self.db.query(ServiceVlan)
+            .filter(
+                ServiceVlan.id_service == service_id,
+                ServiceVlan.vlan == vlan_id,
+            )
+            .first()
+        )
+        if record:
+            self.db.delete(record)
+            self.db.commit()
+            return True
+        else:
+            return False
