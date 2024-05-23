@@ -110,7 +110,7 @@ const TechInfoTable = ({service, userData}) => {
                                 {service.serviceDocs.files.map((doc, i) => (
                                     <li key={i}>
                                         <a target='_blank'
-                                           href={`https://boss.comfortel.pro/service_docs/${serviceId}/${doc}`}>
+                                           href={`https://boss.comfortel.pro/service_docs/${service.id}/${doc}`}>
                                             {doc}
                                         </a>
                                     </li>
