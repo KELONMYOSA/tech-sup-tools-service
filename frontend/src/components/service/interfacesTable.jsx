@@ -128,9 +128,9 @@ const InterfacesTable = ({service, userData}) => {
     const toggleAdd = (record) => {
         if (isAddingNew) {
             setIsAddingNew(!isAddingNew);
-            interfacesRef.current = interfacesRef.current.splice(-1)
-            interfacesRef.current = [...interfacesRef.current, {key: 'addButton'}]
-            setInterfaces(interfacesRef.current)
+            setInterfaces(interfaces.splice(-1))
+            setInterfaces([...interfaces, {key: 'addButton'}])
+            interfacesRef.current = [...interfaces, {key: 'addButton'}]
             setRowsCount(rowsCount - 1)
         } else {
             if (addressChoices === null) {
@@ -176,7 +176,7 @@ const InterfacesTable = ({service, userData}) => {
                 );
 
                 setIsAddingNew(!isAddingNew);
-                const newInterfaces = interfacesRef.current
+                const newInterfaces = interfaces
                 const newInf = {}
                 Object.entries(formResults).forEach(([k, v]) => {
                     if (k === 'unitAddress') {
@@ -224,8 +224,8 @@ const InterfacesTable = ({service, userData}) => {
                     }
                 })
                 newInterfaces[newInterfaces.length - 1] = {...newInterfaces[newInterfaces.length - 1], ...newInf}
+                setInterfaces([...newInterfaces, {key: 'addButton'}])
                 interfacesRef.current = [...newInterfaces, {key: 'addButton'}]
-                setInterfaces(interfacesRef.current)
                 showSuccess("Интерфейс создан!")
             } catch (error) {
                 showAlert("Ошибка создания интерфейса!")
