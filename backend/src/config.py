@@ -16,6 +16,8 @@ class Settings(BaseSettings):
 
     MARIA_DB_URL: str
 
+    POSTGRES_DB_URL: str
+
     ES_URL: str
 
     JIRA_URL: str

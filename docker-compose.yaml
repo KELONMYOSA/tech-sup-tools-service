@@ -37,7 +37,7 @@ services:
       - ES_JAVA_OPTS=-Xms1g -Xmx1g
     volumes:
       - esdata:/usr/share/elasticsearch/data
-    ports:
+    ports: # Потом закрыть доступ из вне
       - "9200:9200"
       - "9300:9300"
     networks:
@@ -87,8 +87,26 @@ services:
       timeout: 10s
       retries: 10
 
+  postgres:
+    image: postgres:16.3-alpine
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=${POSTGRES_DB_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_DB_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB_BASE}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./postgres/initdb:/docker-entrypoint-initdb.d
+    ports: # Потом закрыть доступ из вне
+      - "5432:5432"
+    networks:
+      - tech-sup-net
+    restart: unless-stopped
+
 volumes:
   esdata:
+    driver: local
+  pgdata:
     driver: local
 
 networks:

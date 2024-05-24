@@ -353,7 +353,7 @@ class Service(OracleBase):
     pack = relationship(
         "Service",
         secondary=service_pack_table,
-        primaryjoin=id == service_pack_table.c.id_service,
+        primaryjoin=and_(id == service_pack_table.c.id_service, service_pack_table.c.is_delete == "N"),
         secondaryjoin=id == service_pack_table.c.id_pack,
         viewonly=True,
     )
