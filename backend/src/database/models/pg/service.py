@@ -11,8 +11,6 @@ class ServiceType(PostgresBase):
     id = Column(postgresql.INTEGER, primary_key=True, unique=True, nullable=False)
     name = Column(postgresql.TEXT, nullable=False)
 
-    services = relationship("Service", backref="service_type")
-
 
 class Service(PostgresBase):
     __tablename__ = "service"
@@ -35,5 +33,3 @@ class WifiSetupService(PostgresBase):
     router_domain = Column(postgresql.TEXT, nullable=False)
     equipment_domain = Column(postgresql.TEXT, nullable=False)
     ssid = Column(postgresql.TEXT, nullable=False)
-
-    service = relationship("Service", backref="wifi_setup_service")

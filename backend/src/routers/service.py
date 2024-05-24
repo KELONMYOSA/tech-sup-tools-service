@@ -3,6 +3,7 @@ from pydantic import BaseModel
 
 from src.models.user import User
 from src.utils.auth import get_current_user
+from src.utils.pg.service import create_wifi_setup_service, get_wifi_setup_service, update_wifi_setup_service
 from src.utils.services import (
     delete_service_vlan,
     get_service_by_id,
@@ -74,6 +75,7 @@ async def update_service_doc_link_by_id(
     return {"detail": "Success", "document_id": result}
 
 
+# Добавить vlan к услуге
 @router.post("/vlan")
 async def add_service_vlan(service_id: int, vlan_id: int, user: User = Depends(get_current_user)):  # noqa: B008
     if user.gidNumber in [10001, 10025]:
@@ -83,6 +85,7 @@ async def add_service_vlan(service_id: int, vlan_id: int, user: User = Depends(g
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient rights")
 
 
+# Удалить vlan у услуги
 @router.delete("/vlan")
 async def remove_vlan(service_id: int, vlan_id: int, user: User = Depends(get_current_user)):  # noqa: B008
     if user.gidNumber in [10001, 10025]:
@@ -92,3 +95,37 @@ async def remove_vlan(service_id: int, vlan_id: int, user: User = Depends(get_cu
             raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Service vlan not found")
     else:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient rights")
+
+
+# Создать запись с данными для услуги 'Организация WiFi сети'
+class WifiSetupData(BaseModel):
+    service_id: int
+    wifi_type: str
+    controller_domain: str
+    router_domain: str
+    equipment_domain: str
+    ssid: str
+
+
+@router.post("/wifi-setup")
+async def create_wifi_setup(data: WifiSetupData, _: User = Depends(get_current_user)):  # noqa: B008
+    create_wifi_setup_service(**data.model_dump())
+    return {"detail": "Success"}
+
+
+# Обновить запись с данными для услуги 'Организация WiFi сети'
+@router.put("/wifi-setup")
+async def update_wifi_setup(data: WifiSetupData, _: User = Depends(get_current_user)):  # noqa: B008
+    if update_wifi_setup_service(**data.model_dump()):
+        return {"detail": "Success"}
+    else:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Wifi Setup Service not found")
+
+
+# Получить данные услуги 'Организация WiFi сети'
+@router.get("/wifi-setup/{service_id}")
+async def get_wifi_setup(service_id: int, _: User = Depends(get_current_user)):  # noqa: B008
+    result = get_wifi_setup_service(service_id)
+    if not result:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Wifi Setup Service not found")
+    return result
