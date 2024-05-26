@@ -11,6 +11,7 @@ import ServiceLinksCard from "./serviceLinksCard.jsx";
 import InterfacesTable from "./interfacesTable.jsx";
 import SvgRenderer from "../../utils/svgRenderer.jsx";
 import TechInfoTable from "./techInfoTable.jsx";
+import WifiSetupTable from "./wifiSetupTable.jsx";
 
 export default async function ServiceInfo(data) {
     const apiUrl = import.meta.env.VITE_API_URL
@@ -550,6 +551,7 @@ export default async function ServiceInfo(data) {
                         {pack}
                         {packData}
                         <TechInfoTable service={service} userData={data.userData}/>
+                        <WifiSetupTable service={service} userData={data.userData}/>
                         <InterfacesTable service={service} userData={data.userData}/>
                         {ipList}
                         {telData}
