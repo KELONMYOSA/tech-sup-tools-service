@@ -13,11 +13,11 @@ CREATE TABLE IF NOT EXISTS service (
 -- Создаем таблицу для услуги "Организация WiFi сети"
 CREATE TABLE IF NOT EXISTS wifi_setup_service (
   id int UNIQUE PRIMARY KEY NOT NULL REFERENCES service(id) ON DELETE CASCADE,
-  type text NOT NULL,
-  controller_domain text NOT NULL,
-  router_domain text NOT NULL,
-  equipment_domain text NOT NULL,
-  ssid text NOT NULL
+  type text,
+  controller_domain text,
+  router_domain text,
+  equipment_domain text,
+  ssid text
 );
 
 -- Заполняем таблицу типов услуг

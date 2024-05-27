@@ -100,11 +100,11 @@ async def remove_vlan(service_id: int, vlan_id: int, user: User = Depends(get_cu
 # Создать запись с данными для услуги 'Организация WiFi сети'
 class WifiSetupData(BaseModel):
     service_id: int
-    wifi_type: str
-    controller_domain: str
-    router_domain: str
-    equipment_domain: str
-    ssid: str
+    wifi_type: str | None
+    controller_domain: str | None
+    router_domain: str | None
+    equipment_domain: str | None
+    ssid: str | None
 
 
 @router.post("/wifi-setup")

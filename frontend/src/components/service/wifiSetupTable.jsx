@@ -26,6 +26,16 @@ const WifiSetupTable = ({service, userData}) => {
         })
     }
 
+    const checkIsNew = () => {
+        let allNull = true
+        Object.entries(wifiData).forEach(([k, v]) => {
+            if (['type', 'controller_domain', 'router_domain', 'equipment_domain', 'ssid'].indexOf(k) !== -1 && v !== null) {
+                allNull = false
+            }
+        })
+        return allNull && (wifiData.id === undefined || wifiData.id === null);
+    }
+
     const editableCell = ({dataIndex, children}) => {
         const index2Item = {
             'type': <Select
@@ -47,12 +57,6 @@ const WifiSetupTable = ({service, userData}) => {
                 style={{
                     margin: 0,
                 }}
-                rules={[
-                    {
-                        required: true,
-                        message: 'Обязательное поле!',
-                    },
-                ]}
             >
                 {index2Item[dataIndex]}
             </Form.Item>
@@ -73,7 +77,7 @@ const WifiSetupTable = ({service, userData}) => {
                 ssid: formResults.ssid,
             }
             try {
-                if (wifiData.type === null) {
+                if (checkIsNew()) {
                     await axios.post(
                         `${apiUrl}/service/wifi-setup`,
                         body
