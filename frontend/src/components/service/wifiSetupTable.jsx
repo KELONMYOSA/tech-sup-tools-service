@@ -149,6 +149,7 @@ const WifiSetupTable = ({service, userData}) => {
                     title='Организация WiFi сети'
                     bordered
                     size='small'
+                    column={1}
                     extra={
                         [10001, 10025].indexOf(userData.gidNumber) !== -1 ?
                             isEditing ?
