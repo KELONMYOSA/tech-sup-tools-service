@@ -3,6 +3,7 @@ import React, {useEffect, useRef, useState} from "react";
 import ServiceBriefInfo from "./serviceBriefInfo.jsx";
 import {DownOutlined, SearchOutlined, UpOutlined} from "@ant-design/icons";
 import styles from '../../index.module.less'
+import JiraTicketsModal from "./jiraTicketsModal.jsx";
 
 export default function ServiceCard(data) {
     const [isGettingData, setIsGettingData] = useState(true);
@@ -10,6 +11,7 @@ export default function ServiceCard(data) {
     const [serviceTable, setServiceTable] = useState(null);
     const [expandedData, setExpandedData] = useState({});
     const [serviceStatuses, setServiceStatuses] = useState(null);
+    const [jiraModalIsOpen, setJiraModalIsOpen] = useState(false);
     const searchInput = useRef(null);
 
     const handleExpand = async (expanded, record) => {
@@ -283,6 +285,11 @@ export default function ServiceCard(data) {
 
     return (
         <>
+            <JiraTicketsModal
+                isOpen={jiraModalIsOpen}
+                closeModal={() => setJiraModalIsOpen(false)}
+                companyIds={data.servicesData ? data.servicesData.stats.company_id2name : null}
+            />
             {!isGettingData ?
                 <Row justify='space-between' align='middle' style={{paddingBottom: 10}}>
                     <Col>
@@ -290,9 +297,16 @@ export default function ServiceCard(data) {
                     </Col>
                     <Col>
                         <Button
+                            icon={<SearchOutlined />}
+                            onClick={() => setJiraModalIsOpen(true)}
+                        >
+                            Открытые задачи
+                        </Button>
+                        <Button
                             onClick={() => setIsExpandedComments(!isExpandedComments)}
                             type='text'
-                            icon={isExpandedComments ? <UpOutlined/> : <DownOutlined/>}>
+                            icon={isExpandedComments ? <UpOutlined/> : <DownOutlined/>}
+                        >
                             {isExpandedComments ? 'Свернуть комментарии' : 'Развернуть комментарии'}
                         </Button>
                     </Col>
