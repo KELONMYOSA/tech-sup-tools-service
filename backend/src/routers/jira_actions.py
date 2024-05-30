@@ -4,7 +4,7 @@ from jira import JIRA
 from src.config import settings
 from src.models.user import User
 from src.utils.auth import get_current_user
-from src.utils.jira_utils import JIRAIssueCreateData, create_issue, get_issues_by_service_id
+from src.utils.jira_utils import JIRAIssueCreateData, create_issue, get_issues_by_company_id, get_issues_by_service_id
 
 router = APIRouter(
     prefix="/jira",
@@ -30,6 +30,16 @@ def _check_jira(jira):
 async def issues_by_service_id(service_id: int, _: User = Depends(get_current_user)):  # noqa: B008
     _check_jira(jira)
     result = get_issues_by_service_id(jira, service_id)
+    if not result:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Issues not found")
+    return result
+
+
+# Поиск задачи в jira по id компании
+@router.get("/company/{company_id}")
+async def issues_company_id(company_id: int, _: User = Depends(get_current_user)):  # noqa: B008
+    _check_jira(jira)
+    result = get_issues_by_company_id(jira, company_id)
     if not result:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Issues not found")
     return result

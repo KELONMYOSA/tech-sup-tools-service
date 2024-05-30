@@ -150,6 +150,7 @@ const WifiSetupTable = ({service, userData}) => {
                     bordered
                     size='small'
                     column={1}
+                    labelStyle={{width: '200px'}}
                     extra={
                         [10001, 10025].indexOf(userData.gidNumber) !== -1 ?
                             isEditing ?

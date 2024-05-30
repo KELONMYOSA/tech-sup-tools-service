@@ -11,6 +11,14 @@ def get_issues_by_service_id(jira: JIRA, service_id: int) -> list[dict]:
     return _result_list_to_dict_list(sorted_issues)
 
 
+def get_issues_by_company_id(jira: JIRA, company_id: int) -> list[dict]:
+    query1 = f'"Клиент" ~ "{company_id}"'
+    query2 = f'project = CLIENTS AND description ~ "\\"(id = {company_id})\\""'
+    issues = jira.search_issues(f"{query1} OR {query2}")
+    sorted_issues = sorted(issues, key=lambda x: x.fields.created, reverse=True)
+    return _result_list_to_dict_list(sorted_issues)
+
+
 class JIRAIssueCreateData(BaseModel):
     project: str | None = None
     issue_type: str | None = None

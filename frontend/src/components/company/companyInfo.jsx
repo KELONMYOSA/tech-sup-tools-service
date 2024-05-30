@@ -6,6 +6,7 @@ import CopyToClipboardButton from "../../utils/copyToClipboardButton.jsx";
 
 export default async function CompanyInfo(data) {
     const apiUrl = import.meta.env.VITE_API_URL
+    const jiraUrl = import.meta.env.VITE_JIRA_URL
     const companyId = data.companyId
 
     const getCompanyInfo = async (companyId) => {
@@ -161,6 +162,36 @@ export default async function CompanyInfo(data) {
         )
     }
 
+    const getJiraIssues = async (companyId) => {
+        try {
+            const response = await axios.get(
+                `${apiUrl}/jira/company/${companyId}`
+            );
+
+            return response.data
+        } catch (error) {
+            return []
+        }
+    };
+
+    const jira = await getJiraIssues(companyId)
+
+    const jiraOpen = jira.filter((issue) => issue.status !== 'Решено')
+    let jiraOpenIssues
+    if (jiraOpen.length > 0) {
+        jiraOpenIssues = (
+            <Card title="Открытые заявки" size='small' style={{marginBottom: 10}}>
+                <ul style={{marginLeft: 10, listStyle: 'none'}}>
+                    {jiraOpen.map((issue, i) => (
+                        <li key={i}>
+                            <a target='_blank'
+                               href={`${jiraUrl}/browse/${issue.key}`}>{`[${issue.key}] ${issue.summary} (${issue.status})`}</a>
+                        </li>
+                    ))}
+                </ul>
+            </Card>
+        )
+    }
 
     return [true,
         <>
@@ -169,6 +200,7 @@ export default async function CompanyInfo(data) {
                     {companyDescriptionItem}
                 </Col>
                 <Col xs={24} md={14} lg={17} style={{padding: 20}}>
+                    {jiraOpenIssues}
                     {companyContactsItem}
                 </Col>
             </Row>
